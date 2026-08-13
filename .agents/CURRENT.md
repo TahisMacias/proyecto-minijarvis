@@ -2,7 +2,7 @@
 
 ```yaml
 updated_at: 2026-08-13
-source_commit: 3726302 (limpio, sincronizado con origin/main)
+source_commit: 6d0cf88 (limpio, sincronizado con origin/main)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
 active_task: T-11
@@ -43,7 +43,7 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 - Plan activo de 18 tareas en 3 fases con fechas de corte: nucleo 22 ago,
   valor agregado 25 ago, cierre 27 ago.
 - Repositorio publico en `https://github.com/TahisMacias/proyecto-minijarvis`,
-  4 commits publicados, local y remoto sincronizados.
+  8 commits publicados, local y remoto sincronizados.
 - `gh` CLI v2.97.0 autenticado como `TahisMacias`, scopes `repo` y `workflow`.
 - `TOGETHER_API_KEY` en `.env` local, validada contra `GET /v1/models` (HTTP 200).
 - Modelos verificados disponibles en la cuenta: `openai/whisper-large-v3`,
@@ -58,7 +58,10 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 - Microfono verificado: 10 dispositivos, Realtek por defecto, captura real correcta.
 - Esqueleto del repositorio completo: `README.md`, `requirements.txt` con 12
   versiones fijadas, `.env.example`, y los cuatro paquetes importables.
-- Aun no existe logica de aplicacion: no hay `config.py` ni `main.py`.
+- `config.py` existe y esta APTO: carga segura de credenciales, paleta de 5 acentos,
+  IDs de modelo, limites de memoria y lista blanca de dominios. Es la fuente unica
+  de verdad de configuracion; ningun otro modulo debe leer variables de entorno.
+- Aun no existe `main.py` ni ningun modulo de `core/`, `tools/` o `gui/`.
 
 ## Open findings
 
