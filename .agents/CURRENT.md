@@ -17,10 +17,9 @@ backup: remote origin -> https://github.com/TahisMacias/proyecto-minijarvis (pub
 
 ## Blockers
 
-- **Credenciales de GitHub sin configurar.** No hay `gh` CLI ni credential helper.
-  El primer `git push` va a pedir autenticacion. Bloquea T-06, no bloquea T-01.
-- **Ninguna API key disponible todavia.** Sin `TOGETHER_API_KEY` no hay pipeline.
-  No bloquea la Semana 1, pero si bloquea la Semana 2 completa.
+- **Ninguno bloqueante.** Los dos bloqueos anteriores se resolvieron el 2026-08-13:
+  GitHub autenticado y `TOGETHER_API_KEY` validada contra la API.
+- Riesgo abierto (no bloqueo): el stack sobre Python 3.14.5 sigue sin verificarse.
 
 ## Current facts
 
@@ -41,9 +40,11 @@ backup: remote origin -> https://github.com/TahisMacias/proyecto-minijarvis (pub
 
 ## Human actions
 
-- [ ] Resolver autenticacion con GitHub: instalar `gh` CLI o crear un Personal
-      Access Token. Necesario antes de T-06.
-- [ ] Conseguir la `TOGETHER_API_KEY` en https://api.together.xyz y guardarla en
-      `.env` local. **Nunca pegarla en el chat ni commitearla.**
-- [ ] Decidir el proveedor de STT (Whisper de OpenAI requiere clave propia y saldo).
-- [ ] Pausar la sincronizacion de OneDrive durante operaciones largas de Git.
+- [x] Autenticacion con GitHub. `gh` v2.97.0, cuenta `TahisMacias`, scopes `repo` y
+      `workflow`. Verificado 2026-08-13.
+- [x] `TOGETHER_API_KEY` en `.env` local, 50 caracteres. Validada contra
+      `GET /v1/models` -> HTTP 200. Verificado 2026-08-13.
+- [x] Proveedor de STT decidido: `openai/whisper-large-v3` en Together AI.
+      Disponible en la cuenta.
+- [ ] Verificar saldo en Together AI la vispera de la sustentacion (26 ago).
+- [ ] No reactivar OneDrive durante el proyecto.
