@@ -115,3 +115,36 @@ fechas, decisiones, riesgos abiertos, referencias a tareas/commits y un puntero 
   - `Sintesis del proyecto.md` conserva decisiones ya superadas (`asyncio`, 7 tools).
     Sigue versionado como documento historico.
 - Next: ejecutar T-01.
+
+## 2026-08-13 - T-01 APTO (spike de entorno)
+
+- Changed: creado `.venv/` con los 11 paquetes del stack. Registradas las versiones
+  verificadas en `AGENTS.md`. Cerrado el riesgo mayor del proyecto.
+- **Decision: se mantiene Python 3.14.5.** No hace falta instalar otro interprete.
+  Todo el stack tiene wheels nativos `cp314`, incluido `torch 2.13.0+cpu`.
+- Ejecutada por el Arquitecto y no delegada al Obrero: es diagnostico cuyo producto
+  es una decision, y su interpretacion requiere juicio sobre que significa cada fallo.
+- Evidence:
+  - `pip install` de los 11 paquetes -> exit 0. Instalacion de `torch`+`transformers`
+    tomo 5.1 min.
+  - imports de los 10 modulos -> todos OK
+  - `sounddevice.query_devices()` -> 10 entradas; captura de 0.5s a 16 kHz -> 8000
+    frames con senal no nula
+  - `OpenAI(base_url="https://api.together.xyz/v1")` -> construye correctamente en 3.0.0
+  - `edge_tts.list_voices()` -> 45 voces `es-*`, `es-MX-DaliaNeural` presente
+  - tokenizador de Qwen -> 14 tokens para 56 caracteres, con marcador `Ġ` de espacio
+  - BETO -> embeddings `(1, 20, 768)`, 12 capas de `(1, 12, 20, 20)`, filas suman 1.0
+  - heatmap PNG generado; muestra estructura real (`bate` <-> `##ria` de "bateria")
+- **Hallazgos que cambian tareas futuras:**
+  1. `transformers 5.x` usa SDPA por defecto y devuelve `None` en `output_attentions`
+     **sin lanzar error**. Obliga a `attn_implementation="eager"`. Anadido como
+     criterio de aceptacion explicito de T-11 y a Learned safeguards.
+  2. `openai` subio a 3.0.0 (major). El patron `OpenAI(base_url=...)` sigue vigente.
+  3. `$?` no es fiable tras un exe nativo en PowerShell 5.1: dos paquetes validos
+     aparecieron como fallidos en la primera comprobacion. Se rehizo con
+     `$LASTEXITCODE`. Regla registrada.
+- Nota de proceso: `requirements.txt` se movio de T-01 a T-02 para respetar la regla
+  de que el Arquitecto no edita el product plane. Las versiones verificadas viven en
+  `AGENTS.md` como fuente de verdad.
+- Unresolved: ninguno nuevo.
+- Next: despachar T-02 al Obrero.

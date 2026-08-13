@@ -24,33 +24,42 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-01 - Decidir el interprete verificando el stack real
 
-- Status: ready
+- Status: **done** (2026-08-13). Ejecutada por el Arquitecto: es un spike de
+  diagnostico cuya salida es una decision, no codigo.
 - Depends on: none
-- Tipo: spike. Su salida es una decision, no codigo que se conserve.
-- Scope: `.agents/AGENTS.md`, `requirements.txt` (borrador)
+- Scope: `.agents/AGENTS.md`
 - Acceptance:
-  - [ ] Evidencia real de `pip install` para: `customtkinter`, `edge-tts`, `openai`,
-        `sounddevice`, `tiktoken`, `transformers`, `torch`, `matplotlib`, `psutil`,
-        `duckduckgo-search`, `python-dotenv`.
-  - [ ] Decision escrita: seguir en 3.14.5 o fijar otra version.
-  - [ ] La version elegida queda en `AGENTS.md` > Environment.
-  - [ ] Se verifica que el microfono es accesible desde Python y que hay al menos un
-        dispositivo de entrada.
-- Gates: creacion del venv e instalacion; se registra el codigo de salida de cada paso.
-- Human checks: H-01, H-02
-- Risk triggers: si `torch` no instala, T-11 cambia de alcance.
-- STOP when: haya que instalar un interprete nuevo en la maquina. Lo decide la duena.
+  - [x] Evidencia real de `pip install` para los 11 paquetes del stack. Exit code 0.
+  - [x] Decision escrita: **se mantiene Python 3.14.5**. Riesgo cerrado.
+  - [x] Versiones verificadas registradas en `AGENTS.md` > Environment.
+  - [x] Microfono accesible: 10 dispositivos de entrada, captura real de 0.5s correcta.
+  - [x] Caso de uso de T-11 verificado de extremo a extremo, no solo la instalacion.
+- Resultado:
+  - Todo el stack instala con wheels nativos `cp314`. `torch 2.13.0+cpu` incluido.
+    **No hace falta bajar de version de Python.**
+  - `openai 3.0.0` construye el cliente contra `https://api.together.xyz/v1`.
+  - `edge-tts` expone `es-MX-DaliaNeural` entre 45 voces `es-*`.
+  - BETO devuelve embeddings `(1, 20, 768)`, 12 capas de atencion de
+    `(1, 12, 20, 20)`, y cada fila suma 1.0. Heatmap PNG generado.
+  - **Hallazgo critico:** `transformers 5.x` usa SDPA por defecto y devuelve `None`
+    en `output_attentions=True` sin lanzar error. Hay que cargar con
+    `attn_implementation="eager"`. Registrado en Learned safeguards.
+- Nota de alcance: `requirements.txt` se movio a T-02. Motivo: el Arquitecto no edita
+  el product plane. Las versiones verificadas quedan en `AGENTS.md` como fuente de
+  verdad para que el Obrero las fije.
+- Human checks: H-01 [OK], H-02 [OK]
 
 ### T-02 - Esqueleto del repositorio reproducible
 
-- Status: blocked (T-01)
-- Depends on: T-01
+- Status: **ready**
+- Depends on: T-01 (cerrada)
 - Scope: `README.md`, `requirements.txt`, `.env.example`, `core/__init__.py`,
   `tools/__init__.py`, `gui/__init__.py`, `exploration/__init__.py`
 - Acceptance:
   - [ ] `README.md` documenta requisitos, venv, instalacion y ejecucion, y el comando
-        exacto del modulo de exploracion.
-  - [ ] `requirements.txt` con versiones fijadas que instalan limpio.
+        exacto del modulo de exploracion. Debe indicar **Python 3.14.5**.
+  - [ ] `requirements.txt` fija exactamente las 12 versiones de la tabla de
+        `AGENTS.md` > Environment. Ni mas recientes ni sin fijar.
   - [ ] `.env.example` lista `TOGETHER_API_KEY` sin ningun valor real.
   - [ ] `git status` no muestra `.env` ni `.venv/`.
 - Gates: `python -m compileall .`
@@ -195,7 +204,9 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 - Acceptance:
   - [ ] Nivel 1: tokenizador real de `Qwen/Qwen2.5-72B-Instruct` (sin pesos). Imprime
         tokens e IDs de una frase en espanol del propio proyecto.
-  - [ ] Nivel 2: `dccuchile/bert-base-spanish-wwm-cased` con `output_attentions=True`.
+  - [ ] Nivel 2: `dccuchile/bert-base-spanish-wwm-cased` cargado **obligatoriamente**
+        con `attn_implementation="eager"`, con `output_attentions=True`. Sin ese
+        argumento el modelo devuelve `None` en silencio (verificado en T-01).
         Imprime la forma del tensor de embeddings y explica que significa cada dimension.
   - [ ] Genera un mapa de calor PNG de una capa y cabeza concretas, con los tokens
         etiquetados en ambos ejes.
@@ -203,9 +214,9 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
   - [ ] Cada seccion tiene un comentario que explica el concepto, no solo el codigo.
 - Gates: ejecucion del script; se conserva la salida y el PNG como evidencia.
 - Human checks: H-11
-- Risk triggers: **si** — depende de `torch`. Si T-01 lo descarto, el nivel 2 cambia
-  de alcance y eso **para y sube al Arquitecto**.
-- STOP when: `torch` no sea instalable en el interprete elegido.
+- Risk triggers: ninguno. **Riesgo cerrado en T-01**: `torch 2.13.0+cpu` instalado y
+  la extraccion de atencion sobre BETO verificada de extremo a extremo.
+- STOP when: ninguna prevista.
 
 ### T-12 - Cierre del nucleo: errores y README
 

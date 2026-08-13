@@ -9,10 +9,12 @@ directa de codigo desde este archivo.
 
 ## Fase 1 - Nucleo (limite 22 de agosto)
 
-- [ ] H-01. Crear el venv e instalar el stack completo -> toda libreria instala, o queda
-      documentado exactamente cual falla, con que error y en que version de Python.
-- [ ] H-02. Listar dispositivos de audio desde Python -> aparece al menos un microfono
-      de entrada utilizable.
+- [x] H-01. **[OK 2026-08-13]** Crear el venv e instalar el stack completo -> los 11
+      paquetes instalan con wheels nativos `cp314` en Python 3.14.5. Exit code 0.
+      Ninguno requirio compilacion ni version alternativa.
+- [x] H-02. **[OK 2026-08-13]** Listar dispositivos de audio desde Python -> 10
+      dispositivos de entrada. Predeterminado: "Microfono (Realtek(R) Audio)".
+      Captura real de 0.5s a 16 kHz: 8000 frames, senal no nula.
 - [ ] H-03. Seguir el README desde cero en una carpeta limpia -> el proyecto queda
       instalado sin ningun paso que no este escrito.
 - [ ] H-04. Grabar 5 segundos y reproducir lo capturado -> se escucha la voz con claridad,
@@ -58,7 +60,8 @@ directa de codigo desde este archivo.
 
 ## Results
 
-- Date: pendiente
-- Environment: Windows 11 Pro 10.0.26200; interprete pendiente de fijar en T-01
-- Verdict: pending
-- Failures mapped to tasks: ninguno todavia
+- Date: 2026-08-13 (parcial: H-01, H-02)
+- Environment: Windows 11 Pro 10.0.26200; **Python 3.14.5** fijado en T-01;
+  venv en `.venv/`
+- Verdict: pending (16 de 18 checks por ejecutar)
+- Failures mapped to tasks: ninguno

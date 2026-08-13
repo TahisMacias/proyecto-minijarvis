@@ -71,7 +71,26 @@ igual corren en cada commit.
 ## Environment
 
 - OS/shell: Windows 11 Pro 10.0.26200; PowerShell 5.1 + Git Bash
-- Runtime: **Python 3.14.5** (riesgo abierto — ver `PLAN_v0.1` T-02)
+- Runtime: **Python 3.14.5 — CONFIRMADO en T-01 (2026-08-13).** Todo el stack instala
+  con wheels nativos `cp314`. No hace falta bajar de version. Riesgo cerrado.
+- Entorno virtual: `.venv/` en la raiz. Interprete: `.venv\Scripts\python.exe`.
+
+### Versiones verificadas en T-01 (fuente de verdad para `requirements.txt`)
+
+| Paquete | Version | Nota |
+|---|---|---|
+| `python-dotenv` | 1.2.2 | |
+| `openai` | 3.0.0 | major nueva; `OpenAI(base_url=...)` verificado contra Together |
+| `edge-tts` | 7.2.8 | `es-MX-DaliaNeural` presente entre 45 voces `es-*` |
+| `customtkinter` | 6.0.0 | |
+| `sounddevice` | 0.5.5 | 10 dispositivos de entrada; captura real verificada |
+| `psutil` | 7.2.2 | |
+| `duckduckgo-search` | 8.1.1 | |
+| `tiktoken` | 0.13.0 | |
+| `matplotlib` | 3.11.1 | heatmap PNG generado correctamente |
+| `transformers` | 5.15.0 | ver trampa de `attn_implementation` abajo |
+| `torch` | 2.13.0+cpu | CPU puro, sin CUDA. Suficiente para BETO. |
+| `numpy` | 2.5.2 | |
 - Git: 2.54.0.windows.1, identidad `Tahis Macias <britany.macias@cenestur.edu.ec>`
 - `gh` CLI: instalado v2.97.0 en `C:\Program Files\GitHub CLI\gh.exe`, pero **no estaba
   en el PATH** de la sesion del 2026-08-13 (se instalo con la terminal ya abierta).
@@ -87,6 +106,17 @@ igual corren en cada commit.
 
 ## Learned safeguards
 
+- **2026-08-13 (T-01). `transformers 5.x` no devuelve pesos de atencion por defecto.**
+  El backend predeterminado es SDPA, que devuelve `None` en `output_attentions=True`
+  **sin lanzar error**. Un fallo silencioso que habria costado horas en T-11.
+  **Regla:** cargar el modelo con `AutoModel.from_pretrained(nombre,
+  attn_implementation="eager")`. Verificado: con eager, `salida.attentions` trae
+  12 capas de `(lote, 12 cabezas, tokens, tokens)` y cada fila suma 1.0.
+- **2026-08-13. `$?` no es fiable tras un ejecutable nativo en PowerShell 5.1.**
+  Al comprobar paquetes con `pip ... 2>&1`, dos resultaron "FALLA" siendo validos:
+  redirigir stderr de un exe nativo envuelve cada linea en un ErrorRecord y pone `$?`
+  en `$false` aunque el exit code sea 0.
+  **Regla:** usar `$LASTEXITCODE` para juzgar exitos de comandos nativos, nunca `$?`.
 - **2026-08-13.** Purgar el PDF del enunciado con `git filter-branch --index-filter`
   borro tambien el archivo del working tree: al reescribir HEAD, filter-branch resetea
   el arbol de trabajo. Se recupero del respaldo hecho minutos antes.

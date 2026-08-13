@@ -2,20 +2,20 @@
 
 ```yaml
 updated_at: 2026-08-13
-source_commit: 16e449a (limpio, sincronizado con origin/main)
+source_commit: 42a1214 (limpio, sincronizado con origin/main)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
-active_task: T-01
-last_verdict: none
+active_task: T-02
+last_verdict: T-01 APTO
 backup: remote origin -> https://github.com/TahisMacias/proyecto-minijarvis (publico)
 deadline: 2026-08-27
 ```
 
 ## Next action
 
-1. Ejecutar **T-01**: crear `.venv`, intentar instalar el stack completo y verificar
-   acceso al microfono. Es un spike: su salida es la decision de que interprete usar.
-   Bloquea a todas las demas tareas del plan.
+1. Despachar **T-02** al Obrero: esqueleto del repositorio. `README.md`,
+   `requirements.txt` con las 12 versiones fijadas de `AGENTS.md`, `.env.example`
+   y los `__init__.py` de los cuatro paquetes.
 
 ## Blockers
 
@@ -35,7 +35,12 @@ deadline: 2026-08-27
   `Qwen/Qwen2.5-72B-Instruct`, `meta-llama/Llama-3.3-70B-Instruct`.
 - El enunciado en PDF **no esta versionado** a proposito: es material del docente y
   el repositorio es publico. Vive en local, excluido por `.gitignore`.
-- Python instalado: 3.14.5. **Compatibilidad con el stack aun sin verificar.**
+- **Python 3.14.5 confirmado como interprete definitivo** (T-01). Todo el stack
+  instala con wheels nativos `cp314`, `torch 2.13.0+cpu` incluido. Riesgo cerrado.
+- Entorno virtual creado en `.venv/` con los 11 paquetes instalados.
+- La extraccion de self-attention sobre BETO esta verificada de extremo a extremo:
+  T-11 es viable. Requiere `attn_implementation="eager"`.
+- Microfono verificado: 10 dispositivos, Realtek por defecto, captura real correcta.
 - No existe codigo de producto todavia.
 
 ## Open findings
