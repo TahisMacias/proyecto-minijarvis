@@ -2,20 +2,21 @@
 
 ```yaml
 updated_at: 2026-08-13
-source_commit: 42a1214 (limpio, sincronizado con origin/main)
+source_commit: 3726302 (limpio, sincronizado con origin/main)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
-active_task: T-02
-last_verdict: T-01 APTO
+active_task: T-03 y T-11 (en paralelo)
+last_verdict: T-02 APTO
 backup: remote origin -> https://github.com/TahisMacias/proyecto-minijarvis (publico)
 deadline: 2026-08-27
 ```
 
 ## Next action
 
-1. Despachar **T-02** al Obrero: esqueleto del repositorio. `README.md`,
-   `requirements.txt` con las 12 versiones fijadas de `AGENTS.md`, `.env.example`
-   y los `__init__.py` de los cuatro paquetes.
+1. El **Ingeniero** orquesta dos pistas en paralelo:
+   - **T-03** `config.py` (riesgo: credenciales, exige auditoria del modelo)
+   - **T-11** `exploration/transformer_lab.py` (25% de la rubrica, independiente
+     del pipeline: no toca ningun archivo compartido)
 
 ## Blockers
 
@@ -41,7 +42,9 @@ deadline: 2026-08-27
 - La extraccion de self-attention sobre BETO esta verificada de extremo a extremo:
   T-11 es viable. Requiere `attn_implementation="eager"`.
 - Microfono verificado: 10 dispositivos, Realtek por defecto, captura real correcta.
-- No existe codigo de producto todavia.
+- Esqueleto del repositorio completo: `README.md`, `requirements.txt` con 12
+  versiones fijadas, `.env.example`, y los cuatro paquetes importables.
+- Aun no existe logica de aplicacion: no hay `config.py` ni `main.py`.
 
 ## Open findings
 

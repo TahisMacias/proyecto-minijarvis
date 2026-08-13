@@ -1,0 +1,26 @@
+# Mini-JARVIS — dependencias fijadas y verificadas (ver .agents/AGENTS.md, T-01)
+# No actualizar sin volver a verificar el stack completo.
+
+# --- Utilidades base ---
+python-dotenv==1.2.2
+
+# --- Pipeline de voz (STT / TTS / audio) ---
+openai==3.0.0
+edge-tts==7.2.8
+sounddevice==0.5.5
+
+# --- GUI de escritorio ---
+customtkinter==6.0.0
+
+# --- Herramientas (Tool Calling) ---
+psutil==7.2.2
+duckduckgo-search==8.1.1
+
+# --- LLM: conteo de tokens para el indicador de memoria ---
+tiktoken==0.13.0
+
+# --- Exploracion del Transformer (tokenizacion, embeddings, self-attention) ---
+matplotlib==3.11.1
+transformers==5.15.0
+torch==2.13.0
+numpy==2.5.2

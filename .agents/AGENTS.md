@@ -27,6 +27,22 @@ Reglas que sostienen la separacion:
   Arquitecto; no lo resuelve el Ingeniero por su cuenta.
 - Todo brief para el Obrero debe ser autocontenido: ID de tarea, objetivo, alcance
   permitido, criterios de aceptacion, gates y condiciones de STOP.
+
+### Cuando se activa el Ingeniero
+
+Levantar un Ingeniero cuesta un agente que arranca en frio y re-deriva contexto.
+Esta tabla evita que la decision quede al criterio del momento:
+
+| Situacion | Quien despacha |
+|---|---|
+| 2 o mas tareas paralelizables | **Ingeniero** |
+| Tarea con `Risk triggers: si` (T-03, T-09, T-15, T-18) | **Ingeniero** |
+| Ciclo de correccion tras un NO APTO | **Ingeniero** |
+| Tarea unica, mecanica, con gates binarios | Arquitecto directo, **declarandolo en voz alta** |
+
+La ultima fila es una excepcion, no la norma. Si el Arquitecto despacha directo,
+debe decirlo explicitamente en el momento. Saltarse el nivel en silencio es el
+defecto que esta tabla existe para prevenir (incidente del 2026-08-13 en T-02).
 - Local Git: required — inicializado 2026-08-13, rama `main`
 - Backup: remote GitHub **publico** `origin` ->
   `https://github.com/TahisMacias/proyecto-minijarvis` (verificado vacio y alcanzable 2026-08-13)

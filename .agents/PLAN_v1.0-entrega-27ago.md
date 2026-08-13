@@ -51,7 +51,18 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-02 - Esqueleto del repositorio reproducible
 
-- Status: **ready**
+- Status: **done** (2026-08-13). Implementada por el Obrero, auditada por el
+  Arquitecto. **Excepcion declarada**: se salto el nivel Ingeniero porque la tarea ya
+  estaba en vuelo cuando se activo ese nivel. Desde T-03 el Ingeniero orquesta y audita.
+- Veredicto: **APTO**. Gates verificados de forma independiente, no por reporte:
+  7 archivos exactos sin desbordar alcance; `compileall` exit 0; `.env` y `.venv`
+  invisibles para Git; los 4 paquetes importan.
+- Aportes del Obrero fuera del brief, aceptados:
+  - Paso de `Set-ExecutionPolicy` en el README. Sin el, `Activate.ps1` falla bajo la
+    politica por defecto de Windows y el README no seria reproducible en otra maquina,
+    que era el objetivo de la tarea.
+  - Reporto que `.env` contiene una clave real, verificando que no esta en el
+    historial y **sin reproducir el valor**. Comportamiento correcto.
 - Depends on: T-01 (cerrada)
 - Scope: `README.md`, `requirements.txt`, `.env.example`, `core/__init__.py`,
   `tools/__init__.py`, `gui/__init__.py`, `exploration/__init__.py`
@@ -69,8 +80,9 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-03 - Configuracion y credenciales
 
-- Status: blocked (T-02)
-- Depends on: T-02
+- Status: **ready**
+- Depends on: T-02 (cerrada)
+- Despacho: **Ingeniero** (tiene `Risk triggers: si`)
 - Scope: `config.py`
 - Acceptance:
   - [ ] `TOGETHER_API_KEY` se lee de `.env` con `python-dotenv`. Ninguna clave literal.
@@ -197,8 +209,10 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-11 - Modulo de exploracion del Transformer
 
-- Status: blocked (T-01)
-- Depends on: T-01
+- Status: **ready — se ejecuta EN PARALELO con la cadena del pipeline**
+- Depends on: T-01 (cerrada). No depende de `config.py` ni de ningun modulo de `core/`.
+  Toca un unico archivo que nadie mas toca, asi que no hay conflicto posible.
+- Despacho: **Ingeniero**, en paralelo con T-03.
 - **Criterio de mayor peso de la rubrica (25%). No se recorta bajo ninguna circunstancia.**
 - Scope: `exploration/transformer_lab.py`
 - Acceptance:
