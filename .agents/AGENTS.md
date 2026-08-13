@@ -3,8 +3,30 @@
 ## Operating mode
 
 - Assurance: **Lean**
-- Product plane owner: executor (codigo de la app, tests, assets)
-- Control plane owner: planner/auditor (`.agents/`)
+- Product plane owner: Obrero (codigo de la app, tests, assets)
+- Control plane owner: Arquitecto (`.agents/`)
+
+### Jerarquia de tres niveles
+
+`agents-workflow` define dos planos (ejecutor / auditor). Este proyecto los reparte
+en tres roles, sin romper esa separacion:
+
+| Rol | Modelo | Responsabilidad | Puede editar |
+|---|---|---|---|
+| **Arquitecto** | Opus (sesion principal) | Planea, audita fases, decide alcance, commit y push | solo control plane |
+| **Ingeniero** | Opus (subagente) | Orquesta obreros, audita cada tarea, arma audit capsules | solo control plane |
+| **Obrero** | Sonnet (subagente) | Escribe codigo acotado y tareas repetitivas | solo product plane |
+
+Reglas que sostienen la separacion:
+
+- El Obrero **nunca** audita su propio trabajo. Devuelve un audit capsule al Ingeniero.
+- El Ingeniero **nunca** escribe codigo de producto. Si detecta un defecto, reabre la
+  tarea con un brief nuevo para el Obrero.
+- Solo el Arquitecto hace `commit` y `push`. Nadie mas toca el historial de Git.
+- Un cambio de alcance, arquitectura, seguridad o interfaces **para** y sube al
+  Arquitecto; no lo resuelve el Ingeniero por su cuenta.
+- Todo brief para el Obrero debe ser autocontenido: ID de tarea, objetivo, alcance
+  permitido, criterios de aceptacion, gates y condiciones de STOP.
 - Local Git: required — inicializado 2026-08-13, rama `main`
 - Backup: remote GitHub **publico** `origin` ->
   `https://github.com/TahisMacias/proyecto-minijarvis` (verificado vacio y alcanzable 2026-08-13)
@@ -51,10 +73,15 @@ igual corren en cada commit.
 - OS/shell: Windows 11 Pro 10.0.26200; PowerShell 5.1 + Git Bash
 - Runtime: **Python 3.14.5** (riesgo abierto — ver `PLAN_v0.1` T-02)
 - Git: 2.54.0.windows.1, identidad `Tahis Macias <britany.macias@cenestur.edu.ec>`
-- `gh` CLI: NO instalado. Sin credential helper configurado.
+- `gh` CLI: instalado v2.97.0 en `C:\Program Files\GitHub CLI\gh.exe`, pero **no estaba
+  en el PATH** de la sesion del 2026-08-13 (se instalo con la terminal ya abierta).
+  Requiere reiniciar la terminal. Autenticacion pendiente: `gh auth login`.
 - Build/test quirks:
-  - El repositorio vive dentro de **OneDrive**. La sincronizacion puede bloquear o
-    corromper archivos de `.git`. Pausar OneDrive durante operaciones largas de Git.
+  - **OneDrive: riesgo dormido, no activo.** Verificado el 2026-08-13: el proceso
+    OneDrive NO corre. Pero `Documentos` si esta redirigido a `C:\Users\brith\OneDrive\
+    Documents` en el registro, y la carpeta tiene el atributo `RECALL_ON_DATA_ACCESS`
+    (Files On-Demand). Si OneDrive vuelve a arrancar, empezara a sincronizar `.git`.
+    No reactivarlo durante el proyecto.
   - Wheels de audio (`sounddevice`, `pyaudio`) y `torch` pueden no existir para 3.14.
 - Ignored/generated: `.venv/`, `__pycache__/`, `*.wav`, `*.mp3`, `models/`, `.cache/`
 
