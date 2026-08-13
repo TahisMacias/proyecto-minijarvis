@@ -6,6 +6,10 @@
 credentials.json
 token.json
 
+# --- Material del docente: no republicar en un repo publico ---
+# El enunciado es documento del docente. Se conserva en local, fuera de Git.
+Proyecto_MiniJARVIS.pdf
+
 # --- Entorno virtual ---
 .venv/
 venv/

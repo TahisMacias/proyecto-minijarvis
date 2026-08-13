@@ -12,6 +12,9 @@
 
 - `Proyecto_MiniJARVIS.pdf`: enunciado oficial. Requisitos y rubrica. Maxima autoridad
   academica; ante cualquier conflicto, manda este documento.
+  **No esta versionado**: es documento del docente y el repositorio es publico.
+  Vive solo en la carpeta local, excluido por `.gitignore`. Su contenido esta
+  reflejado en `APPCORE.md` y en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 - `Sintesis del proyecto.md`: decisiones de diseno del equipo — stack, paleta,
   catalogo de herramientas y estructura modular objetivo.
 - `.gitignore`: primera linea de defensa contra publicar credenciales.
