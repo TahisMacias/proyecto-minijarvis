@@ -48,6 +48,12 @@ deadline: 2026-08-27
 
 ## Open findings
 
+- **Pendiente de aplicar a `config.py`**: la paleta gano un quinto acento, durazno
+  `#FFF3E0`, para el estado ATENCION. El `config.py` entregado en T-03 asigna rosa
+  palido tanto a RESPONDIENDO como a ATENCION, siguiendo el brief original.
+  Es una correccion de una linea; se despacha cuando el Ingeniero cierre T-03.
+  Motivo del cambio en `docs/specs/...-design.md` seccion 11.
+
 - La sintesis original del equipo proponia `asyncio` y 7 herramientas. El diseno
   aprobado se aparta en ambos puntos, con motivos registrados en CONTEXT y en el spec.
   `Sintesis del proyecto.md` sigue en el repositorio como documento historico; si

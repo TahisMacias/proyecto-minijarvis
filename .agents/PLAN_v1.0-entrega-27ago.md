@@ -197,7 +197,10 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 - Scope: `gui/desktop_app.py`, `main.py`
 - Acceptance:
   - [ ] Ventana CustomTkinter en modo claro con la paleta pastel de `config.py`.
-  - [ ] Los 4 estados son distinguibles a simple vista, sin leer texto.
+  - [ ] Los 4 estados son distinguibles a simple vista, sin leer texto, **por color
+        y por forma**. Usa la tabla de la seccion 11 del spec (corregida el 2026-08-13):
+        cada estado tiene color propio y forma propia. Que dos estados compartan color
+        es un NO APTO automatico: incumple H-09 y deja fuera a personas con daltonismo.
   - [ ] Boton push-to-talk funcional; la barra espaciadora hace lo mismo.
   - [ ] Panel de conversacion con el historial visible.
   - [ ] Los errores aparecen como mensajes amables, sin trazas tecnicas.

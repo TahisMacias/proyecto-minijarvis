@@ -249,14 +249,25 @@ Laboratorio de la interfaz consume la misma logica sobre la ultima frase dicha.
 Tarjeta flotante de escritorio en CustomTkinter, modo claro.
 
 Paleta: crema `#F9F9FB` de fondo, verde menta `#E8F5E9`, rosa palido `#FCE4EC`,
-azul cielo `#E1F5FE`, texto gris marengo `#37474F`.
+azul cielo `#E1F5FE`, durazno `#FFF3E0`, texto gris marengo `#37474F`.
 
-| Estado | Senal visual |
-|---|---|
-| ESCUCHANDO | indicador verde menta, captura activa |
-| PENSANDO | animacion en azul cielo mientras razona o invoca herramientas |
-| RESPONDIENDO | onda de audio ligera durante la reproduccion |
-| ATENCION | mensaje de error amable, sin congelar la interfaz |
+Los cinco acentos son tintes Material de nivel 50 (green, pink, light-blue, orange).
+Mantener ese nivel al anadir cualquier color nuevo: es lo que da coherencia visual.
+
+**Correccion 2026-08-13.** La version original de esta seccion no asignaba color a
+RESPONDIENDO ni a ATENCION, y el mapeo provisional los dejaba compartiendo rosa
+palido. Eso incumple H-09, que exige distinguir los cuatro estados sin leer texto.
+Se anade durazno `#FFF3E0` para ATENCION. Detectado por el Obrero durante T-03.
+
+| Estado | Color | Senal visual | Forma |
+|---|---|---|---|
+| ESCUCHANDO | verde menta `#E8F5E9` | captura activa de microfono | circulo lleno, pulso lento |
+| PENSANDO | azul cielo `#E1F5FE` | razonando o invocando herramientas | puntos en secuencia |
+| RESPONDIENDO | rosa palido `#FCE4EC` | reproduciendo la voz | onda de audio ligera |
+| ATENCION | durazno `#FFF3E0` | error, sin congelar la interfaz | triangulo con borde |
+
+**El color no basta.** H-09 pide distinguirlos por color *y forma*: una persona con
+daltonismo debe poder operar la aplicacion. La columna de forma no es decorativa.
 
 **Controles de sustentacion** (fase de valor agregado). Cada uno responde una pregunta
 guia de la seccion 12 del enunciado:

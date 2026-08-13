@@ -177,3 +177,24 @@ fechas, decisiones, riesgos abiertos, referencias a tareas/commits y un puntero 
     **sin reproducir el valor** en ningun archivo ni en su reporte.
 - Unresolved: ninguno nuevo.
 - Next: el Ingeniero orquesta T-03 y T-11 en paralelo.
+
+## 2026-08-13 - Correccion de diseno: paleta de estados
+
+- Changed: `docs/specs/...-design.md` seccion 11 y criterio de aceptacion de T-10.
+- **Defecto detectado por el Obrero durante T-03**, no por el Arquitecto ni por el
+  Ingeniero: la seccion 11 del spec describia la senal visual de cada estado pero
+  **no asignaba color a RESPONDIENDO ni a ATENCION**. El mapeo provisional que el
+  Arquitecto puso en el brief los dejaba compartiendo rosa palido.
+- Por que importa: H-09 exige distinguir los cuatro estados sin leer texto. Dos
+  estados del mismo color reprueban ese check y dejan fuera a personas con daltonismo.
+- Decision: se anade durazno `#FFF3E0` para ATENCION. No es arbitrario — los acentos
+  de la paleta son tintes Material de nivel 50 (green/pink/light-blue 50), y naranja 50
+  extiende el sistema en vez de parchearlo. Se documenta la regla para futuros colores.
+- Decision adicional: se anade una columna de **forma** por estado (circulo, puntos,
+  onda, triangulo). El color por si solo no es accesible. T-10 marca como NO APTO
+  automatico que dos estados compartan color.
+- Pendiente: `config.py` conserva el mapeo antiguo. Correccion de una linea, se
+  despacha cuando el Ingeniero cierre T-03, para no auditar contra un blanco movil.
+- Observacion de proceso: el hallazgo vino del nivel mas bajo de la jerarquia. Es un
+  argumento a favor de pedir a los Obreros que reporten inconsistencias del diseno
+  aunque esten fuera de su alcance, en vez de limitarse a implementar el brief.
