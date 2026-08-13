@@ -1,0 +1,39 @@
+# --- Credenciales: NUNCA versionar (requisito seccion 6 del PDF) ---
+.env
+.env.*
+!.env.example
+*.key
+credentials.json
+token.json
+
+# --- Entorno virtual ---
+.venv/
+venv/
+env/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+
+# --- Audio / artefactos temporales generados en runtime ---
+*.wav
+*.mp3
+capturas/
+temp/
+
+# --- Modelos y caches de Hugging Face descargados localmente ---
+.cache/
+models/
+
+# --- OneDrive / Windows ---
+desktop.ini
+Thumbs.db
+*.tmp
+~$*
+
+# --- Editores ---
+.vscode/
+.idea/
