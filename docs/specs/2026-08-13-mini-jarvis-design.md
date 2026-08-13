@@ -154,6 +154,7 @@ hilo trabajador toca un widget directamente.
 | Modulo | Responsabilidad unica | Depende de |
 |---|---|---|
 | `config.py` | claves desde `.env`, paleta pastel, constantes | — |
+| `core/audio_capture.py` | microfono -> bytes en memoria | config |
 | `core/stt_client.py` | bytes de audio -> texto | config |
 | `core/llm_engine.py` | mensajes -> respuesta o peticion de tool | config, tools/manifest |
 | `core/tts_engine.py` | texto -> audio reproducido | config |

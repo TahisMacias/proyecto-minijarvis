@@ -87,4 +87,8 @@ igual corren en cada commit.
 
 ## Learned safeguards
 
-- (vacio — se llena cuando un incidente produzca una regla reutilizable)
+- **2026-08-13.** Purgar el PDF del enunciado con `git filter-branch --index-filter`
+  borro tambien el archivo del working tree: al reescribir HEAD, filter-branch resetea
+  el arbol de trabajo. Se recupero del respaldo hecho minutos antes.
+  **Regla:** antes de purgar cualquier archivo del historial de Git, copiarlo fuera del
+  repositorio. No confiar en que `--index-filter` "solo toca el indice".

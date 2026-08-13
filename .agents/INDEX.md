@@ -4,9 +4,15 @@
 - `APPCORE.md`: hechos estables de producto y arquitectura objetivo.
 - `CURRENT.md`: estado activo, bloqueos y siguiente accion.
 - `CONTEXT.md`: decisiones y handoffs en orden cronologico.
-- `PLAN_v0.1-fundamentos.md`: milestone activo (Semana 1) y briefs de tareas.
-- `TESTING.md`: checks humanos H-01 a H-05.
-- `archive/`: planes cerrados y detalle historico desplazado (vacio).
+- `PLAN_v1.0-entrega-27ago.md`: plan activo. 18 tareas en 3 fases con fechas de corte.
+- `TESTING.md`: checks humanos H-01 a H-18 mas la regresion R-01.
+- `archive/PLAN_v0.1-fundamentos.md`: superseded, nunca ejecutado. Se escribio antes
+  de conocer la fecha de entrega.
+
+## Diseno
+
+- `docs/specs/2026-08-13-mini-jarvis-design.md`: documento de diseno aprobado.
+  17 secciones. Es la referencia de toda tarea del plan y la base del informe tecnico.
 
 ## Important product paths
 
@@ -25,4 +31,4 @@
 Ninguno todavia. La estructura objetivo esta descrita en `APPCORE.md` > Architecture map
 y se materializa en la tarea T-02.
 
-Last reindexed: 2026-08-13, pre-primer-commit.
+Last reindexed: 2026-08-13, tras publicar en origin/main.

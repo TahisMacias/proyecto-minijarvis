@@ -1,6 +1,12 @@
+> **ARCHIVADO 2026-08-13 — SUPERSEDIDO, NUNCA EJECUTADO.**
+> Escrito antes de conocer la fecha de entrega (27 ago) y antes del brainstorming que
+> fijo el alcance real. Planificaba una "Semana 1" de un cronograma de 3 semanas que
+> no existe: hay 14 dias en total. Ninguna de sus tareas llego a ejecutarse.
+> Reemplazado por `PLAN_v1.0-entrega-27ago.md`. Se conserva por trazabilidad.
+
 # PLAN v0.1 - Fundamentos y diseno (Semana 1)
 
-Status: active
+Status: superseded
 Goal: cerrar el entregable de Semana 1 del PDF — propuesta tecnica de una pagina y
 prototipo funcional del modulo de exploracion (tokenizacion/atencion) — sobre un
 repositorio publicado con entorno verificado y sin credenciales expuestas.

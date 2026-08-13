@@ -78,3 +78,40 @@ fechas, decisiones, riesgos abiertos, referencias a tareas/commits y un puntero 
   - Autenticacion de GitHub pendiente (`gh auth login` tras reiniciar la terminal).
   - `TOGETHER_API_KEY` aun no provista.
 - Next: la duena revisa el spec. Luego se reescribe el plan por fases.
+
+## 2026-08-13 - PUBLICACION Y REPLANIFICACION
+
+- Changed: repositorio publicado en `origin/main`. `PLAN_v0.1` archivado y reemplazado
+  por `PLAN_v1.0-entrega-27ago.md` (18 tareas, 3 fases). `TESTING.md` reescrito con
+  H-01 a H-18 y R-01. Anadido `core/audio_capture.py` al diseno.
+- Decisiones y motivo:
+  - **El PDF del enunciado se saco del repositorio.** Es documento del docente y el
+    repositorio es publico; republicarlo no corresponde. Se purgo del historial con
+    `git filter-branch` — seguro porque nada se habia publicado aun— y se anadio a
+    `.gitignore`. El archivo se conserva en local. Decision de la duena.
+  - **Captura de audio separada del cliente STT.** Al desglosar las tareas quedo claro
+    que gestionar dispositivo y buffer no es lo mismo que hacer una llamada HTTP.
+    Refinamiento del diseno aprobado, no cambio de alcance.
+  - **`PLAN_v0.1` archivado sin ejecutar.** Se escribio antes de conocer la fecha de
+    entrega; planificaba una "Semana 1" de un cronograma de 3 semanas inexistente.
+  - **T-04 (memoria) y T-05 (captura) van temprano** aunque no sean criticos: son las
+    piezas mas faciles de verificar sin APIs, y dan gates deterministas reales pronto.
+  - **T-09 (orquestador) marcada como la de mayor riesgo tecnico** del plan, con
+    auditoria del modelo obligatoria. Es donde el proyecto puede congelarse.
+- Evidence:
+  - `git filter-branch` -> reescritos 3 commits; `git log --all --name-only` sin el PDF
+  - PDF local restaurado desde respaldo: 395049 bytes, identico al original
+  - barrido previo al push: `.env` no rastreado, 0 coincidencias de la clave en el
+    historial, sin patrones de secreto en archivos rastreados
+  - `git push -u origin main` -> `[new branch] main -> main`
+  - `gh repo view` -> `visibility: PUBLIC`, 4 commits publicados
+- Riesgo observado durante la operacion:
+  - `git filter-branch` hizo un reset del working tree al reescribir HEAD y borro el
+    PDF local. Se recupero del respaldo hecho antes de la operacion.
+    **Regla aprendida:** respaldar siempre cualquier archivo que se purgue del
+    historial, aunque la operacion se anuncie como que no toca el working tree.
+- Unresolved:
+  - El stack sobre Python 3.14.5 sigue sin verificarse (T-01, bloquea todo).
+  - `Sintesis del proyecto.md` conserva decisiones ya superadas (`asyncio`, 7 tools).
+    Sigue versionado como documento historico.
+- Next: ejecutar T-01.
