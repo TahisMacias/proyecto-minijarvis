@@ -1,12 +1,12 @@
 # CURRENT - Mini-JARVIS
 
 ```yaml
-updated_at: 2026-08-13
-source_commit: 6d0cf88 (limpio, sincronizado con origin/main)
+updated_at: 2026-08-14
+source_commit: f1a9f43 (limpio; falta push a origin/main)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
-active_task: T-11
-last_verdict: T-03 APTO
+active_task: T-04
+last_verdict: T-11 APTO
 backup: remote origin -> https://github.com/TahisMacias/proyecto-minijarvis (publico)
 deadline: 2026-08-27
 ```
@@ -17,10 +17,13 @@ Di "continua el plan". Todo el estado vive aqui, no en ninguna conversacion.
 Orden de lectura: este archivo -> `PLAN_v1.0-entrega-27ago.md` -> `AGENTS.md`.
 El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 
-### Trabajo a medias al cerrar la sesion del 2026-08-13
+### Estado al cerrar la sesion del 2026-08-14
 
-1. **T-11 NO se hizo.** `exploration/transformer_lab.py` no existe. Su Obrero no
-   entrego. Hay que redespacharlo. **Es el 25% de la rubrica y ya esta desbloqueado.**
+1. **T-11 esta cerrada y APTO** (commit `f1a9f43`). El aviso de la sesion anterior
+   ("T-11 no se hizo, el archivo no existe") era **falso**: el Obrero si entrego,
+   pero su codigo entro por error dentro del commit de T-03 y nadie lo audito.
+   Leccion de proceso: verificar `git show --stat` antes de declarar que una tarea
+   no se hizo. Un archivo puede existir y aun asi no estar cerrado.
 2. **Decision abierta sobre la jerarquia de tres niveles.** El Ingeniero se detuvo a
    mitad de su primera tanda sin emitir veredictos; hubo que reanudarlo. Criterio ya
    acordado con la duena: si vuelve a fallar, se elimina el nivel intermedio y el
@@ -29,8 +32,11 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 
 ## Next action
 
-1. Redespachar **T-11**. Recordatorio critico: BETO debe cargarse con
-   `attn_implementation="eager"` o `output_attentions` devuelve `None` en silencio.
+1. **Hacer push**: hay 2 commits locales sin publicar (`f1a9f43` y el `[STATE]` que
+   lo acompana).
+2. Despachar **T-04** (`core/memory.py` + tests). Es la pieza mas facil de verificar
+   sin APIs y desbloquea T-07. T-05 y T-08 tambien estan listas y no comparten
+   archivos con T-04: se pueden lanzar en paralelo.
 
 ## Blockers
 
@@ -53,15 +59,21 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 - **Python 3.14.5 confirmado como interprete definitivo** (T-01). Todo el stack
   instala con wheels nativos `cp314`, `torch 2.13.0+cpu` incluido. Riesgo cerrado.
 - Entorno virtual creado en `.venv/` con los 11 paquetes instalados.
-- La extraccion de self-attention sobre BETO esta verificada de extremo a extremo:
-  T-11 es viable. Requiere `attn_implementation="eager"`.
+- **T-11 entregado y APTO.** `exploration/transformer_lab.py` corre con exit 0 y
+  genera `exploration/mapa_atencion.png` (capa 6, cabeza 4: cabeza de token
+  anterior). La salida completa esta versionada en
+  `docs/evidencia/T-11-salida-transformer_lab.txt` y sirve de material directo para
+  el informe (T-16) y la sustentacion. El 25% mas pesado de la rubrica esta cubierto.
+- La extraccion de self-attention sobre BETO requiere `attn_implementation="eager"`;
+  el script lo verifica en tiempo de ejecucion y falla con mensaje explicito si no.
 - Microfono verificado: 10 dispositivos, Realtek por defecto, captura real correcta.
 - Esqueleto del repositorio completo: `README.md`, `requirements.txt` con 12
   versiones fijadas, `.env.example`, y los cuatro paquetes importables.
 - `config.py` existe y esta APTO: carga segura de credenciales, paleta de 5 acentos,
   IDs de modelo, limites de memoria y lista blanca de dominios. Es la fuente unica
   de verdad de configuracion; ningun otro modulo debe leer variables de entorno.
-- Aun no existe `main.py` ni ningun modulo de `core/`, `tools/` o `gui/`.
+- Aun no existe `main.py` ni ningun modulo de `core/`, `tools/` o `gui/`. El README
+  ya lo dice con precision: avisa solo por `main.py`, no por el laboratorio.
 
 ## Open findings
 

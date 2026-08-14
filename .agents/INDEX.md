@@ -28,7 +28,16 @@
 
 ## Codigo de producto
 
-Ninguno todavia. La estructura objetivo esta descrita en `APPCORE.md` > Architecture map
-y se materializa en la tarea T-02.
+- `config.py` (T-03): fuente unica de verdad de configuracion. Credenciales, paleta,
+  IDs de modelo, limites de memoria y lista blanca de dominios. **Ningun otro modulo
+  debe leer variables de entorno.**
+- `exploration/transformer_lab.py` (T-11): laboratorio del Transformer. Independiente
+  del resto del proyecto: no importa `config.py` ni nada de `core/`. Se ejecuta con
+  `python -m exploration.transformer_lab`.
+- `exploration/mapa_atencion.png`: salida del laboratorio, material de sustentacion.
+- `docs/evidencia/T-11-salida-transformer_lab.txt`: salida de consola conservada como
+  evidencia del gate de T-11 y como material para el informe tecnico (T-16).
+- El resto (`main.py`, `core/`, `tools/`, `gui/`) todavia no existe. La estructura
+  objetivo esta en `APPCORE.md` > Architecture map.
 
-Last reindexed: 2026-08-13, tras publicar en origin/main.
+Last reindexed: 2026-08-14, al cerrar T-11.

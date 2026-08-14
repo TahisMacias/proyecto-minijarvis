@@ -67,12 +67,12 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 - Scope: `README.md`, `requirements.txt`, `.env.example`, `core/__init__.py`,
   `tools/__init__.py`, `gui/__init__.py`, `exploration/__init__.py`
 - Acceptance:
-  - [ ] `README.md` documenta requisitos, venv, instalacion y ejecucion, y el comando
+  - [x] `README.md` documenta requisitos, venv, instalacion y ejecucion, y el comando
         exacto del modulo de exploracion. Debe indicar **Python 3.14.5**.
-  - [ ] `requirements.txt` fija exactamente las 12 versiones de la tabla de
+  - [x] `requirements.txt` fija exactamente las 12 versiones de la tabla de
         `AGENTS.md` > Environment. Ni mas recientes ni sin fijar.
-  - [ ] `.env.example` lista `TOGETHER_API_KEY` sin ningun valor real.
-  - [ ] `git status` no muestra `.env` ni `.venv/`.
+  - [x] `.env.example` lista `TOGETHER_API_KEY` sin ningun valor real.
+  - [x] `git status` no muestra `.env` ni `.venv/`.
 - Gates: `python -m compileall .`
 - Human checks: H-03
 - Risk triggers: ninguno
@@ -80,15 +80,18 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-03 - Configuracion y credenciales
 
-- Status: **ready**
+- Status: **done** (2026-08-13). Veredicto: **APTO** (commit `6d0cf88`).
+  Auditada por el Ingeniero con gates propios y releida por el Arquitecto antes de
+  publicar a un repositorio publico. Incluye la correccion de paleta (ATENCION pasa
+  a durazno `#FFF3E0`), aplicada por el Arquitecto como excepcion declarada.
 - Depends on: T-02 (cerrada)
 - Despacho: **Ingeniero** (tiene `Risk triggers: si`)
 - Scope: `config.py`
 - Acceptance:
-  - [ ] `TOGETHER_API_KEY` se lee de `.env` con `python-dotenv`. Ninguna clave literal.
-  - [ ] Si falta la clave, mensaje claro y la app no arranca a medias.
-  - [ ] Paleta pastel, IDs de modelo, voz TTS y limites de memoria centralizados aqui.
-  - [ ] Lista blanca de dominios para `abrir_kiosk` definida aqui.
+  - [x] `TOGETHER_API_KEY` se lee de `.env` con `python-dotenv`. Ninguna clave literal.
+  - [x] Si falta la clave, mensaje claro y la app no arranca a medias.
+  - [x] Paleta pastel, IDs de modelo, voz TTS y limites de memoria centralizados aqui.
+  - [x] Lista blanca de dominios para `abrir_kiosk` definida aqui.
 - Gates: `python -m compileall .`; `git grep` sin coincidencias de patrones de secreto.
 - Human checks: none
 - Risk triggers: **si** — manejo de credenciales. Auditoria del modelo obligatoria.
@@ -96,7 +99,7 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-04 - Memoria conversacional
 
-- Status: blocked (T-03)
+- Status: **ready** (T-03 cerrada el 2026-08-13)
 - Depends on: T-03
 - Scope: `core/memory.py`, `tests/test_memory.py`
 - Es la pieza mas facil de verificar sin APIs. Se hace temprano a proposito.
@@ -112,7 +115,7 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-05 - Captura de audio
 
-- Status: blocked (T-03)
+- Status: **ready** (T-03 cerrada el 2026-08-13)
 - Depends on: T-03
 - Scope: `core/audio_capture.py`
 - Acceptance:
@@ -159,7 +162,7 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-08 - Motor TTS
 
-- Status: blocked (T-03)
+- Status: **ready** (T-03 cerrada el 2026-08-13)
 - Depends on: T-03
 - Scope: `core/tts_engine.py`
 - Acceptance:
@@ -212,23 +215,39 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-11 - Modulo de exploracion del Transformer
 
-- Status: **ready — se ejecuta EN PARALELO con la cadena del pipeline**
+- Status: **done** (2026-08-14). Veredicto: **APTO**.
+- Nota de trazabilidad: el codigo entro por error dentro del commit de T-03
+  (`6d0cf88`) y quedo sin veredicto. Se cerro y se le dio commit propio en `f1a9f43`.
+- Verificacion independiente, ejecutada y no reportada:
+  `python -m exploration.transformer_lab` -> exit 0; BETO con
+  `attn_implementation="eager"` -> 12 capas de `(1, 12, 20, 20)`; embeddings
+  `(1, 20, 768)`; la fila de atencion suma `1.000000`; el PNG se regenera
+  identico byte a byte (89415 bytes); `compileall` exit 0. Salida completa
+  versionada en `docs/evidencia/T-11-salida-transformer_lab.txt`.
+- Correcciones aplicadas al cerrar, declaradas como excepcion del Arquitecto sobre
+  el product plane (mismo criterio que en T-03):
+  - Aviso en la salida del nivel 1: los tokens tipo `ÃŃa` no son un error de
+    codificacion sino la representacion byte-level BPE del UTF-8. Sin ese aviso, la
+    salida proyectada en la sustentacion parece un programa roto.
+  - `README.md` afirmaba que este modulo no estaba implementado. Era falso en un
+    repositorio publico.
 - Depends on: T-01 (cerrada). No depende de `config.py` ni de ningun modulo de `core/`.
   Toca un unico archivo que nadie mas toca, asi que no hay conflicto posible.
 - Despacho: **Ingeniero**, en paralelo con T-03.
 - **Criterio de mayor peso de la rubrica (25%). No se recorta bajo ninguna circunstancia.**
 - Scope: `exploration/transformer_lab.py`
 - Acceptance:
-  - [ ] Nivel 1: tokenizador real de `Qwen/Qwen2.5-72B-Instruct` (sin pesos). Imprime
-        tokens e IDs de una frase en espanol del propio proyecto.
-  - [ ] Nivel 2: `dccuchile/bert-base-spanish-wwm-cased` cargado **obligatoriamente**
+  - [x] Nivel 1: tokenizador real de `Qwen/Qwen2.5-72B-Instruct` (sin pesos). Imprime
+        tokens e IDs de una frase en espanol del propio proyecto. 30 tokens.
+  - [x] Nivel 2: `dccuchile/bert-base-spanish-wwm-cased` cargado **obligatoriamente**
         con `attn_implementation="eager"`, con `output_attentions=True`. Sin ese
         argumento el modelo devuelve `None` en silencio (verificado en T-01).
         Imprime la forma del tensor de embeddings y explica que significa cada dimension.
-  - [ ] Genera un mapa de calor PNG de una capa y cabeza concretas, con los tokens
-        etiquetados en ambos ejes.
-  - [ ] Corre solo, sin la GUI, con el comando documentado en el README.
-  - [ ] Cada seccion tiene un comentario que explica el concepto, no solo el codigo.
+  - [x] Genera un mapa de calor PNG de una capa y cabeza concretas, con los tokens
+        etiquetados en ambos ejes. Capa 6, cabeza 4: cabeza de token anterior, la
+        franja iluminada a la izquierda de la diagonal se ve a simple vista.
+  - [x] Corre solo, sin la GUI, con el comando documentado en el README.
+  - [x] Cada seccion tiene un comentario que explica el concepto, no solo el codigo.
 - Gates: ejecucion del script; se conserva la salida y el PNG como evidencia.
 - Human checks: H-11
 - Risk triggers: ninguno. **Riesgo cerrado en T-01**: `torch 2.13.0+cpu` instalado y

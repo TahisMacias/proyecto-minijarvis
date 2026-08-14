@@ -198,3 +198,35 @@ fechas, decisiones, riesgos abiertos, referencias a tareas/commits y un puntero 
 - Observacion de proceso: el hallazgo vino del nivel mas bajo de la jerarquia. Es un
   argumento a favor de pedir a los Obreros que reporten inconsistencias del diseno
   aunque esten fuera de su alcance, en vez de limitarse a implementar el brief.
+
+## 2026-08-14 - T-11 cerrada: existia, pero no estaba entregada
+
+- Changed: `exploration/transformer_lab.py`, `README.md`,
+  `docs/evidencia/T-11-salida-transformer_lab.txt` (commit `f1a9f43`).
+- **Defecto de proceso encontrado al retomar:** CURRENT afirmaba que T-11 no se habia
+  hecho y que el archivo no existia. `git show --stat 6d0cf88` demostro lo contrario:
+  las 508 lineas del laboratorio y el PNG habian entrado dentro del commit de T-03,
+  sin veredicto propio y sin gate ejecutado. Un archivo puede existir y aun asi no
+  estar cerrado; y un commit puede arrastrar trabajo de otra tarea sin que nadie lo
+  note. Regla derivada: antes de declarar que una tarea no se hizo, mirar el diff de
+  los commits recientes, no solo el estado del arbol.
+- Veredicto T-11: **APTO**. Verificacion ejecutada, no aceptada por reporte:
+  `python -m exploration.transformer_lab` -> exit 0; 12 capas de atencion de
+  `(1, 12, 20, 20)`; embeddings `(1, 20, 768)`; fila de atencion = `1.000000`;
+  PNG regenerado identico byte a byte (89415 bytes); `compileall` exit 0.
+  El mapa se inspecciono visualmente: la franja iluminada a la izquierda de la
+  diagonal confirma que la capa 6 / cabeza 4 es una cabeza de token anterior, tal
+  como el codigo afirma. La afirmacion del script y la imagen concuerdan.
+- Dos correcciones aplicadas por el Arquitecto sobre el product plane, **declaradas
+  como excepcion** (mismo criterio que en T-03):
+  - La salida del nivel 1 mostraba tokens como `ÃŃa` sin explicarlos. No es un error:
+    el tokenizador de Qwen es byte-level BPE y opera sobre bytes UTF-8. Pero esa
+    salida se proyecta en la sustentacion, y sin explicacion parece un programa roto
+    delante del tribunal. Se anadio un aviso que convierte el detalle en argumento.
+  - `README.md` afirmaba que el laboratorio no estaba implementado. Era falso, y el
+    repositorio es publico.
+- Barrido de estado obsoleto en el plan: T-03 seguia como `ready` estando APTO, y
+  T-04, T-05 y T-08 seguian `blocked (T-03)`. Corregido.
+- Unresolved: la observacion sobre el nivel Ingeniero sigue abierta. En esta sesion
+  no hubo despacho jerarquico, asi que no aporta evidencia ni a favor ni en contra.
+- Next: push, y despachar T-04 (T-05 y T-08 pueden ir en paralelo, no comparten archivos).
