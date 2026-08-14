@@ -2,7 +2,7 @@
 
 ```yaml
 updated_at: 2026-08-14
-source_commit: f1a9f43 (limpio; falta push a origin/main)
+source_commit: 0304bd3 (limpio, sincronizado con origin/main)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
 active_task: T-04
@@ -32,9 +32,7 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 
 ## Next action
 
-1. **Hacer push**: hay 2 commits locales sin publicar (`f1a9f43` y el `[STATE]` que
-   lo acompana).
-2. Despachar **T-04** (`core/memory.py` + tests). Es la pieza mas facil de verificar
+1. Despachar **T-04** (`core/memory.py` + tests). Es la pieza mas facil de verificar
    sin APIs y desbloquea T-07. T-05 y T-08 tambien estan listas y no comparten
    archivos con T-04: se pueden lanzar en paralelo.
 
@@ -49,7 +47,7 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 - Plan activo de 18 tareas en 3 fases con fechas de corte: nucleo 22 ago,
   valor agregado 25 ago, cierre 27 ago.
 - Repositorio publico en `https://github.com/TahisMacias/proyecto-minijarvis`,
-  8 commits publicados, local y remoto sincronizados.
+  12 commits publicados, local y remoto sincronizados.
 - `gh` CLI v2.97.0 autenticado como `TahisMacias`, scopes `repo` y `workflow`.
 - `TOGETHER_API_KEY` en `.env` local, validada contra `GET /v1/models` (HTTP 200).
 - Modelos verificados disponibles en la cuenta: `openai/whisper-large-v3`,
