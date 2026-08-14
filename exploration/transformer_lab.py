@@ -50,6 +50,17 @@ import numpy as np  # noqa: E402
 import torch  # noqa: E402
 from matplotlib.colors import LinearSegmentedColormap  # noqa: E402
 from transformers import AutoModel, AutoTokenizer  # noqa: E402
+from transformers import logging as hf_logging  # noqa: E402
+
+# Silenciamos SOLO el ruido informativo de la libreria transformers: la barra de
+# progreso "Loading weights" y el reporte de pesos UNEXPECTED/MISSING que imprime al
+# cargar BETO con AutoModel (es esperado: BETO se publico como checkpoint de
+# BertForPreTraining y AutoModel solo carga el encoder, nunca la cabeza de
+# prediccion de palabras enmascaradas ni el pooler). No se sube el umbral por encima
+# de "error": una excepcion real durante la carga sigue interrumpiendo el script con
+# su traceback normal; esto no oculta fallos, solo aviso informativo repetitivo.
+hf_logging.set_verbosity_error()
+hf_logging.disable_progress_bar()
 
 
 # ---------------------------------------------------------------------------------
@@ -185,6 +196,16 @@ def nivel_1_tokenizacion():
         "aparece pegado a algunos tokens es la forma en que este tokenizador marca "
         "'aqui empezaba un espacio en el texto original'; se muestra como un punto "
         "medio (·) para que se lea con claridad."
+    )
+    print(
+        "AVISO PARA LA SUSTENTACION: mas abajo veras tokens con aspecto de error de "
+        "codificacion, como 'ÃŃa' donde el texto decia 'ía'. NO es un error del "
+        "programa. Este tokenizador es de tipo byte-level BPE: no trabaja sobre "
+        "letras sino sobre los BYTES del texto en UTF-8, y una letra acentuada ocupa "
+        "dos bytes. Al mostrar cada byte como si fuera un caracter suelto aparecen "
+        "esos simbolos raros. Es la representacion interna real del modelo, y es "
+        "justamente por eso que las palabras acentuadas se parten en mas sub-tokens "
+        "que las palabras sin acento."
     )
     print(f"{'idx':>4}  {'ID token':>9}  token")
     print(f"{'-' * 4}  {'-' * 9}  {'-' * 30}")

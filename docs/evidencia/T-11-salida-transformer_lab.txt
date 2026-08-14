@@ -1,0 +1,129 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+
+==============================================================================
+MINI-JARVIS - LABORATORIO DE EXPLORACION DEL TRANSFORMER (T-11)
+==============================================================================
+Este script no es parte del pipeline de voz de Mini-JARVIS: es un modulo independiente para demostrar, con un Transformer real corriendo en esta misma maquina, los tres conceptos que la rubrica exige poder explicar: tokenizacion, embeddings y self-attention.
+
+==============================================================================
+NIVEL 1 - TOKENIZACION (tokenizador real de Qwen2.5-72B-Instruct)
+==============================================================================
+Se descarga UNICAMENTE el tokenizador (un archivo de vocabulario y reglas de division de texto), sin los pesos del modelo de 72 mil millones de parametros. Pesa pocos megabytes y no necesita GPU.
+
+--- Frase de ejemplo (propia del proyecto Mini-JARVIS) ---
+"Mini-JARVIS es mi asistente de voz y me avisa cuando la batería del portátil está por agotarse."
+
+--- Tokens generados: 30 ---
+Cada fila de abajo es un token con su ID numerico. El caracter 'Ġ' que aparece pegado a algunos tokens es la forma en que este tokenizador marca 'aqui empezaba un espacio en el texto original'; se muestra como un punto medio (·) para que se lea con claridad.
+AVISO PARA LA SUSTENTACION: mas abajo veras tokens con aspecto de error de codificacion, como 'ÃŃa' donde el texto decia 'ía'. NO es un error del programa. Este tokenizador es de tipo byte-level BPE: no trabaja sobre letras sino sobre los BYTES del texto en UTF-8, y una letra acentuada ocupa dos bytes. Al mostrar cada byte como si fuera un caracter suelto aparecen esos simbolos raros. Es la representacion interna real del modelo, y es justamente por eso que las palabras acentuadas se parten en mas sub-tokens que las palabras sin acento.
+ idx   ID token  token
+----  ---------  ------------------------------
+   0      54213  Mini
+   1      12009  -J
+   2        934  AR
+   3      57327  VIS
+   4       1531  ·es
+   5       9497  ·mi
+   6        438  ·as
+   7        380  ist
+   8       6817  ente
+   9        409  ·de
+  10      84090  ·voz
+  11        379  ·y
+  12        752  ·me
+  13       1822  ·av
+  14      10761  isa
+  15      26346  ·cuando
+  16       1187  ·la
+  17        293  ·b
+  18        962  ater
+  19       7431  ÃŃa
+  20       1594  ·del
+  21       2635  ·port
+  22       1953  Ã¡
+  23       1646  til
+  24      15466  ·estÃ¡
+  25       4154  ·por
+  26        933  ·ag
+  27        354  ot
+  28       2583  arse
+  29         13  .
+
+--- Palabras que se partieron en varios sub-tokens ---
+Este es exactamente el fenomeno que se explicara en la sustentacion oral: las palabras acentuadas y los nombres poco frecuentes (como 'Mini-JARVIS', que no existe en el vocabulario de entrenamiento) no tienen un token propio, asi que el tokenizador los reconstruye pegando varios sub-tokens mas chicos.
+  'Mini-JARVIS' -> 4 sub-tokens: ['Mini', '-J', 'AR', 'VIS']
+  'asistente' -> 3 sub-tokens: ['Ġas', 'ist', 'ente']
+  'avisa' -> 2 sub-tokens: ['Ġav', 'isa']
+  'batería' -> 3 sub-tokens: ['Ġb', 'ater', 'ÃŃa']
+  'portátil' -> 3 sub-tokens: ['Ġport', 'Ã¡', 'til']
+  'agotarse.' -> 4 sub-tokens: ['Ġag', 'ot', 'arse', '.']
+
+==============================================================================
+NIVEL 2 - EMBEDDINGS Y SELF-ATTENTION (BETO, local y completo)
+==============================================================================
+Modelo: dccuchile/bert-base-spanish-wwm-cased (~110 millones de parametros, entrenado en espanol). A diferencia del nivel 1, aqui SI se descargan y se ejecutan los pesos completos del modelo, porque necesitamos mirar dentro de sus capas.
+
+--- Frase de ejemplo (propia del proyecto Mini-JARVIS) ---
+"El asistente escucha mi voz, piensa la respuesta y habla antes de quedarse sin bateria."
+Sub-tokens de la frase: 18  ->  + [CLS] y [SEP]  =  20 tokens totales.
+
+--- Tokens de BETO para esta frase (incluye [CLS] y [SEP]) ---
+El prefijo '##' marca un sub-token que continua la palabra anterior sin espacio: es la misma idea del nivel 1, con otra notacion.
+   0  [CLS]
+   1  El
+   2  asistente
+   3  escucha
+   4  mi
+   5  voz
+   6  ,
+   7  piensa
+   8  la
+   9  respuesta
+  10  y
+  11  habla
+  12  antes
+  13  de
+  14  quedarse
+  15  sin
+  16  bate
+  17  ##ria
+  18  .
+  19  [SEP]
+
+--- Embeddings contextuales (last_hidden_state) ---
+Forma del tensor: (1, 20, 768)
+  - Dimension 1 (1): tamano del lote. Aqui procesamos una sola frase a la vez, asi que vale 1.
+  - Dimension 2 (20): numero de tokens de la frase (incluyendo [CLS] y [SEP]).
+  - Dimension 3 (768): tamano del vector de significado de CADA token en el espacio semantico interno de BETO. Son 768 numeros que, juntos, codifican el significado contextual de ese token.
+
+--- Matrices de self-attention ---
+Numero de capas de atencion devueltas: 12 (BETO tiene 12 capas Transformer).
+Forma de UNA capa de atencion: (1, 12, 20, 20)
+  - Dimension 1 (1): tamano del lote (una sola frase).
+  - Dimension 2 (12): numero de cabezas de atencion de esa capa. BETO calcula 12 'formas de mirar' distintas en paralelo dentro de cada capa, cada una puede aprender a fijarse en un tipo de relacion diferente.
+  - Dimension 3 (20): token que CONSULTA (query) - la fila: 'desde este token, cuanto miro a los demas'.
+  - Dimension 4 (20): token CONSULTADO (key) - la columna: 'a este otro token, cuanto lo miro'.
+
+--- Verificacion: cada fila de atencion suma 1.0 ---
+Fila elegida: capa 0, cabeza 0, token consultante = 'El' (indice 1).
+Suma de esa fila: 1.000000
+torch.allclose(suma, 1.0) = True
+Por que suma 1.0: cada fila de la matriz de atencion es el resultado de una funcion softmax. El softmax convierte una lista de puntajes en una distribucion de probabilidad: numeros entre 0 y 1 que siempre suman exactamente 1. En este caso representa 'que porcentaje de mi atencion total reparto entre cada uno de los demas tokens de la frase' — nunca mas, nunca menos que el 100 %.
+
+==============================================================================
+MAPA DE CALOR DE ATENCION
+==============================================================================
+Capa elegida: indice base-0 = 5  (capa humana #6 de 12)
+Cabeza elegida: indice base-0 = 3  (cabeza humana #4 de 12)
+Se eligio esta combinacion porque, de las 144 capas x cabezas posibles, es una 'cabeza de token anterior': en el mapa se ve una franja iluminada justo a la izquierda de la diagonal principal, es decir, cada token le presta casi toda su atencion a la palabra que lo precede inmediatamente. Es un patron clasico y muy documentado en modelos tipo BERT, y resulta facil de senalar en la imagen durante la sustentacion oral.
+
+PNG guardado en: C:\Users\brith\OneDrive\Documents\PROYECTO INTEGRADOR MINIJARVIS\exploration\mapa_atencion.png
+Tamano del archivo: 89415 bytes
+
+==============================================================================
+FIN DEL LABORATORIO
+==============================================================================
+Los tres pilares del Transformer quedaron demostrados sobre modelos reales:
+  1) Tokenizacion  -> tokenizador real de Qwen2.5-72B-Instruct.
+  2) Embeddings    -> last_hidden_state de BETO, forma (1, N, 768).
+  3) Self-attention -> 12 capas de atencion de BETO, filas que suman 1.0.

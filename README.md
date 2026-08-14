@@ -65,9 +65,8 @@ obtenida en https://api.together.xyz.
 
 ## Ejecucion
 
-> Los comandos de esta seccion describen el uso previsto. `main.py` y
-> `exploration/transformer_lab.py` todavia no estan implementados en este
-> repositorio; ejecutarlos hoy producira un error de "modulo no encontrado".
+> `exploration/transformer_lab.py` ya esta implementado y se ejecuta hoy mismo.
+> `main.py` todavia no; ejecutarlo producira un error de "modulo no encontrado".
 
 Iniciar la aplicacion (GUI de escritorio):
 
