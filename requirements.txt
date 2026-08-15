@@ -19,6 +19,9 @@ duckduckgo-search==8.1.1
 # --- LLM: conteo de tokens para el indicador de memoria ---
 tiktoken==0.13.0
 
+# --- Pruebas (gates deterministas del plan: T-04, T-09, T-15) ---
+pytest==9.1.1
+
 # --- Exploracion del Transformer (tokenizacion, embeddings, self-attention) ---
 matplotlib==3.11.1
 transformers==5.15.0
