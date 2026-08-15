@@ -64,7 +64,15 @@ obtenida en https://api.together.xyz.
 
 ## Ejecucion
 
-Iniciar la aplicacion (GUI de escritorio):
+**La forma comoda: doble clic en `Iniciar Mini-JARVIS.bat`**, en la carpeta del
+proyecto. Comprueba que el entorno virtual y el archivo `.env` esten en su sitio,
+explica que falta si falta algo, y abre la aplicacion. Se le puede crear un acceso
+directo en el escritorio (clic derecho > Enviar a > Escritorio).
+
+Deja abierta la ventana negra que aparece detras: si se cierra, se cierra tambien el
+asistente.
+
+La forma manual, con el entorno virtual activado:
 
 ```powershell
 python main.py
@@ -137,6 +145,7 @@ Detalle completo de la arquitectura y las decisiones de diseno en
 ## Estructura del proyecto
 
 ```
+Iniciar Mini-JARVIS.bat        lanzador para abrir la app con doble clic
 config.py                      fuente unica de configuracion y credenciales
 core/memory.py                 historial de la conversacion y su truncado
 core/audio_capture.py          microfono -> WAV en memoria
