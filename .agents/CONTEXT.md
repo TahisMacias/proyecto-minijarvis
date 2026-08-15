@@ -230,3 +230,46 @@ fechas, decisiones, riesgos abiertos, referencias a tareas/commits y un puntero 
 - Unresolved: la observacion sobre el nivel Ingeniero sigue abierta. En esta sesion
   no hubo despacho jerarquico, asi que no aporta evidencia ni a favor ni en contra.
 - Next: push, y despachar T-04 (T-05 y T-08 pueden ir en paralelo, no comparten archivos).
+
+## 2026-08-14 - Cinco modulos de core/ entregados, y un hallazgo que salva la demo
+
+- Changed: `core/memory.py`, `core/audio_capture.py`, `core/stt_client.py`,
+  `core/llm_engine.py`, `core/tts_engine.py`, `tests/`, `pytest.ini`,
+  `requirements.txt`, `config.py`, `exploration/transformer_lab.py`.
+  Commits `04f2fbc`, `f7230a7`, `ba169e1`, `5874a35`, `b620ac7`, `38715f7`, `a034533`.
+- Ejecutado por el Arquitecto, **excepcion declarada** al reparto de roles: la duena
+  pidio continuar con todo en una sola sesion. Cada tarea llevo su gate ejecutado, no
+  reportado, y su commit propio. La separacion que si se mantuvo es la que importa:
+  ninguna tarea se dio por buena sin evidencia reproducible.
+- **HALLAZGO MAYOR (T-07): los dos modelos del plan no los sirve esta cuenta.**
+  `Qwen/Qwen2.5-72B-Instruct` y `meta-llama/Llama-3.3-70B-Instruct` figuran en
+  `GET /v1/models` —que es como se dieron por verificados el 2026-08-13— pero
+  responden HTTP 400 "Unable to access non-serverless model". Estan en el catalogo de
+  Together, no en su servicio compartido; usarlos exigiria pagar un endpoint dedicado.
+  Se probaron catorce identificadores uno por uno hasta encontrar los que responden:
+  `meta-llama/Llama-3.3-70B-Instruct-Turbo` y `Qwen/Qwen2.5-7B-Instruct-Turbo`.
+  **Leccion general, aplicable mas alla de este proyecto: que un recurso aparezca en
+  un listado no prueba que se pueda usar. Solo lo prueba ejercerlo.** De no haberse
+  detectado ahora, habria aparecido como un 400 sin explicacion el dia de la demo.
+- Consecuencia en cadena: el nivel 1 del laboratorio decia usar "el tokenizador del
+  LLM de produccion" nombrando un modelo inaccesible. Se repunto al de
+  `Qwen/Qwen2.5-7B-Instruct`, que es el del modelo alterno real. No se uso el de
+  Llama porque su repositorio en Hugging Face esta restringido: se comprobo y
+  devuelve "You are trying to access a gated repo". Una demostracion que depende de
+  un permiso ajeno es fragil.
+- Decisiones de implementacion que se apartan de lo previsto, con motivo:
+  - `core/memory.py` **no importa `config.py`**, siguiendo la tabla de modulos del
+    diseno, que lo lista sin dependencias. Efecto util: las pruebas corren en una
+    maquina sin `.env` ni credenciales.
+  - La reproduccion de voz usa **MCI** de Windows via `ctypes` en vez de anadir una
+    libreria de audio: edge-tts devuelve MP3 y Windows ya sabe decodificarlo.
+  - Se anadio `pytest` (no estaba en `requirements.txt` pese a que tres gates del
+    plan lo exigen) y `pytest.ini` con `pythonpath = .`.
+- Verificaciones que no se aceptaron por reporte: transcripcion real de audio
+  sintetizado, reproduccion medida en 4.92 s para confirmar que bloquea, captura real
+  de microfono releida con el modulo `wave`, y cambio de modelo en caliente con la
+  conversacion viva.
+- Unresolved: H-04 y H-07 pendientes de la duena (son de oido, nadie mas los puede
+  hacer). El nivel Ingeniero sigue sin segunda observacion: esta sesion no uso
+  jerarquia, asi que no aporta evidencia.
+- Next: T-09, el orquestador. Es la tarea de mayor riesgo tecnico del plan.

@@ -99,15 +99,22 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-04 - Memoria conversacional
 
-- Status: **ready** (T-03 cerrada el 2026-08-13)
+- Status: **done** (2026-08-14). Veredicto: **APTO** (commit `04f2fbc`).
+  Gate ejecutado: 13 pruebas verdes con `pytest tests/test_memory.py`.
+  Desviacion declarada y justificada: el modulo **no importa `config.py`**. La tabla
+  de modulos del diseno lo lista sin dependencias; `system_prompt` y `max_turnos` son
+  argumentos obligatorios, asi no se duplica ninguna constante y las pruebas corren
+  en una maquina sin `.env`. El orquestador (T-09) pasara `MAX_TURNOS_MEMORIA`.
+  Se anadio `pytest==9.1.1` a `requirements.txt` y `pytest.ini` con `pythonpath = .`;
+  sin eso el comando del gate falla con `No module named 'core'`.
 - Depends on: T-03
 - Scope: `core/memory.py`, `tests/test_memory.py`
 - Es la pieza mas facil de verificar sin APIs. Se hace temprano a proposito.
 - Acceptance:
-  - [ ] Mantiene los ultimos 10 turnos; el system prompt nunca se descarta.
-  - [ ] Al superar el limite descarta el par mas antiguo, no el mas nuevo.
-  - [ ] Expone conteo de turnos y estimacion de tokens para el indicador de la GUI.
-  - [ ] Tests cubren: vacia, por debajo del limite, justo en el limite, por encima.
+  - [x] Mantiene los ultimos 10 turnos; el system prompt nunca se descarta.
+  - [x] Al superar el limite descarta el par mas antiguo, no el mas nuevo.
+  - [x] Expone conteo de turnos y estimacion de tokens para el indicador de la GUI.
+  - [x] Tests cubren: vacia, por debajo del limite, justo en el limite, por encima.
 - Gates: `pytest tests/test_memory.py`
 - Human checks: none
 - Risk triggers: ninguno
@@ -115,14 +122,20 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-05 - Captura de audio
 
-- Status: **ready** (T-03 cerrada el 2026-08-13)
+- Status: **done** (2026-08-14). Veredicto: **APTO** (commit `f7230a7`).
+  Verificado sobre el microfono real: 3 s -> 88 236 bytes, cabecera RIFF/WAVE valida,
+  el WAV se relee con el modulo `wave` y da 1 canal, 16 bits, 16 kHz. Los tres errores
+  tipados se provocaron a proposito y salieron correctos. `compileall` exit 0.
+  Pendiente **H-04** (calidad del audio a oido de la duena):
+  `python -m core.audio_capture` graba 3 s y reporta.
 - Depends on: T-03
 - Scope: `core/audio_capture.py`
 - Acceptance:
-  - [ ] Graba del microfono a `io.BytesIO`, sin archivo temporal en disco.
-  - [ ] Empieza y para bajo control explicito (push-to-talk), no por temporizador.
-  - [ ] Si no hay dispositivo de entrada, lanza un error tipado que la GUI sabe mostrar.
-  - [ ] Formato de salida compatible con el endpoint de transcripcion.
+  - [x] Graba del microfono a `io.BytesIO`, sin archivo temporal en disco.
+  - [x] Empieza y para bajo control explicito (push-to-talk), no por temporizador.
+  - [x] Si no hay dispositivo de entrada, lanza un error tipado que la GUI sabe mostrar.
+  - [x] Formato de salida compatible con el endpoint de transcripcion: WAV PCM 16 bits,
+        mono, 16 kHz, el nativo de Whisper.
 - Gates: `python -m compileall .`
 - Human checks: H-04
 - Risk triggers: drivers de audio en Windows.
@@ -130,14 +143,18 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-06 - Cliente STT
 
-- Status: blocked (T-05)
+- Status: **done** (2026-08-14). Veredicto: **APTO** (commit `5874a35`).
+  Verificado contra la API real: se sintetizo una frase conocida con edge-tts y
+  Whisper la devolvio transcrita. Los seis caminos de error se provocaron con
+  clientes falsos y cada uno dio su tipo esperado; una excepcion que contenia la
+  clave salio con la clave reemplazada por `***`.
 - Depends on: T-05
 - Scope: `core/stt_client.py`
 - Acceptance:
-  - [ ] Envia los bytes a `openai/whisper-large-v3` con `language="es"`.
-  - [ ] Devuelve texto limpio; transcripcion vacia es un caso de retorno, no excepcion.
-  - [ ] Errores de red, timeout y 401 se traducen a errores tipados.
-  - [ ] Ningun fragmento de la API key aparece en mensajes de error.
+  - [x] Envia los bytes a `openai/whisper-large-v3` con `language="es"`.
+  - [x] Devuelve texto limpio; transcripcion vacia es un caso de retorno, no excepcion.
+  - [x] Errores de red, timeout y 401 se traducen a errores tipados.
+  - [x] Ningun fragmento de la API key aparece en mensajes de error.
 - Gates: `python -m compileall .`
 - Human checks: H-05
 - Risk triggers: ninguno
@@ -145,16 +162,23 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-07 - Motor LLM
 
-- Status: blocked (T-04)
+- Status: **done** (2026-08-14). Veredicto: **APTO** (commit `b620ac7`).
+  Gate: 15 pruebas de parseo con datos fijos, sin red ni saldo. Verificacion
+  adicional contra la API real: identidad declarada, cambio de modelo en caliente
+  con la memoria viva (el segundo modelo recordo la pregunta hecha al primero) y una
+  peticion de `tool_call` devuelta **sin ejecutar**, con su id y su mensaje crudo.
+- **Hallazgo mayor de esta tarea** (ver T-03, commit `38715f7`): los dos IDs de
+  modelo del plan no los sirve esta cuenta. Ver `CURRENT.md` > Current facts.
 - Depends on: T-04
 - Scope: `core/llm_engine.py`
 - Acceptance:
-  - [ ] Cliente `openai` con `base_url="https://api.together.xyz/v1"`.
-  - [ ] System prompt documentado que define la personalidad y **declara ser una IA
+  - [x] Cliente `openai` con `base_url="https://api.together.xyz/v1"`.
+  - [x] System prompt documentado que define la personalidad y **declara ser una IA
         cuyas respuestas pueden contener errores** (seccion 11 del enunciado).
-  - [ ] `temperature` y `top_p` son parametros, no constantes: los sliders los leeran.
-  - [ ] El modelo se puede cambiar entre Qwen y Llama sin reiniciar.
-  - [ ] Devuelve texto o peticion de tool; el motor no ejecuta herramientas.
+  - [x] `temperature` y `top_p` son parametros, no constantes: los sliders los leeran.
+  - [x] El modelo se puede cambiar entre Qwen y Llama sin reiniciar. Verificado en
+        caliente, con la conversacion viva.
+  - [x] Devuelve texto o peticion de tool; el motor no ejecuta herramientas.
 - Gates: `pytest tests/test_llm_parsing.py` (parseo de respuestas, con datos fijos)
 - Human checks: H-06
 - Risk triggers: ninguno
@@ -162,13 +186,20 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-08 - Motor TTS
 
-- Status: **ready** (T-03 cerrada el 2026-08-13)
+- Status: **done** (2026-08-14). Veredicto: **APTO** (commit `ba169e1`).
+  Verificado de extremo a extremo: MP3 real de 49 104 bytes sintetizado y reproducido;
+  `reproducir()` tardo 4.92 s en una frase de esa duracion, o sea bloquea de verdad;
+  texto vacio/en blanco/None -> `SintesisFallida`; sin temporales huerfanos.
+  Decision de implementacion: la reproduccion usa **MCI** (interfaz multimedia de
+  Windows) via `ctypes`. Windows decodifica el MP3 de edge-tts sin dependencias
+  extra; anadir una libreria de audio solo para sonar no se justificaba.
+  Pendiente **H-07** (naturalidad de la voz): `python -m core.tts_engine`.
 - Depends on: T-03
 - Scope: `core/tts_engine.py`
 - Acceptance:
-  - [ ] `edge-tts` con voz `es-MX-DaliaNeural`, invocado con `asyncio.run()` local.
-  - [ ] Reproduce el audio y devuelve el control al terminar.
-  - [ ] Si `edge-tts` falla, se propaga un error tipado sin romper el flujo.
+  - [x] `edge-tts` con voz `es-MX-DaliaNeural`, invocado con `asyncio.run()` local.
+  - [x] Reproduce el audio y devuelve el control al terminar (medido: 4.92 s).
+  - [x] Si `edge-tts` falla, se propaga un error tipado sin romper el flujo.
 - Gates: `python -m compileall .`
 - Human checks: H-07
 - Risk triggers: ninguno
@@ -176,7 +207,7 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-09 - Orquestador y maquina de estados
 
-- Status: blocked (T-06, T-07, T-08)
+- Status: **ready** (T-06, T-07 y T-08 cerradas el 2026-08-14)
 - Depends on: T-06, T-07, T-08
 - **Es la tarea de mayor riesgo tecnico del plan.**
 - Scope: `core/orchestrator.py`
