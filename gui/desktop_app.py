@@ -21,9 +21,13 @@ circulo lleno, tres puntos, onda y triangulo. La forma no es decoracion.
 
 from __future__ import annotations
 
+import tempfile
+import threading
 import tkinter
+from pathlib import Path
 
 import customtkinter
+from PIL import Image
 
 from config import COLOR_POR_ESTADO, PALETA
 from core.orchestrator import Estado, TipoEvento
@@ -38,6 +42,14 @@ ALTO_VENTANA = 680
 # Fraccion de la altura de pantalla que la ventana puede ocupar como maximo. El resto
 # deja sitio a la barra de tareas y al marco de la ventana.
 FRACCION_MAXIMA_DE_PANTALLA = 0.86
+
+PESTANA_CONVERSACION = "Conversacion"
+PESTANA_LABORATORIO = "Laboratorio"
+
+# Margen que se espera antes de creerle a un "solte la barra espaciadora". Ver
+# _al_presionar_espacio: por debajo de esto, un soltar+presionar es repeticion
+# automatica del sistema, no un dedo humano.
+MILIS_ANTIRREBOTE_ESPACIO = 60
 
 LADO_LIENZO = 150          # el lienzo del indicador de estado es cuadrado
 MILIS_ANIMACION = 90       # ritmo del pulso, los puntos y la onda
@@ -73,6 +85,9 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         self._estado = Estado.REPOSO
         self._paso_animacion = 0
         self._espacio_presionado = False
+        self._analisis_en_curso = False
+        self._imagen_mapa = None
+        self._cierre_de_espacio_pendiente = None
 
         self._construir()
 
@@ -82,6 +97,10 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         self._orquestador = crear_orquestador(self._notificar_desde_otro_hilo)
 
         self._animar()
+
+        # Que la ventana nazca con el foco del teclado: si nace detras de la terminal
+        # que la lanzo, la barra espaciadora no le llega y parece que no funciona.
+        self.after(120, self._tomar_el_foco)
 
     def _alto_que_cabe(self) -> int:
         """Altura de ventana que de verdad entra en esta pantalla.
@@ -135,21 +154,39 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         )
         self._leyenda.pack(pady=(8, 0))
 
-        # --- Panel de conversacion -------------------------------------------
-        self._conversacion = customtkinter.CTkTextbox(
+        # --- Pestanas: Conversacion y Laboratorio ----------------------------
+        self._pestanas = customtkinter.CTkTabview(
             self,
             fg_color="white",
+            segmented_button_selected_color=PALETA["azul_cielo"],
+            segmented_button_selected_hover_color=PALETA["azul_cielo"],
+            segmented_button_unselected_color=PALETA["fondo_crema"],
             text_color=PALETA["texto_gris_marengo"],
-            border_color=PALETA["azul_cielo"],
-            border_width=2,
             corner_radius=12,
+        )
+        self._pestanas.grid(row=2, column=0, padx=24, pady=8, sticky="nsew")
+        pestana_conversacion = self._pestanas.add(PESTANA_CONVERSACION)
+        pestana_laboratorio = self._pestanas.add(PESTANA_LABORATORIO)
+        self._pestanas.set(PESTANA_CONVERSACION)
+
+        for pestana in (pestana_conversacion, pestana_laboratorio):
+            pestana.grid_columnconfigure(0, weight=1)
+            pestana.grid_rowconfigure(0, weight=1)
+
+        self._conversacion = customtkinter.CTkTextbox(
+            pestana_conversacion,
+            fg_color="white",
+            text_color=PALETA["texto_gris_marengo"],
+            border_width=0,
             font=("Segoe UI", 13),
             wrap="word",
         )
-        self._conversacion.grid(row=2, column=0, padx=24, pady=8, sticky="nsew")
+        self._conversacion.grid(row=0, column=0, sticky="nsew")
         # Solo lectura, pero se escribe en el programaticamente: se habilita justo
         # para escribir y se vuelve a bloquear (ver _escribir).
         self._conversacion.configure(state="disabled")
+
+        self._construir_laboratorio(pestana_laboratorio)
 
         # --- Boton de hablar --------------------------------------------------
         self._boton = customtkinter.CTkButton(
@@ -176,9 +213,12 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         )
         self._pie.grid(row=4, column=0, pady=(0, 14))
 
-        # La barra espaciadora se escucha en toda la ventana.
-        self.bind("<KeyPress-space>", self._al_presionar_espacio)
-        self.bind("<KeyRelease-space>", self._al_soltar_espacio)
+        # bind_all y no bind: con las pestanas, el foco del teclado puede acabar en
+        # el selector, en el panel de texto o en el boton. `bind` en la ventana
+        # depende de que el evento suba por la jerarquia; `bind_all` lo atiende
+        # siempre, este donde este el foco.
+        self.bind_all("<KeyPress-space>", self._al_presionar_espacio)
+        self.bind_all("<KeyRelease-space>", self._al_soltar_espacio)
         self.protocol("WM_DELETE_WINDOW", self._al_cerrar)
 
         self._escribir(
@@ -186,6 +226,51 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             "Hola. Soy una inteligencia artificial, asi que mis respuestas pueden "
             "contener errores. Manten presionado el boton y hablame.",
         )
+
+    def _construir_laboratorio(self, contenedor) -> None:
+        """Pestana Laboratorio (T-13): que le pasa por dentro al Transformer.
+
+        Muestra, sobre la ULTIMA frase que dijo la usuaria: como se corta en tokens y
+        que numero le toca a cada uno, y el mapa de atencion de BETO para esa misma
+        frase. Es la respuesta visual a la pregunta de sustentacion sobre tokenizacion
+        y self-attention: no con un ejemplo de libro, sino con lo que se acaba de decir.
+
+        Todo el calculo lo hace `exploration/transformer_lab.py`. Aqui no se
+        reimplementa nada: si el laboratorio y esta pestana dijeran cosas distintas,
+        una de las dos estaria mintiendo en la sustentacion.
+        """
+        contenedor.grid_rowconfigure(0, weight=0)
+        contenedor.grid_rowconfigure(1, weight=0)
+        contenedor.grid_rowconfigure(2, weight=1)
+
+        self._laboratorio_frase = customtkinter.CTkLabel(
+            contenedor,
+            text="Habla y aqui aparecera el analisis de lo que dijiste.",
+            text_color=PALETA["texto_gris_marengo"],
+            font=("Segoe UI", 12, "italic"),
+            wraplength=440,
+            justify="left",
+        )
+        self._laboratorio_frase.grid(row=0, column=0, sticky="w", padx=8, pady=(8, 4))
+
+        self._laboratorio_tokens = customtkinter.CTkTextbox(
+            contenedor,
+            height=120,
+            fg_color=PALETA["fondo_crema"],
+            text_color=PALETA["texto_gris_marengo"],
+            border_width=0,
+            font=("Consolas", 12),
+            wrap="none",
+        )
+        self._laboratorio_tokens.grid(row=1, column=0, sticky="ew", padx=8)
+        self._laboratorio_tokens.configure(state="disabled")
+
+        self._laboratorio_imagen = customtkinter.CTkLabel(
+            contenedor,
+            text="",
+            image=None,
+        )
+        self._laboratorio_imagen.grid(row=2, column=0, sticky="n", padx=8, pady=8)
 
     # --- Entrada de la usuaria ---------------------------------------------
 
@@ -196,15 +281,41 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         self._orquestador.terminar_y_responder()
 
     def _al_presionar_espacio(self, evento=None) -> None:
-        """Windows repite KeyPress mientras la tecla sigue hundida; se ignora el eco."""
+        """Inicio de la escucha por teclado, a prueba de la repeticion automatica.
+
+        EL PROBLEMA QUE RESUELVE ESTO: mientras una tecla sigue hundida, el sistema
+        la repite. Segun la maquina, esa repeticion puede llegar como una ristra de
+        KeyPress sueltos o como PAREJAS de soltar+presionar decenas de veces por
+        segundo. En el segundo caso, mantener la barra espaciadora cerraba el
+        microfono a los milisegundos de abrirlo: la usuaria hablaba y no se grababa
+        nada. Ignorar solo el KeyPress repetido no bastaba, porque el que hacia dano
+        era el KeyRelease falso.
+
+        La solucion es no creerle a un KeyRelease de inmediato: se espera un instante
+        y, si llega otro KeyPress en ese margen, era repeticion y se cancela el cierre.
+        Un dedo humano no suelta y vuelve a presionar en 60 milisegundos; la
+        repeticion automatica, si.
+        """
+        if self._cierre_de_espacio_pendiente is not None:
+            # Habia un cierre agendado y llego otra pulsacion: era repeticion.
+            self.after_cancel(self._cierre_de_espacio_pendiente)
+            self._cierre_de_espacio_pendiente = None
+            return
         if self._espacio_presionado:
             return
         self._espacio_presionado = True
         self._al_presionar()
 
     def _al_soltar_espacio(self, evento=None) -> None:
-        if not self._espacio_presionado:
+        if not self._espacio_presionado or self._cierre_de_espacio_pendiente is not None:
             return
+        self._cierre_de_espacio_pendiente = self.after(
+            MILIS_ANTIRREBOTE_ESPACIO, self._cerrar_escucha_por_teclado
+        )
+
+    def _cerrar_escucha_por_teclado(self) -> None:
+        """Se solto de verdad: pasaron los milisegundos sin ninguna repeticion."""
+        self._cierre_de_espacio_pendiente = None
         self._espacio_presionado = False
         self._al_soltar()
 
@@ -232,6 +343,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             self._cambiar_estado(evento.estado)
         elif evento.tipo is TipoEvento.TRANSCRIPCION:
             self._escribir("Tu", evento.texto)
+            self._analizar_en_segundo_plano(evento.texto)
         elif evento.tipo is TipoEvento.RESPUESTA:
             self._escribir("Mini-JARVIS", evento.texto)
         elif evento.tipo is TipoEvento.HERRAMIENTA:
@@ -240,6 +352,119 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             # El texto ya viene redactado para una persona: el orquestador se encarga
             # de que ninguna traza tecnica llegue hasta aqui.
             self._escribir("Aviso", evento.texto)
+
+    # --- Laboratorio (T-13) --------------------------------------------------
+
+    def _analizar_en_segundo_plano(self, frase: str) -> None:
+        """Lanza el analisis del Transformer en un hilo aparte.
+
+        POR QUE UN HILO: la primera vez hay que cargar BETO, que son cientos de
+        megabytes y varios segundos. Hacerlo en el hilo de la interfaz dejaria la
+        ventana congelada justo despues de hablar, que es el momento en que la usuaria
+        esta mirando. El criterio de aceptacion de T-13 lo dice explicitamente.
+
+        Si ya hay un analisis corriendo, este se descarta: la frase nueva llegara con
+        el siguiente turno y no vale la pena encolar trabajo que ya quedo viejo.
+        """
+        if self._analisis_en_curso:
+            return
+        self._analisis_en_curso = True
+        self._laboratorio_frase.configure(
+            text=f'Analizando: "{frase}"  (la primera vez tarda unos segundos)'
+        )
+        hilo = threading.Thread(
+            target=self._analizar,
+            args=(frase,),
+            name="minijarvis-laboratorio",
+            daemon=True,
+        )
+        hilo.start()
+
+    def _analizar(self, frase: str) -> None:
+        """Corre en el hilo del laboratorio. No toca ningun widget: solo calcula."""
+        try:
+            # Import perezoso a proposito: `transformer_lab` arrastra torch y
+            # transformers, que tardan segundos en cargar y ocupan memoria. Si se
+            # importara arriba, la aplicacion tardaria eso en abrir aunque nadie
+            # llegue a mirar esta pestana.
+            from exploration import transformer_lab
+
+            filas = transformer_lab.tokenizar_con_qwen(frase)
+            analisis = transformer_lab.analizar_con_beto(frase)
+            ruta_png = Path(tempfile.gettempdir()) / "minijarvis-atencion.png"
+            transformer_lab.dibujar_mapa_de_atencion(
+                analisis["tokens"],
+                analisis["atenciones"],
+                transformer_lab.CAPA_ELEGIDA_BASE0,
+                transformer_lab.CABEZA_ELEGIDA_BASE0,
+                ruta_salida=ruta_png,
+                silencioso=True,
+            )
+            resultado = {
+                "frase": frase,
+                "filas": filas,
+                "forma": analisis["forma_embeddings"],
+                "n_capas": analisis["n_capas"],
+                "n_cabezas": analisis["n_cabezas"],
+                "png": ruta_png,
+            }
+        except Exception as excepcion:  # noqa: BLE001
+            # El laboratorio es valor agregado: si falla, la conversacion sigue
+            # funcionando igual. No se le arruina el turno a nadie por un grafico.
+            resultado = {"frase": frase, "error": str(excepcion)}
+
+        self.after(0, self._pintar_laboratorio, resultado)
+
+    def _pintar_laboratorio(self, resultado: dict) -> None:
+        """Ya en el hilo principal: aqui si se pueden tocar los widgets."""
+        self._analisis_en_curso = False
+
+        if "error" in resultado:
+            self._laboratorio_frase.configure(
+                text="No se pudo analizar esta frase. La conversacion no se ve "
+                     "afectada; vuelve a intentarlo en el siguiente turno."
+            )
+            return
+
+        self._laboratorio_frase.configure(text=f'Frase analizada: "{resultado["frase"]}"')
+
+        lineas = [
+            f"TOKENIZACION con el tokenizador real de Qwen  ->  {len(resultado['filas'])} tokens",
+            "",
+            f"{'idx':>4}  {'ID':>9}  token",
+            f"{'-' * 4}  {'-' * 9}  {'-' * 24}",
+        ]
+        lineas += [
+            f"{indice:>4}  {id_token:>9}  {token}"
+            for indice, id_token, token in resultado["filas"]
+        ]
+        lineas += [
+            "",
+            f"EMBEDDINGS de BETO: {resultado['forma']}",
+            f"  = (1 frase, {resultado['forma'][1]} tokens, {resultado['forma'][2]} numeros por token)",
+            f"ATENCION: {resultado['n_capas']} capas x {resultado['n_cabezas']} cabezas.",
+        ]
+
+        self._laboratorio_tokens.configure(state="normal")
+        self._laboratorio_tokens.delete("1.0", "end")
+        self._laboratorio_tokens.insert("1.0", "\n".join(lineas))
+        self._laboratorio_tokens.configure(state="disabled")
+
+        self._mostrar_mapa(resultado["png"])
+
+    def _mostrar_mapa(self, ruta_png) -> None:
+        """Carga el PNG del mapa de atencion y lo encaja en el ancho disponible."""
+        imagen = Image.open(ruta_png)
+        ancho_disponible = max(self._laboratorio_imagen.winfo_width(), 400)
+        proporcion = imagen.height / imagen.width
+        ancho = min(ancho_disponible, 460)
+        tamano = (ancho, int(ancho * proporcion))
+
+        # Se guarda la referencia en el propio objeto: si se pierde, el recolector de
+        # basura de Python se lleva la imagen y el widget queda en blanco. Es un
+        # tropiezo clasico de Tkinter.
+        self._imagen_mapa = customtkinter.CTkImage(light_image=imagen, size=tamano)
+        self._laboratorio_imagen.configure(image=self._imagen_mapa, text="")
 
     # --- Pintado -------------------------------------------------------------
 
@@ -352,3 +577,16 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             centro - radio, centro - radio, centro + radio, centro + radio,
             fill=PALETA["fondo_crema"], outline=borde, width=2, dash=(6, 5),
         )
+
+    def _tomar_el_foco(self) -> None:
+        """Trae la ventana al frente y le da el foco del teclado al abrirse.
+
+        Sin esto, la ventana puede quedar detras de la terminal desde la que se
+        lanzo. La aplicacion se ve, pero las teclas se las lleva la otra ventana y la
+        barra espaciadora "no hace nada", sin ninguna pista de por que.
+        """
+        try:
+            self.lift()
+            self.focus_force()
+        except Exception:  # noqa: BLE001 - tomar el foco nunca debe romper el arranque
+            pass

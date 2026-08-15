@@ -168,6 +168,116 @@ def _cargar_o_fallar(descripcion, funcion, *args, **kwargs):
 
 
 # ---------------------------------------------------------------------------------
+# API reutilizable
+#
+# Estas funciones son el laboratorio de verdad; lo que viene despues (nivel_1, nivel_2)
+# solo las llama y da formato a la consola. Existen porque la pestana Laboratorio de la
+# aplicacion (T-13) necesita lo mismo que el script, y tener dos implementaciones del
+# mismo calculo es la forma mas segura de que un dia digan cosas distintas: se corrige
+# una y se olvida la otra, y la demostracion contradice al informe.
+#
+# Los modelos se guardan en cache al primer uso: BETO pesa cientos de MB y tarda varios
+# segundos en cargar. En el script da igual porque se carga una vez; en la aplicacion
+# seria inaceptable esperar eso en cada frase.
+# ---------------------------------------------------------------------------------
+
+_cache_modelos = {}
+
+
+def obtener_tokenizador_qwen():
+    """Devuelve el tokenizador de Qwen, cargandolo solo la primera vez."""
+    if "qwen" not in _cache_modelos:
+        _cache_modelos["qwen"] = _cargar_o_fallar(
+            f"el tokenizador de {NOMBRE_TOKENIZADOR_QWEN}",
+            AutoTokenizer.from_pretrained,
+            NOMBRE_TOKENIZADOR_QWEN,
+        )
+    return _cache_modelos["qwen"]
+
+
+def obtener_beto():
+    """Devuelve (tokenizador, modelo) de BETO, cargandolos solo la primera vez.
+
+    El modelo se carga con `attn_implementation="eager"` SIEMPRE. Es la trampa
+    documentada al inicio del archivo: sin eso, `output_attentions=True` devuelve
+    None en silencio y todo el laboratorio queda vacio sin dar ningun error.
+    """
+    if "beto" not in _cache_modelos:
+        tokenizador = _cargar_o_fallar(
+            f"el tokenizador de {NOMBRE_MODELO_BETO}",
+            AutoTokenizer.from_pretrained,
+            NOMBRE_MODELO_BETO,
+        )
+        modelo = _cargar_o_fallar(
+            f"los pesos de {NOMBRE_MODELO_BETO}",
+            AutoModel.from_pretrained,
+            NOMBRE_MODELO_BETO,
+            attn_implementation="eager",
+        )
+        # Modo inferencia: se desactivan capas como dropout y el resultado es
+        # determinista, que es lo que se quiere para poder repetir una demostracion.
+        modelo.eval()
+        _cache_modelos["beto"] = (tokenizador, modelo)
+    return _cache_modelos["beto"]
+
+
+def token_legible(token):
+    """Convierte un token crudo en algo que una persona pueda leer en pantalla.
+
+    El tokenizador de Qwen marca el inicio de palabra con 'Ġ' (un espacio codificado);
+    se muestra como punto medio para que se vea donde habia un espacio en el original.
+    """
+    return "·" + token[1:] if token.startswith("Ġ") else token
+
+
+def tokenizar_con_qwen(frase):
+    """Corta la frase en tokens con el tokenizador real de Qwen.
+
+    Devuelve una lista de (indice, id_numerico, token_legible). Es lo que muestran
+    tanto la consola del script como la tabla de la pestana Laboratorio.
+    """
+    tokenizador = obtener_tokenizador_qwen()
+    ids = tokenizador.encode(frase)
+    tokens = tokenizador.convert_ids_to_tokens(ids)
+    return [
+        (indice, id_token, token_legible(token))
+        for indice, (token, id_token) in enumerate(zip(tokens, ids))
+    ]
+
+
+def analizar_con_beto(frase):
+    """Pasa la frase por BETO y devuelve sus tokens, embeddings y atenciones reales.
+
+    Devuelve un diccionario con:
+      tokens              lista de tokens, incluidos [CLS] y [SEP]
+      embeddings          tensor (1, n_tokens, 768)
+      atenciones          tupla de 12 tensores (1, 12, n_tokens, n_tokens)
+      forma_embeddings    la forma de arriba como tupla, para mostrarla
+      n_capas, n_cabezas  numero de capas y de cabezas de atencion
+    """
+    tokenizador, modelo = obtener_beto()
+    entradas = tokenizador(frase, return_tensors="pt")
+    tokens = tokenizador.convert_ids_to_tokens(entradas["input_ids"][0])
+
+    # Sin torch.no_grad() PyTorch guardaria informacion para calcular gradientes, como
+    # si fueramos a entrenar. Aqui solo hay inferencia: es mas rapido y usa menos
+    # memoria desactivarlo.
+    with torch.no_grad():
+        salida = modelo(**entradas, output_attentions=True)
+
+    _verificar_atenciones(salida)
+
+    return {
+        "tokens": tokens,
+        "embeddings": salida.last_hidden_state,
+        "atenciones": salida.attentions,
+        "forma_embeddings": tuple(salida.last_hidden_state.shape),
+        "n_capas": len(salida.attentions),
+        "n_cabezas": salida.attentions[0].shape[1],
+    }
+
+
+# ---------------------------------------------------------------------------------
 # Nivel 1 - Tokenizacion
 # ---------------------------------------------------------------------------------
 
@@ -191,19 +301,17 @@ def nivel_1_tokenizacion():
         "responde en la aplicacion."
     )
 
-    tokenizador = _cargar_o_fallar(
-        f"el tokenizador de {NOMBRE_TOKENIZADOR_QWEN}",
-        AutoTokenizer.from_pretrained,
-        NOMBRE_TOKENIZADOR_QWEN,
-    )
+    tokenizador = obtener_tokenizador_qwen()
 
     _subtitulo("Frase de ejemplo (propia del proyecto Mini-JARVIS)")
     print(f'"{FRASE_NIVEL_1}"')
 
+    # Misma funcion que alimenta la tabla de la pestana Laboratorio de la aplicacion.
+    filas = tokenizar_con_qwen(FRASE_NIVEL_1)
     ids = tokenizador.encode(FRASE_NIVEL_1)
     tokens = tokenizador.convert_ids_to_tokens(ids)
 
-    _subtitulo(f"Tokens generados: {len(tokens)}")
+    _subtitulo(f"Tokens generados: {len(filas)}")
     print(
         "Cada fila de abajo es un token con su ID numerico. El caracter 'Ġ' que "
         "aparece pegado a algunos tokens es la forma en que este tokenizador marca "
@@ -222,8 +330,7 @@ def nivel_1_tokenizacion():
     )
     print(f"{'idx':>4}  {'ID token':>9}  token")
     print(f"{'-' * 4}  {'-' * 9}  {'-' * 30}")
-    for indice, (token, id_token) in enumerate(zip(tokens, ids)):
-        token_visible = "·" + token[1:] if token.startswith("Ġ") else token
+    for indice, id_token, token_visible in filas:
         print(f"{indice:>4}  {id_token:>9}  {token_visible}")
 
     # Concepto: agrupamos los tokens en "palabras" para mostrar donde el
@@ -305,24 +412,7 @@ def nivel_2_embeddings_y_atencion():
         "pesos completos del modelo, porque necesitamos mirar dentro de sus capas."
     )
 
-    tokenizador = _cargar_o_fallar(
-        f"el tokenizador de {NOMBRE_MODELO_BETO}",
-        AutoTokenizer.from_pretrained,
-        NOMBRE_MODELO_BETO,
-    )
-
-    # attn_implementation="eager" es OBLIGATORIO: ver la trampa critica documentada
-    # al inicio del archivo. Sin esto, output_attentions=True devuelve None en silencio.
-    modelo = _cargar_o_fallar(
-        f"los pesos de {NOMBRE_MODELO_BETO}",
-        AutoModel.from_pretrained,
-        NOMBRE_MODELO_BETO,
-        attn_implementation="eager",
-    )
-
-    # Modo inferencia: le decimos a PyTorch que no vamos a entrenar, asi que capas
-    # como dropout se desactivan y el resultado es determinista.
-    modelo.eval()
+    tokenizador, _modelo = obtener_beto()
 
     _subtitulo("Frase de ejemplo (propia del proyecto Mini-JARVIS)")
     print(f'"{FRASE_NIVEL_2}"')
@@ -341,8 +431,9 @@ def nivel_2_embeddings_y_atencion():
             "el numero real de tokens de esta ejecucion."
         )
 
-    entradas = tokenizador(FRASE_NIVEL_2, return_tensors="pt")
-    tokens = tokenizador.convert_ids_to_tokens(entradas["input_ids"][0])
+    # Mismo analisis que usa la pestana Laboratorio: una sola implementacion.
+    analisis = analizar_con_beto(FRASE_NIVEL_2)
+    tokens = analisis["tokens"]
 
     _subtitulo("Tokens de BETO para esta frase (incluye [CLS] y [SEP])")
     print(
@@ -352,15 +443,7 @@ def nivel_2_embeddings_y_atencion():
     for indice, token in enumerate(tokens):
         print(f"  {indice:>2}  {token}")
 
-    # Sin torch.no_grad() PyTorch guardaria informacion extra para poder calcular
-    # gradientes (como si fueramos a entrenar). Aqui solo queremos inferencia: es
-    # mas rapido y usa menos memoria desactivar ese calculo.
-    with torch.no_grad():
-        salida = modelo(**entradas, output_attentions=True)
-
-    _verificar_atenciones(salida)
-
-    embeddings = salida.last_hidden_state
+    embeddings = analisis["embeddings"]
     _subtitulo("Embeddings contextuales (last_hidden_state)")
     print(f"Forma del tensor: {tuple(embeddings.shape)}")
     print(
@@ -377,7 +460,7 @@ def nivel_2_embeddings_y_atencion():
         "juntos, codifican el significado contextual de ese token."
     )
 
-    atenciones = salida.attentions
+    atenciones = analisis["atenciones"]
     _subtitulo("Matrices de self-attention")
     print(f"Numero de capas de atencion devueltas: {len(atenciones)} (BETO tiene 12 capas Transformer).")
     forma_capa = tuple(atenciones[0].shape)
@@ -429,25 +512,37 @@ def nivel_2_embeddings_y_atencion():
 # Mapa de calor
 # ---------------------------------------------------------------------------------
 
-def dibujar_mapa_de_atencion(tokens, atenciones, capa_base0, cabeza_base0):
+def dibujar_mapa_de_atencion(tokens, atenciones, capa_base0, cabeza_base0,
+                             ruta_salida=None, silencioso=False):
     """Dibuja y guarda un mapa de calor de una capa y cabeza de atencion concretas.
 
     CONCEPTO CLAVE: un mapa de calor de atencion es, literalmente, la matriz que
     describe el nivel 2 vuelta imagen. Cada celda (fila=token que consulta,
     columna=token consultado) se pinta con un color segun cuanta atencion le puso
     ese token a ese otro token; entre mas oscuro/saturado, mas atencion.
+
+    `ruta_salida` y `silencioso` existen para la pestana Laboratorio de la aplicacion
+    (T-13), que necesita el PNG en otro sitio y sin imprimir nada por consola. El
+    dibujo es exactamente el mismo, y esa es la idea: la imagen que se ve en la
+    aplicacion y la del informe salen del mismo codigo. Devuelve la ruta escrita.
     """
-    _encabezado("MAPA DE CALOR DE ATENCION")
+    # En modo silencioso los comentarios de consola se descartan. Se usa un nombre
+    # propio en vez de sombrear `print`: sombrearlo volveria local ese nombre en toda
+    # la funcion y reventaria en el camino normal.
+    escribir = (lambda *_a, **_k: None) if silencioso else print
+
+    if not silencioso:
+        _encabezado("MAPA DE CALOR DE ATENCION")
 
     capa_humana = capa_base0 + 1
     cabeza_humana = cabeza_base0 + 1
-    print(
+    escribir(
         f"Capa elegida: indice base-0 = {capa_base0}  (capa humana #{capa_humana} de 12)"
     )
-    print(
+    escribir(
         f"Cabeza elegida: indice base-0 = {cabeza_base0}  (cabeza humana #{cabeza_humana} de 12)"
     )
-    print(
+    escribir(
         "Se eligio esta combinacion porque, de las 144 capas x cabezas posibles, es "
         "una 'cabeza de token anterior': en el mapa se ve una franja iluminada justo "
         "a la izquierda de la diagonal principal, es decir, cada token le presta casi "
@@ -499,13 +594,15 @@ def dibujar_mapa_de_atencion(tokens, atenciones, capa_base0, cabeza_base0):
 
     figura.tight_layout()
 
-    ruta_salida = Path(__file__).resolve().parent / NOMBRE_PNG_SALIDA
+    if ruta_salida is None:
+        ruta_salida = Path(__file__).resolve().parent / NOMBRE_PNG_SALIDA
+    ruta_salida = Path(ruta_salida)
     figura.savefig(ruta_salida, dpi=150, facecolor=figura.get_facecolor())
     plt.close(figura)
 
-    tamano_bytes = ruta_salida.stat().st_size
-    print(f"\nPNG guardado en: {ruta_salida}")
-    print(f"Tamano del archivo: {tamano_bytes} bytes")
+    escribir(f"\nPNG guardado en: {ruta_salida}")
+    escribir(f"Tamano del archivo: {ruta_salida.stat().st_size} bytes")
+    return ruta_salida
 
 
 # ---------------------------------------------------------------------------------
