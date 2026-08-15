@@ -78,6 +78,18 @@ class MemoriaConversacional:
         """Cierra el turno abierto con la respuesta del asistente."""
         self._mensaje_al_turno_abierto({"role": "assistant", "content": texto})
 
+    def agregar_mensaje_del_asistente_crudo(self, mensaje: dict) -> None:
+        """Anade el mensaje del asistente tal cual lo devolvio la API.
+
+        Hace falta cuando el modelo pidio una herramienta: la API exige que cada
+        mensaje de rol "tool" venga precedido por el mensaje del asistente que la
+        pidio, con sus `tool_calls` intactos. Si se guardara solo el texto, la
+        siguiente llamada seria rechazada por incoherente.
+        """
+        if not mensaje:
+            return
+        self._mensaje_al_turno_abierto(dict(mensaje))
+
     def agregar_mensaje_de_tool(self, tool_call_id: str, contenido: str) -> None:
         """Anade al turno abierto el resultado de una herramienta (T-15).
 
