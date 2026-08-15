@@ -345,7 +345,15 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ### T-13 - Pestana Laboratorio en la GUI
 
-- Status: blocked (Fase 1)
+- Status: **construida y verificada, veredicto EN SUSPENSO** (2026-08-14).
+  Se implemento antes de que la duena pidiera detener la Fase 2, asi que su cierre
+  formal espera su OK. Verificado con un `mainloop` real: 20.3 s el primer analisis
+  (carga de BETO) y 0.8 s los siguientes; la ventana latio 309 veces mientras
+  calculaba, o sea no se congelo. `exploration/transformer_lab.py` se refactorizo para
+  exponer su API y **no duplicar el calculo**; su salida de consola quedo identica
+  byte a byte, comprobado contra la evidencia anterior.
+  **Aviso**: si se aprueba el rediseno de ventana que pidio la duena, esta pestana
+  desaparece como tal y su contenido pasa a verse junto a la conversacion.
 - Depends on: T-11, T-10
 - Scope: `gui/desktop_app.py`
 - Acceptance:
@@ -375,9 +383,16 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ### T-15 - Tool calling
 
-- Status: blocked (T-14)
+- Status: blocked (Fase 2 sin abrir)
 - Depends on: T-07, T-09
 - Scope: `tools/manifest.py`, `tools/system_skills.py`, `tests/test_tools.py`
+- **ALCANCE AMPLIADO a peticion de la duena (2026-08-14): cuarta herramienta
+  `calcular`.** Motivo: probo "raiz cuadrada de 3340" y el modelo respondio "no tengo
+  calculadora pero puedo dar una respuesta aproximada". Un LLM no calcula, predice
+  texto. No hace falta ningun servicio externo: Python es la calculadora.
+  **Restriccion de seguridad, no negociable: nada de `eval` ni `exec` sobre lo que
+  devuelva el modelo.** La expresion se analiza con `ast` contra una lista blanca de
+  operaciones y funciones matematicas. Es la misma clase de riesgo que `abrir_kiosk`.
 - Acceptance:
   - [ ] `estado_laptop` con `psutil`: bateria, RAM y CPU en tono conversacional.
   - [ ] `buscar_web` con `duckduckgo-search`.
@@ -390,6 +405,31 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 - Human checks: H-15
 - Risk triggers: **si** — `abrir_kiosk` ejecuta un proceso. Auditoria obligatoria.
 - STOP when: se proponga ejecutar cualquier comando fuera de la lista blanca.
+
+### T-19 - Rediseno visual y de distribucion (NUEVA, pedida el 2026-08-14)
+
+- Status: **propuesta, sin abrir**. Requiere el OK de la duena.
+- Depends on: cierre de la Fase 1 (hecho)
+- Scope: `gui/desktop_app.py`, `config.py`, posible `gui/assets/`
+- Motivo: la duena considera la interfaz "limpia y profesional" pero sin personalidad,
+  y quiere que la presentacion sea mas vistosa.
+- Acceptance:
+  - [ ] Estetica con la tematica que pidio (paleta turquesa/rosa del personaje).
+  - [ ] Modulo de estado mas grande.
+  - [ ] **Sin pestanas**: conversacion y laboratorio visibles a la vez.
+  - [ ] El mapa de atencion se abre expandido sobre la ventana, con boton de cerrar
+        visible.
+  - [ ] Los cuatro estados siguen distinguiendose por color Y forma (H-09 no se
+        negocia: sigue siendo NO APTO automatico que dos compartan color).
+- **Punto abierto que hay que decidir ANTES de implementar**: el repositorio es
+  publico y el diseno del personaje es propiedad de Crypton Future Media. Subir arte
+  de terceros a un repositorio publico no procede. Opciones: arte original generado
+  por codigo con esa estetica, o una imagen cuyos derechos tenga la duena.
+- Sobre la voz: no existe un TTS libre con la voz del personaje. Lo viable es subir
+  tono y ritmo de una voz de edge-tts. Ya preparado en `config.py` (`TONO_TTS`,
+  `RITMO_TTS`), sin aplicar todavia en `core/tts_engine.py`.
+- Risk triggers: ninguno tecnico. El riesgo es de alcance: es la clase de tarea que
+  se come los dias que hacen falta para el informe y el video.
 
 ## Cierre de Fase 2 — fecha limite 25 de agosto
 

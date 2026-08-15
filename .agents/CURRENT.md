@@ -5,8 +5,8 @@ updated_at: 2026-08-14
 source_commit: (ver ultimo [STATE]; limpio y sincronizado con origin/main)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
-active_task: ninguna — Fase 1 CERRADA, esperando checks humanos
-last_verdict: T-12 APTO — Fase 1 completa (T-01 a T-12)
+active_task: ninguna — sesion cerrada, esperando auditoria externa y el OK de la duena
+last_verdict: T-12 APTO — Fase 1 completa y probada a mano por la duena
 backup: remote origin -> https://github.com/TahisMacias/proyecto-minijarvis (publico)
 deadline: 2026-08-27
 ```
@@ -17,121 +17,95 @@ Di "continua el plan". Todo el estado vive aqui, no en ninguna conversacion.
 Orden de lectura: este archivo -> `PLAN_v1.0-entrega-27ago.md` -> `AGENTS.md`.
 El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 
-### Estado al cerrar la sesion del 2026-08-14
-
-1. **T-11 esta cerrada y APTO** (commit `f1a9f43`). El aviso de la sesion anterior
-   ("T-11 no se hizo, el archivo no existe") era **falso**: el Obrero si entrego,
-   pero su codigo entro por error dentro del commit de T-03 y nadie lo audito.
-   Leccion de proceso: verificar `git show --stat` antes de declarar que una tarea
-   no se hizo. Un archivo puede existir y aun asi no estar cerrado.
-2. **Decision abierta sobre la jerarquia de tres niveles.** El Ingeniero se detuvo a
-   mitad de su primera tanda sin emitir veredictos; hubo que reanudarlo. Criterio ya
-   acordado con la duena: si vuelve a fallar, se elimina el nivel intermedio y el
-   Arquitecto despacha Obreros declarando cada despacho en voz alta. Un incidente no
-   es patron; dos si.
-
 ## Next action
 
-**La Fase 1 cerro el 2026-08-14, ocho dias antes de su fecha limite.** El plan tiene
-una regla propia: *la Fase 2 no empieza hasta que la Fase 1 este completa y
-verificada*. Lo que falta para "verificada" no lo puede hacer nadie mas que la duena:
+**BLOQUEADO A PROPOSITO. No abrir la Fase 2 sin el OK explicito de la duena.**
 
-1. **H-04**: `python -m core.audio_capture` — escuchar si el audio capturado sirve.
-2. **H-07**: `python -m core.tts_engine` — juzgar si la voz suena natural.
-3. **H-09 y H-10**: `python main.py` — usar la aplicacion con voz real, y confirmar
-   que los estados se distinguen sin leer el texto.
-4. **H-11**: mirar `exploration/mapa_atencion.png` y poder explicarlo en voz alta.
-5. **H-12**: seguir el README desde cero como si fuera otra persona.
+1. **Auditoria externa** con otro agente. Es lo que la duena pidio antes de seguir.
+   Alcance sugerido: `core/`, `gui/`, `config.py`, `tests/`; base de comparacion los
+   criterios de aceptacion de T-01 a T-13 en el plan.
+2. Con su OK, abrir la **Fase 2 con alcance ampliado** (ver la seccion siguiente).
 
-Con esos cinco firmados, la Fase 2 entra completa (T-13, T-14, T-15): la decision de
-no recortarla ya esta tomada y escrita en el plan, porque la fase cerro con margen.
+## Fase 2 propuesta — pedida por la duena, NO empezada
+
+Tres bloques nuevos que se suman a lo ya planificado. Ninguno se ha tocado.
+
+### A. Tool calling con calculadora (amplia T-15)
+- La duena probo "raiz cuadrada de 3340" y el modelo respondio "no tengo calculadora
+  pero puedo dar una respuesta aproximada". Un LLM **no calcula: predice texto**.
+- Se anade `calcular` como cuarta herramienta. No hace falta ningun servicio externo:
+  Python es la calculadora. **Nunca con `eval` sobre lo que diga el modelo**; hay que
+  analizar la expresion con `ast` y una lista blanca de operaciones y funciones.
+- Valor doble: arregla el sintoma y da una demostracion muy clara del antes y despues.
+
+### B. Rediseno visual con tematica Hatsune Miku
+- Paleta del personaje (turquesa `#39C5BB` y rosa) y un fondo con el personaje.
+- **Punto abierto de derechos**: el repositorio es publico y el diseno del personaje es
+  propiedad de Crypton Future Media. No conviene subir arte de terceros. Alternativas:
+  arte original generado por codigo con esa estetica, o que la duena aporte una imagen
+  cuyos derechos tenga. Hay que decidirlo antes de implementar.
+- Voz "tipo Miku": no existe un TTS libre con esa voz. Lo viable es subir tono y ritmo
+  de una voz de edge-tts; ya esta preparado en `config.py` (`TONO_TTS`, `RITMO_TTS`),
+  sin aplicar todavia en el motor de voz.
+
+### C. Nueva distribucion de la ventana
+- Modulo de estado mas grande.
+- **Quitar las pestanas**: conversacion y laboratorio visibles a la vez, para que la
+  presentacion sea mas vistosa.
+- El mapa de atencion pasa a ser un boton que lo abre **expandido sobre la ventana**,
+  con boton de cerrar visible.
 
 ## Blockers
 
-- Ninguno. Los dos bloqueos de la sesion anterior se resolvieron el 2026-08-13.
+- Ninguno tecnico. El unico freno es deliberado: falta el OK de la duena.
 
 ## Current facts
 
-- **Entrega: 27 de agosto de 2026.** 14 dias desde el inicio del proyecto.
-- Diseno aprobado y versionado en `docs/specs/2026-08-13-mini-jarvis-design.md`.
-- Plan activo de 18 tareas en 3 fases con fechas de corte: nucleo 22 ago,
-  valor agregado 25 ago, cierre 27 ago.
+- **Entrega: 27 de agosto de 2026.** Fase 1 cerrada el 14 de agosto, con 8 dias de
+  margen sobre su fecha limite.
+- **La aplicacion funciona de extremo a extremo con voz real**, verificado por la
+  duena: hablar -> transcribir -> responder -> voz, con memoria entre turnos.
 - Repositorio publico en `https://github.com/TahisMacias/proyecto-minijarvis`,
-  12 commits publicados, local y remoto sincronizados.
-- `gh` CLI v2.97.0 autenticado como `TahisMacias`, scopes `repo` y `workflow`.
-- `TOGETHER_API_KEY` en `.env` local, validada contra `GET /v1/models` (HTTP 200).
-- **Modelos: los dos IDs del plan original NO los sirve esta cuenta.**
-  `Qwen/Qwen2.5-72B-Instruct` y `meta-llama/Llama-3.3-70B-Instruct` aparecen en
-  `GET /v1/models` pero al pedirles una respuesta devuelven HTTP 400 "Unable to
-  access non-serverless model": estan en el catalogo, no en el servicio compartido.
-  Aparecer en el listado no prueba disponibilidad; solo la prueba una peticion de
-  chat real. Se probaron catorce identificadores uno por uno.
-  IDs vigentes, ambos con respuesta real verificada (`config.py`, commit `38715f7`):
-  predeterminado `meta-llama/Llama-3.3-70B-Instruct-Turbo`, alterno
-  `Qwen/Qwen2.5-7B-Instruct-Turbo`. `openai/whisper-large-v3` si funciona: se
-  transcribio audio real de extremo a extremo.
-- El tokenizador de Llama 3.3 en Hugging Face es un repositorio restringido (exige
-  aceptar la licencia de Meta). Por eso el nivel 1 del laboratorio usa el de Qwen2.5,
-  que es publico y ademas es el del modelo alterno real del proyecto.
-- El enunciado en PDF **no esta versionado** a proposito: es material del docente y
-  el repositorio es publico. Vive en local, excluido por `.gitignore`.
-- **Python 3.14.5 confirmado como interprete definitivo** (T-01). Todo el stack
-  instala con wheels nativos `cp314`, `torch 2.13.0+cpu` incluido. Riesgo cerrado.
-- Entorno virtual creado en `.venv/` con los 11 paquetes instalados.
-- **T-11 entregado y APTO.** `exploration/transformer_lab.py` corre con exit 0 y
-  genera `exploration/mapa_atencion.png` (capa 6, cabeza 4: cabeza de token
-  anterior). La salida completa esta versionada en
-  `docs/evidencia/T-11-salida-transformer_lab.txt` y sirve de material directo para
-  el informe (T-16) y la sustentacion. El 25% mas pesado de la rubrica esta cubierto.
-- La extraccion de self-attention sobre BETO requiere `attn_implementation="eager"`;
-  el script lo verifica en tiempo de ejecucion y falla con mensaje explicito si no.
-- Microfono verificado: 10 dispositivos, Realtek por defecto, captura real correcta.
-- Esqueleto del repositorio completo: `README.md`, `requirements.txt` con 12
-  versiones fijadas, `.env.example`, y los cuatro paquetes importables.
-- `config.py` existe y esta APTO: carga segura de credenciales, paleta de 5 acentos,
-  IDs de modelo, limites de memoria y lista blanca de dominios. Es la fuente unica
-  de verdad de configuracion; ningun otro modulo debe leer variables de entorno.
-- **El pipeline de voz funciona de extremo a extremo.** Verificado sin GUI con los
-  modulos reales: audio -> Whisper -> Llama -> voz reproducida, con la secuencia de
-  estados correcta y vuelta a REPOSO, en 21.8 s.
-- **`core/` completo y APTO el 2026-08-14**: `memory.py` (T-04), `audio_capture.py`
-  (T-05), `stt_client.py` (T-06), `llm_engine.py` (T-07), `tts_engine.py` (T-08) y
-  `orchestrator.py` (T-09). Mas `gui/desktop_app.py` y `main.py` (T-10).
-- El orquestador **no importa nada de la GUI**: su unico canal de salida es un
-  callback que la ventana envuelve en `root.after(0, ...)`. Hay una prueba que analiza
-  el AST y falla si aparece un import de tkinter, customtkinter o gui.
-- La ventana calcula su altura contra la pantalla real y su escalado. Con el 133 % de
-  esta maquina, la altura fija de 680 dejaba el boton debajo de la barra de tareas.
-- Suite de pruebas: 59 verdes en ~3 s (`tests/test_memory.py`,
-  `tests/test_llm_parsing.py`, `tests/test_orchestrator.py`,
-  `tests/test_paleta_estados.py`). Se anadio `pytest==9.1.1` a `requirements.txt` y
-  `pytest.ini` con `pythonpath = .`, sin lo cual el comando del gate no encuentra
-  el paquete `core`.
-- La reproduccion de voz usa **MCI** (interfaz multimedia de Windows) via `ctypes`:
-  Windows decodifica el MP3 de edge-tts sin dependencias extra.
-- Falta `tools/` (T-15, tool calling), que es Fase 2. El orquestador ya lo soporta:
-  recibe `ejecutar_herramienta` y respeta el limite de 2 rondas; sin ese argumento
-  responde con el texto disponible, que es lo que hace hoy.
+  local y remoto sincronizados.
+- **Modelos (probados uno por uno contra la API, no por el listado)**:
+  predeterminado `Qwen/Qwen3.8-2.4T-A95B` (razonamiento, 1-4 s por respuesta),
+  alterno `Qwen/Qwen2.5-7B-Instruct-Turbo`, STT `openai/whisper-large-v3`.
+  **Aparecer en `GET /v1/models` no prueba disponibilidad**: casi todos los modelos
+  grandes devuelven HTTP 400 "non-serverless". Precios anotados en `config.py`.
+- Python 3.14.5, entorno en `.venv/`, 13 dependencias fijadas en `requirements.txt`.
+  Instalacion desde cero verificada en un entorno limpio.
+- **70 pruebas verdes en ~4 s**, sin red, sin microfono y sin gastar saldo.
+- Codigo entregado: `config.py`, los seis modulos de `core/`, `gui/desktop_app.py`,
+  `main.py`, `exploration/transformer_lab.py`, `Iniciar Mini-JARVIS.bat`.
+- Falta `tools/` (T-15). El orquestador ya lo soporta: recibe `ejecutar_herramienta` y
+  respeta el limite de 2 rondas; sin ese argumento responde con el texto disponible.
+- **T-13 (pestana Laboratorio) esta construida y verificada**, pero se hizo antes de
+  que la duena pidiera detener la Fase 2. Su veredicto queda en suspenso. Si el
+  rediseno de la ventana sigue adelante, esa pestana desaparece como tal.
+- La extraccion de atencion sobre BETO exige `attn_implementation="eager"`; el
+  laboratorio lo verifica en tiempo de ejecucion y falla con mensaje explicito si no.
+- El enunciado en PDF **no esta versionado** a proposito: es material del docente y el
+  repositorio es publico.
 
 ## Open findings
 
-- El nivel Ingeniero **si** aporto independencia real en T-03: corrio sus propios
-  gates y probo un caso que nadie le pidio (variable en blanco `"   "`, tambien
-  rechazada). Pero se detuvo dos veces esperando a sus Obreros. Veredicto pendiente
-  de la segunda observacion; criterio escrito en la seccion de trabajo a medias.
-
-- La sintesis original del equipo proponia `asyncio` y 7 herramientas. El diseno
-  aprobado se aparta en ambos puntos, con motivos registrados en CONTEXT y en el spec.
-  `Sintesis del proyecto.md` sigue en el repositorio como documento historico; si
-  genera confusion mas adelante, conviene marcarlo como superado.
+- **Un color que el usuario no puede nombrar no comunica nada.** Los tres defectos que
+  encontro la duena viven en la frontera entre el codigo y la percepcion: ninguna
+  prueba automatica los habria visto. Conviene seguir alternando pruebas y uso real.
+- El nivel Ingeniero de la jerarquia de tres niveles quedo sin segunda observacion: las
+  ultimas sesiones no lo usaron. El criterio escrito sigue vigente por si se retoma.
+- `Sintesis del proyecto.md` sigue en el repositorio como documento historico y ya
+  contradice varias decisiones vigentes (`asyncio`, 7 herramientas, modelos). Conviene
+  marcarlo como superado antes de la entrega.
 
 ## Human actions
 
-- [x] Autenticacion con GitHub. Verificado 2026-08-13.
-- [x] `TOGETHER_API_KEY` en `.env`, validada contra la API. Verificado 2026-08-13.
-- [x] Proveedor de STT decidido: `openai/whisper-large-v3`.
-- [ ] **H-04**: escuchar la calidad del audio capturado -> `python -m core.audio_capture`.
-- [ ] **H-07**: escuchar la naturalidad de la voz -> `python -m core.tts_engine`.
+- [x] Autenticacion con GitHub, `TOGETHER_API_KEY` validada, proveedor de STT decidido.
+- [x] **Recorrido completo de `docs/pruebas-manuales.md`** (2026-08-14). Todo el lado
+      tecnico paso; los tres fallos reportados estan corregidos y publicados.
+- [ ] **Reprobar 5.1, 5.3 y 2.3** con las correcciones ya aplicadas.
+- [ ] H-10: que una persona ajena al proyecto use la aplicacion sin instrucciones.
+- [ ] H-11: mirar `exploration/mapa_atencion.png` y poder explicarlo en voz alta.
 - [ ] Verificar saldo en Together AI la vispera de la sustentacion (26 ago).
 - [ ] No reactivar OneDrive durante el proyecto.
 - [ ] Reservar los dias 26 y 27 para informe, video y ensayo. Sin codigo.

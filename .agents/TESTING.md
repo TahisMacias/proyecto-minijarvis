@@ -15,19 +15,20 @@ directa de codigo desde este archivo.
 - [x] H-02. **[OK 2026-08-13]** Listar dispositivos de audio desde Python -> 10
       dispositivos de entrada. Predeterminado: "Microfono (Realtek(R) Audio)".
       Captura real de 0.5s a 16 kHz: 8000 frames, senal no nula.
-- [ ] H-03. Seguir el README desde cero en una carpeta limpia -> el proyecto queda
-      instalado sin ningun paso que no este escrito.
+- [x] H-03. **[OK 2026-08-14]** Entorno virtual limpio creado solo desde
+      `requirements.txt`: los 16 imports funcionan, las pruebas pasan y todos los
+      modulos cargan. Falta la version en OTRA maquina, que es parte de T-18.
 - [x] H-04. **[OK 2026-08-14, firmado por la duena]** Uso real de la aplicacion con su
       propia voz: la captura sirvio y la transcripcion fue fiel.
 - [x] H-05. **[OK 2026-08-14]** Frase real de la duena con acento local y un numero de
       cuatro digitos: "Cual es la raiz cuadrada de 3345" se transcribio exacta,
       digitos incluidos, que es la parte dificil.
-- [ ] H-06. Conversar 3 turnos encadenados con referencias al turno anterior -> el
-      asistente mantiene el hilo y su personalidad es consistente.
+- [x] H-06. **[OK 2026-08-14, prueba 3 del recorrido manual]** Tres turnos
+      encadenados con referencia al anterior: mantuvo el hilo.
 - [x] H-07. **[OK 2026-08-14, firmado por la duena]** La voz se entiende y suena
       natural. Voz `es-MX-DaliaNeural`, femenina, como se acordo.
-- [ ] H-08. Durante un turno, mover y redimensionar la ventana -> la interfaz responde
-      en todo momento; nunca aparece "no responde".
+- [x] H-08. **[OK 2026-08-14, prueba 4 del recorrido manual]** Mover, redimensionar y
+      cambiar de pestana durante un turno: nunca aparecio "no responde".
 - [x] H-09. **[OK 2026-08-14, firmado por la duena tras usar la aplicacion]** Apoyado
       ademas por medicion del lienzo: 4 colores distintos y 4 figuras distintas, mas una
       prueba automatica que falla si dos estados llegaran a compartir color.
@@ -43,7 +44,9 @@ directa de codigo desde este archivo.
 
 ## Fase 2 - Valor agregado (limite 25 de agosto)
 
-- [ ] H-13. Abrir la pestana Laboratorio tras hablar -> muestra los tokens y el mapa de
+- [~] H-13. **[OK 2026-08-14, prueba 7 del recorrido manual]** Verificado, pero la
+      tarea T-13 tiene el veredicto en suspenso hasta el OK de la duena.
+      Abrir la pestana Laboratorio tras hablar -> muestra los tokens y el mapa de
       atencion de lo que se acaba de decir, sin congelar la ventana.
 - [ ] H-14. Poner `temperature` en 0.1, repetir una frase, subirla a 1.5 y repetirla ->
       la diferencia entre ambas respuestas es perceptible y explicable.

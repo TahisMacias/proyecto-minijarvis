@@ -8,6 +8,9 @@
 - `TESTING.md`: checks humanos H-01 a H-18 mas la regresion R-01.
 - `archive/PLAN_v0.1-fundamentos.md`: superseded, nunca ejecutado. Se escribio antes
   de conocer la fecha de entrega.
+- `archive/CONTEXT_2026-08-13.md`: texto completo de las seis entradas de la primera
+  jornada. Se compactaron en `CONTEXT.md` el 2026-08-14; esto es la fuente si hace
+  falta el detalle.
 
 ## Diseno
 
@@ -46,9 +49,20 @@
   herramientas.** Contiene el `SYSTEM_PROMPT` con la declaracion de ser una IA.
 - `core/tts_engine.py` (T-08): texto -> voz reproducida. `python -m core.tts_engine`
   como comprobacion manual (H-07).
-- `tests/`: `test_memory.py` y `test_llm_parsing.py`. 28 pruebas, sin red ni saldo.
+- `core/orchestrator.py` (T-09): maquina de estados y el hilo de cada turno. **No
+  importa nada de la GUI**; una prueba lee su AST para que siga siendo cierto.
+- `gui/desktop_app.py` (T-10, T-13): la ventana, el puente `after(0, ...)` entre hilos
+  y la pestana Laboratorio.
+- `main.py`: punto de entrada. `Iniciar Mini-JARVIS.bat`: lanzador con doble clic.
+- `tests/`: memoria, parseo del LLM, orquestador, paleta de estados y barra
+  espaciadora. 70 pruebas, sin red, sin microfono y sin saldo.
 - `pytest.ini`: `pythonpath = .` para que el comando del gate encuentre `core`.
-- El resto (`main.py`, `core/orchestrator.py`, `tools/`, `gui/`) todavia no existe.
-  La estructura objetivo esta en `APPCORE.md` > Architecture map.
+- Falta `tools/` (T-15, Fase 2 sin abrir).
 
-Last reindexed: 2026-08-14, tras cerrar T-04 a T-08.
+## Documentacion para personas
+
+- `docs/pruebas-manuales.md`: recorrido de pruebas de la Fase 1, escrito para usarse.
+- `docs/evidencia/`: salida del laboratorio, captura de la ventana y la tabla de
+  cobertura de los 7 fallos previstos.
+
+Last reindexed: 2026-08-14, al cerrar la sesion de la Fase 1.
