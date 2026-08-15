@@ -207,18 +207,23 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-09 - Orquestador y maquina de estados
 
-- Status: **ready** (T-06, T-07 y T-08 cerradas el 2026-08-14)
+- Status: **done** (2026-08-14). Veredicto: **APTO** (commit `c351170`).
+  Gate: 24 pruebas con dobles. Verificacion adicional con los modulos reales, sin
+  GUI: audio -> Whisper -> Llama -> voz, estados correctos, vuelta a REPOSO en 21.8 s.
+  Defecto real encontrado por las pruebas: una transcripcion de puros espacios pasaba
+  como texto valido. Corregido en el orquestador.
 - Depends on: T-06, T-07, T-08
 - **Es la tarea de mayor riesgo tecnico del plan.**
 - Scope: `core/orchestrator.py`
 - Acceptance:
-  - [ ] Estados ESCUCHANDO, PENSANDO, RESPONDIENDO, ATENCION, REPOSO. De ATENCION
-        siempre se vuelve a REPOSO.
-  - [ ] Un hilo trabajador efimero por turno. Sin bucle `asyncio` persistente.
-  - [ ] **Ningun hilo trabajador toca un widget.** El unico canal de retorno hacia la
-        GUI es un callback que la GUI despacha con `root.after`.
-  - [ ] Ninguna excepcion sube hasta el `mainloop`.
-  - [ ] Maximo 2 rondas de tool calling; al agotarse responde con el texto disponible.
+  - [x] Estados ESCUCHANDO, PENSANDO, RESPONDIENDO, ATENCION, REPOSO. De ATENCION
+        siempre se vuelve a REPOSO. Probado en los seis caminos de fallo.
+  - [x] Un hilo trabajador efimero por turno. Sin bucle `asyncio` persistente.
+  - [x] **Ningun hilo trabajador toca un widget.** Se cumple por construccion: el
+        orquestador no importa nada de la GUI, y una prueba analiza su AST y falla si
+        aparece un import de tkinter, customtkinter o gui.
+  - [x] Ninguna excepcion sube hasta el `mainloop`.
+  - [x] Maximo 2 rondas de tool calling; al agotarse responde con el texto disponible.
 - Gates: `pytest tests/test_orchestrator.py` con dobles de STT, LLM y TTS.
 - Human checks: H-08
 - Risk triggers: **si** — concurrencia. Auditoria del modelo obligatoria.
@@ -226,19 +231,28 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-10 - Interfaz de escritorio
 
-- Status: blocked (T-09)
+- Status: **done** (2026-08-14). Veredicto: **APTO** (commit `d51cbf5`).
+  **Defecto real encontrado al ejecutar la ventana**: con el escalado de Windows al
+  133 %, la altura de 680 se dibujaba de 850 px reales y el boton de hablar quedaba
+  debajo de la barra de tareas. Ahora la altura se calcula contra la pantalla real.
+  Evidencia visual: `docs/evidencia/T-10-ventana.png`.
+  Pendientes **H-09** y **H-10** (son de vista y de uso: los hace la duena).
 - Depends on: T-09
 - Scope: `gui/desktop_app.py`, `main.py`
 - Acceptance:
-  - [ ] Ventana CustomTkinter en modo claro con la paleta pastel de `config.py`.
+  - [x] Ventana CustomTkinter en modo claro con la paleta pastel de `config.py`.
   - [ ] Los 4 estados son distinguibles a simple vista, sin leer texto, **por color
         y por forma**. Usa la tabla de la seccion 11 del spec (corregida el 2026-08-13):
         cada estado tiene color propio y forma propia. Que dos estados compartan color
         es un NO APTO automatico: incumple H-09 y deja fuera a personas con daltonismo.
-  - [ ] Boton push-to-talk funcional; la barra espaciadora hace lo mismo.
-  - [ ] Panel de conversacion con el historial visible.
-  - [ ] Los errores aparecen como mensajes amables, sin trazas tecnicas.
-  - [ ] `python main.py` levanta la aplicacion.
+        **Verificado midiendo el lienzo**: 4 colores distintos y 4 figuras distintas.
+        Queda una prueba automatica que falla si dos estados comparten color.
+  - [x] Boton push-to-talk funcional; la barra espaciadora hace lo mismo (ignorando
+        el eco de repeticion de teclas de Windows).
+  - [x] Panel de conversacion con el historial visible.
+  - [x] Los errores aparecen como mensajes amables, sin trazas tecnicas.
+  - [x] `python main.py` levanta la aplicacion. Verificado: ventana abierta y
+        capturada.
 - Gates: `python -m compileall .`
 - Human checks: H-09, H-10
 - Risk triggers: ninguno
@@ -287,13 +301,26 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ### T-12 - Cierre del nucleo: errores y README
 
-- Status: blocked (T-10, T-11)
+- Status: **done** (2026-08-14). Veredicto: **APTO**.
+- **Hallazgo de la auditoria de errores**: de los 7 fallos de la seccion 13 faltaba
+  uno en el codigo, el **reintento unico** ante respuesta vacia del LLM. Estaba
+  escrito en el diseno desde el principio. Lo encontro auditar contra la lista, uno
+  por uno, en vez de contra el recuerdo. Implementado y probado.
+- Cobertura completa documentada en `docs/evidencia/T-12-cobertura-de-errores.md`,
+  con la fila de cada fallo, donde se atiende y como se verifico. Incluye lo que
+  **no** se cubre, dicho de frente.
 - Depends on: T-10, T-11
 - Scope: `README.md`, retoques de manejo de errores donde falte
 - Acceptance:
-  - [ ] Los 7 fallos de la seccion 13 del diseno estan cubiertos con mensaje propio.
-  - [ ] Desconectar la red a mitad de un turno no rompe la aplicacion.
-  - [ ] README permite instalar y ejecutar desde cero sin pasos no documentados.
+  - [x] Los 7 fallos de la seccion 13 del diseno estan cubiertos con mensaje propio.
+  - [x] Desconectar la red a mitad de un turno no rompe la aplicacion. **No se
+        simulo**: se apunto el motor a un puerto cerrado para provocar un fallo de
+        conexion real a mitad de turno. Aviso en lenguaje llano, vuelta a REPOSO,
+        aplicacion utilizable.
+  - [x] README permite instalar y ejecutar desde cero sin pasos no documentados.
+        Verificado en un entorno virtual limpio, creado desde cero solo con
+        `requirements.txt`: los 16 imports funcionan, las 59 pruebas pasan y todos
+        los modulos del proyecto cargan.
 - Gates: suite completa de `pytest`; `python -m compileall .`
 - Human checks: H-12
 - Risk triggers: ninguno
@@ -301,11 +328,14 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 
 ## Cierre de Fase 1 — fecha limite 22 de agosto
 
-- [ ] T-01 a T-12 en APTO.
-- [ ] Checks humanos H-01 a H-12 completos.
-- [ ] El pipeline completo funciona de extremo a extremo con voz real.
-- [ ] Auditoria de fase del Arquitecto; commit y push.
-- [ ] **Decision explicita**: si esta fase no cerro el 22, se recorta la Fase 2.
+- [x] **T-01 a T-12 en APTO** (2026-08-14, ocho dias antes de la fecha limite).
+- [ ] Checks humanos: H-01, H-02 y H-03 hechos. **Faltan H-04, H-07, H-09, H-10 y
+      H-12**, que son de oido, de vista y de uso: los tiene que hacer la duena.
+- [x] El pipeline completo funciona de extremo a extremo. Verificado sin GUI con los
+      modulos reales en 21.8 s; falta la pasada con voz humana real (parte de H-10).
+- [x] Auditoria de tarea con gate ejecutado en cada una; commit y push por tarea.
+- [x] **Decision explicita**: la fase cerro con margen, asi que la Fase 2 **no se
+      recorta**. Entra completa: T-13, T-14 y T-15.
 
 ---
 

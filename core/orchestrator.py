@@ -230,6 +230,14 @@ class Orquestador:
             texto_respuesta = (respuesta.texto or "").strip()
 
             if not texto_respuesta:
+                # Reintento unico (seccion 13 del diseno). Una respuesta vacia suele
+                # ser un tropiezo puntual del modelo, no un fallo del sistema: pedirla
+                # otra vez la resuelve casi siempre. Se reintenta UNA sola vez para no
+                # dejar a la usuaria esperando ni gastar saldo en un bucle.
+                respuesta = self._conversar()
+                texto_respuesta = (respuesta.texto or "").strip()
+
+            if not texto_respuesta:
                 self._fallar(
                     "Me quede sin palabras con esa. Intenta preguntarme de otra forma."
                 )

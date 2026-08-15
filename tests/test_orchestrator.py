@@ -74,7 +74,12 @@ class MotorFalso:
     def responder(self, mensajes, herramientas=None, **kwargs):
         self.llamadas += 1
         self.mensajes_recibidos.append(mensajes)
-        siguiente = self.respuestas.pop(0) if self.respuestas else self.respuestas
+        if not self.respuestas:
+            raise AssertionError(
+                "el motor falso se quedo sin respuestas: la prueba esperaba menos "
+                "llamadas al modelo de las que hubo"
+            )
+        siguiente = self.respuestas.pop(0)
         if isinstance(siguiente, Exception):
             raise siguiente
         return siguiente
@@ -221,8 +226,9 @@ def test_el_hilo_trabajador_es_efimero():
 @pytest.mark.parametrize("descripcion,argumentos", [
     ("transcripcion vacia", {"transcripcion": ""}),
     ("solo espacios", {"transcripcion": "   "}),
-    ("respuesta vacia del modelo", {"respuestas": [_texto("")]}),
+    ("respuesta vacia dos veces", {"respuestas": [_texto(""), _texto("")]}),
     ("fallo del modelo", {"respuestas": [ErrorDePruebaDelProyecto("El modelo fallo.")]}),
+    ("fallo de red", {"respuestas": [ErrorDePruebaDelProyecto("Revisa tu conexion.")]}),
 ])
 def test_todo_fallo_pasa_por_atencion_y_termina_en_reposo(descripcion, argumentos):
     orquestador, recolector, _ = _armar(**argumentos)
@@ -233,6 +239,34 @@ def test_todo_fallo_pasa_por_atencion_y_termina_en_reposo(descripcion, argumento
     assert recolector.estados[-1] is Estado.REPOSO, descripcion
     assert orquestador.estado is Estado.REPOSO, descripcion
     assert recolector.errores, "un fallo siempre debe avisar con un mensaje"
+
+
+def test_una_respuesta_vacia_se_reintenta_una_sola_vez():
+    """Seccion 13 del diseno: reintento unico, y si vuelve vacia, mensaje.
+
+    Una respuesta vacia suele ser un tropiezo puntual del modelo. Reintentar una vez
+    salva el turno; reintentar sin limite dejaria a la usuaria esperando y gastando
+    saldo delante del tribunal.
+    """
+    orquestador, recolector, _ = _armar(
+        respuestas=[_texto(""), _texto("Ahora si: son las tres.")]
+    )
+
+    _turno_completo(orquestador)
+
+    assert orquestador._motor.llamadas == 2
+    assert recolector.textos(TipoEvento.RESPUESTA) == ["Ahora si: son las tres."]
+    assert Estado.ATENCION not in recolector.estados, "el reintento salvo el turno"
+
+
+def test_dos_respuestas_vacias_seguidas_terminan_en_mensaje():
+    orquestador, recolector, _ = _armar(respuestas=[_texto(""), _texto("")])
+
+    _turno_completo(orquestador)
+
+    assert orquestador._motor.llamadas == 2, "no debe reintentar mas de una vez"
+    assert recolector.errores
+    assert recolector.estados[-1] is Estado.REPOSO
 
 
 def test_la_transcripcion_vacia_da_un_mensaje_amable_y_no_una_traza():

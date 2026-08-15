@@ -273,3 +273,33 @@ fechas, decisiones, riesgos abiertos, referencias a tareas/commits y un puntero 
   hacer). El nivel Ingeniero sigue sin segunda observacion: esta sesion no uso
   jerarquia, asi que no aporta evidencia.
 - Next: T-09, el orquestador. Es la tarea de mayor riesgo tecnico del plan.
+
+## 2026-08-14 - Fase 1 completa: la aplicacion habla, escucha y responde
+
+- Changed: `core/orchestrator.py`, `gui/desktop_app.py`, `main.py`, `README.md`,
+  `tests/test_orchestrator.py`, `tests/test_paleta_estados.py`, evidencia.
+  Commits `c351170` (T-09), `d51cbf5` (T-10) y el de T-12.
+- **T-09, la tarea de mayor riesgo del plan, cerrada sin sobresaltos.** La regla de
+  "ningun hilo toca un widget" no se dejo a la disciplina: el orquestador simplemente
+  no tiene acceso a la GUI, y una prueba lee su AST para que siga siendo cierto. Es
+  la diferencia entre una regla escrita y una regla que se cumple sola.
+- **Tres defectos reales que solo aparecen al ejecutar, no al leer:**
+  1. Una transcripcion de puros espacios pasaba como texto valido (la encontro una
+     prueba de frontera).
+  2. Con el escalado de Windows al 133 %, la ventana de 680 se dibujaba de 850 px y
+     **el boton de hablar quedaba debajo de la barra de tareas**. La aplicacion habria
+     parecido rota el dia de la demostracion sin estarlo. Ahora la altura se calcula
+     contra la pantalla real.
+  3. Al auditar los 7 fallos de la seccion 13 para T-12 faltaba uno: el **reintento
+     unico** ante respuesta vacia del LLM. Estaba en el diseno y no en el codigo.
+     Auditar contra la lista escrita, y no contra el recuerdo, es lo que lo encontro.
+- Verificacion de red que no se simulo: se apunto el motor a un puerto cerrado para
+  provocar un fallo de conexion **real** a mitad de turno. La aplicacion aviso con
+  lenguaje llano, volvio a REPOSO y siguio utilizable.
+- H-09 se verifico midiendo, no a ojo: se instrumento el lienzo y se comprobo que los
+  cuatro estados activos usan cuatro colores y cuatro figuras distintas. Queda una
+  prueba que falla si dos estados llegaran a compartir color: ese defecto ya ocurrio
+  una vez en este proyecto y no deberia poder repetirse en silencio.
+- Unresolved: H-04, H-07, H-09, H-10 y H-12 son de la duena (oido, vista y uso).
+  Nadie mas los puede firmar.
+- Next: cierre de la Fase 1 y decision sobre la Fase 2 (T-13 a T-15).

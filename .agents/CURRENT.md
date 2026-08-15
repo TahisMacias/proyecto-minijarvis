@@ -5,8 +5,8 @@ updated_at: 2026-08-14
 source_commit: (ver ultimo [STATE]; limpio y sincronizado con origin/main)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
-active_task: T-09
-last_verdict: T-04, T-05, T-06, T-07, T-08 y T-11 APTO
+active_task: T-12 (ultima de la Fase 1)
+last_verdict: T-04 a T-11 APTO (toda la Fase 1 salvo T-12)
 backup: remote origin -> https://github.com/TahisMacias/proyecto-minijarvis (publico)
 deadline: 2026-08-27
 ```
@@ -82,17 +82,27 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 - `config.py` existe y esta APTO: carga segura de credenciales, paleta de 5 acentos,
   IDs de modelo, limites de memoria y lista blanca de dominios. Es la fuente unica
   de verdad de configuracion; ningun otro modulo debe leer variables de entorno.
-- **Cinco modulos de `core/` entregados y APTO el 2026-08-14**: `memory.py` (T-04),
-  `audio_capture.py` (T-05), `stt_client.py` (T-06), `llm_engine.py` (T-07) y
-  `tts_engine.py` (T-08). Falta `orchestrator.py` (T-09).
-- Suite de pruebas: 28 verdes en ~3 s (`tests/test_memory.py`,
-  `tests/test_llm_parsing.py`). Se anadio `pytest==9.1.1` a `requirements.txt` y
+- **El pipeline de voz funciona de extremo a extremo.** Verificado sin GUI con los
+  modulos reales: audio -> Whisper -> Llama -> voz reproducida, con la secuencia de
+  estados correcta y vuelta a REPOSO, en 21.8 s.
+- **`core/` completo y APTO el 2026-08-14**: `memory.py` (T-04), `audio_capture.py`
+  (T-05), `stt_client.py` (T-06), `llm_engine.py` (T-07), `tts_engine.py` (T-08) y
+  `orchestrator.py` (T-09). Mas `gui/desktop_app.py` y `main.py` (T-10).
+- El orquestador **no importa nada de la GUI**: su unico canal de salida es un
+  callback que la ventana envuelve en `root.after(0, ...)`. Hay una prueba que analiza
+  el AST y falla si aparece un import de tkinter, customtkinter o gui.
+- La ventana calcula su altura contra la pantalla real y su escalado. Con el 133 % de
+  esta maquina, la altura fija de 680 dejaba el boton debajo de la barra de tareas.
+- Suite de pruebas: 59 verdes en ~3 s (`tests/test_memory.py`,
+  `tests/test_llm_parsing.py`, `tests/test_orchestrator.py`,
+  `tests/test_paleta_estados.py`). Se anadio `pytest==9.1.1` a `requirements.txt` y
   `pytest.ini` con `pythonpath = .`, sin lo cual el comando del gate no encuentra
   el paquete `core`.
 - La reproduccion de voz usa **MCI** (interfaz multimedia de Windows) via `ctypes`:
   Windows decodifica el MP3 de edge-tts sin dependencias extra.
-- Aun no existe `main.py` ni ningun modulo de `tools/` o `gui/`. El README ya lo dice
-  con precision: avisa solo por `main.py`, no por el laboratorio.
+- Falta `tools/` (T-15, tool calling), que es Fase 2. El orquestador ya lo soporta:
+  recibe `ejecutar_herramienta` y respeta el limite de 2 rondas; sin ese argumento
+  responde con el texto disponible, que es lo que hace hoy.
 
 ## Open findings
 

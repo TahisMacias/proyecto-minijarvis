@@ -107,6 +107,7 @@ igual corren en cada commit.
 | `transformers` | 5.15.0 | ver trampa de `attn_implementation` abajo |
 | `torch` | 2.13.0+cpu | CPU puro, sin CUDA. Suficiente para BETO. |
 | `numpy` | 2.5.2 | |
+| `pytest` | 9.1.1 | anadido en T-04: tres gates del plan lo exigen y no estaba. |
 - Git: 2.54.0.windows.1, identidad `Tahis Macias <britany.macias@cenestur.edu.ec>`
 - `gh` CLI: instalado v2.97.0 en `C:\Program Files\GitHub CLI\gh.exe`, pero **no estaba
   en el PATH** de la sesion del 2026-08-13 (se instalo con la terminal ya abierta).
