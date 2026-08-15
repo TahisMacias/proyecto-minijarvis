@@ -567,20 +567,31 @@ def test_el_estado_de_atencion_se_queda_a_la_vista_antes_de_volver_a_reposo():
 
 
 def test_hablar_de_nuevo_cancela_el_aviso_pendiente():
-    """Si la usuaria vuelve a hablar, el aviso se da por leido y no pisa la escucha."""
-    orquestador, recolector, _ = _armar(transcripcion="", segundos_en_atencion=5)
+    """Si la usuaria vuelve a hablar, el aviso se da por leido y no pisa la escucha.
+
+    El primer turno falla (no se escucho nada) y deja el aviso en pantalla con un
+    temporizador largo. El segundo turno si trae voz: el temporizador viejo no debe
+    aterrizar a mitad de camino y mandar el indicador a reposo mientras se escucha.
+    """
+    turnos = iter(["", "ahora si te escucho"])
+    orquestador, recolector, _ = _armar(
+        transcripcion=lambda audio: next(turnos),
+        respuestas=[_texto("perfecto")],
+        segundos_en_atencion=5,
+    )
 
     orquestador.empezar_a_escuchar()
     orquestador.terminar_y_responder()
     orquestador._hilo.join(ESPERA_MAXIMA)
     assert orquestador.estado is Estado.ATENCION
 
-    orquestador._motor = MotorFalso([_texto("ahora si")])
     assert orquestador.empezar_a_escuchar() is True
-
-    assert orquestador.estado is Estado.ESCUCHANDO
-    orquestador.terminar_y_responder()
-    orquestador.esperar(ESPERA_MAXIMA)
-    assert orquestador.estado is Estado.REPOSO, (
-        "el temporizador viejo no debe aterrizar en mitad del turno nuevo"
+    assert orquestador.estado is Estado.ESCUCHANDO, (
+        "empezar a escuchar debe cancelar el aviso pendiente"
     )
+
+    orquestador.terminar_y_responder()
+    orquestador._hilo.join(ESPERA_MAXIMA)
+
+    assert orquestador.estado is Estado.REPOSO
+    assert recolector.textos(TipoEvento.RESPUESTA) == ["perfecto"]
