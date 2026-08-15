@@ -81,8 +81,20 @@ COLOR_POR_ESTADO = {
 # --- Proveedor y modelos (diseno, seccion 4) --------------------------------
 TOGETHER_BASE_URL = "https://api.together.xyz/v1"
 
-MODELO_LLM_PREDETERMINADO = "Qwen/Qwen2.5-72B-Instruct"
-MODELO_LLM_ALTERNO = "meta-llama/Llama-3.3-70B-Instruct"
+# CORREGIDO EL 2026-08-14 TRAS PROBAR CONTRA LA API REAL (T-07). Los identificadores
+# anteriores (Qwen/Qwen2.5-72B-Instruct y meta-llama/Llama-3.3-70B-Instruct) SI
+# aparecen en GET /v1/models, pero al pedirles una respuesta devuelven HTTP 400
+# "Unable to access non-serverless model": estan en el catalogo de Together, no en
+# su servicio compartido. Para usarlos habria que levantar (y pagar) un endpoint
+# dedicado. Aparecer en el listado no significa estar disponible; lo unico que lo
+# demuestra es una peticion de chat real, y por eso se probaron uno por uno.
+#
+# Los dos que si responden en esta cuenta son las variantes "-Turbo". "Turbo" es el
+# nombre comercial del despliegue cuantizado de Together: el mismo modelo, servido
+# con menos precision numerica, mas barato y mas rapido. Para un asistente de voz es
+# justo el compromiso que conviene.
+MODELO_LLM_PREDETERMINADO = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+MODELO_LLM_ALTERNO = "Qwen/Qwen2.5-7B-Instruct-Turbo"
 
 MODELO_STT = "openai/whisper-large-v3"
 IDIOMA_STT = "es"
