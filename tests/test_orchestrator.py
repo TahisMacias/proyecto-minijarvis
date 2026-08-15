@@ -135,8 +135,15 @@ class Recolector:
         return [e.texto for e in self.eventos if e.tipo is tipo]
 
 
+# En las pruebas el aviso dura casi nada: lo que se verifica es que la transicion
+# ocurra y que se pueda ver, no cuantos segundos exactos. Con 2.5 s reales la suite
+# tardaria medio minuto en vez de tres segundos.
+ESPERA_DEL_AVISO = 0.05
+
+
 def _armar(transcripcion="hola", respuestas=None, voz=None, grabadora=None,
-           ejecutar_herramienta=None, limite_rondas_tool=2, herramientas=None):
+           ejecutar_herramienta=None, limite_rondas_tool=2, herramientas=None,
+           segundos_en_atencion=ESPERA_DEL_AVISO):
     recolector = Recolector()
     memoria = MemoriaConversacional(system_prompt="sistema", max_turnos=10)
     orquestador = Orquestador(
@@ -150,6 +157,7 @@ def _armar(transcripcion="hola", respuestas=None, voz=None, grabadora=None,
         herramientas=herramientas,
         ejecutar_herramienta=ejecutar_herramienta,
         limite_rondas_tool=limite_rondas_tool,
+        segundos_en_atencion=segundos_en_atencion,
     )
     return orquestador, recolector, memoria
 
@@ -324,6 +332,7 @@ def test_si_el_microfono_no_abre_no_se_lanza_excepcion_a_la_gui():
 
     assert orquestador.empezar_a_escuchar() is False
     assert recolector.errores == ["Revisa el microfono."]
+    orquestador.esperar(ESPERA_MAXIMA)
     assert orquestador.estado is Estado.REPOSO
 
 
@@ -337,8 +346,9 @@ def test_si_falla_al_detener_el_turno_no_arranca():
     orquestador.terminar_y_responder()
 
     assert not orquestador.ocupado, "no debe lanzarse ningun hilo si no hay audio"
-    assert orquestador.estado is Estado.REPOSO
     assert recolector.errores == ["No se capturo audio."]
+    orquestador.esperar(ESPERA_MAXIMA)
+    assert orquestador.estado is Estado.REPOSO
 
 
 def test_no_se_puede_hablar_encima_de_un_turno_en_vuelo():
@@ -523,3 +533,54 @@ def test_el_orquestador_no_importa_nada_de_la_gui():
     prohibidos = [m for m in importados
                   if m.startswith(("tkinter", "customtkinter", "gui"))]
     assert prohibidos == [], f"el orquestador no debe conocer la GUI: {prohibidos}"
+
+
+# --- El aviso tiene que durar lo suficiente para verse ---------------------
+
+def test_el_estado_de_atencion_se_queda_a_la_vista_antes_de_volver_a_reposo():
+    """Defecto reportado por la duena: el aviso ocurria pero nadie lo veia.
+
+    Las dos transiciones pasaban en la misma linea, asi que ATENCION duraba
+    microsegundos. La maquina de estados era correcta y aun asi el indicador nunca se
+    ponia en durazno. Aqui se comprueba que ATENCION llega ANTES y REPOSO despues, y
+    que entre ambos pasa tiempo de verdad.
+    """
+    import time
+
+    orquestador, recolector, _ = _armar(transcripcion="", segundos_en_atencion=0.3)
+
+    assert orquestador.empezar_a_escuchar() is True
+    orquestador.terminar_y_responder()
+    orquestador._hilo.join(ESPERA_MAXIMA)
+
+    # Justo despues del fallo, el indicador debe estar en ATENCION, no en reposo.
+    assert orquestador.estado is Estado.ATENCION
+    assert recolector.estados[-1] is Estado.ATENCION
+
+    inicio = time.perf_counter()
+    orquestador.esperar(ESPERA_MAXIMA)
+    transcurrido = time.perf_counter() - inicio
+
+    assert orquestador.estado is Estado.REPOSO
+    assert recolector.estados[-1] is Estado.REPOSO
+    assert transcurrido > 0.1, "la vuelta a reposo fue instantanea otra vez"
+
+
+def test_hablar_de_nuevo_cancela_el_aviso_pendiente():
+    """Si la usuaria vuelve a hablar, el aviso se da por leido y no pisa la escucha."""
+    orquestador, recolector, _ = _armar(transcripcion="", segundos_en_atencion=5)
+
+    orquestador.empezar_a_escuchar()
+    orquestador.terminar_y_responder()
+    orquestador._hilo.join(ESPERA_MAXIMA)
+    assert orquestador.estado is Estado.ATENCION
+
+    orquestador._motor = MotorFalso([_texto("ahora si")])
+    assert orquestador.empezar_a_escuchar() is True
+
+    assert orquestador.estado is Estado.ESCUCHANDO
+    orquestador.terminar_y_responder()
+    orquestador.esperar(ESPERA_MAXIMA)
+    assert orquestador.estado is Estado.REPOSO, (
+        "el temporizador viejo no debe aterrizar en mitad del turno nuevo"
+    )

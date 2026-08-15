@@ -29,7 +29,7 @@ from pathlib import Path
 import customtkinter
 from PIL import Image
 
-from config import COLOR_POR_ESTADO, PALETA
+from config import COLOR_BORDE_POR_ESTADO, COLOR_POR_ESTADO, PALETA
 from core.orchestrator import Estado, TipoEvento
 
 
@@ -472,8 +472,13 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         self._estado = estado
         self._paso_animacion = 0
         self._leyenda.configure(text=LEYENDA_POR_ESTADO.get(estado, ""))
+        # El boton acompana al indicador: mismo relleno pastel, mismo borde saturado.
         self._boton.configure(
-            fg_color=COLOR_POR_ESTADO.get(estado.value, PALETA["verde_menta"])
+            fg_color=COLOR_POR_ESTADO.get(estado.value, PALETA["verde_menta"]),
+            border_color=COLOR_BORDE_POR_ESTADO.get(
+                estado.value, PALETA["texto_gris_marengo"]
+            ),
+            border_width=3,
         )
 
     def _escribir(self, quien: str, texto: str) -> None:
@@ -499,7 +504,11 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         lienzo.delete("all")
 
         color = COLOR_POR_ESTADO.get(self._estado.value, COLOR_REPOSO)
-        borde = PALETA["texto_gris_marengo"]
+        # El borde saturado es lo que hace legible el estado: el relleno pastel solo
+        # no basta para distinguir verde menta de azul cielo en una pantalla.
+        borde = COLOR_BORDE_POR_ESTADO.get(
+            self._estado.value, PALETA["texto_gris_marengo"]
+        )
         centro = LADO_LIENZO / 2
 
         if self._estado is Estado.ESCUCHANDO:
@@ -520,7 +529,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         radio = 40 + (fase if fase <= 10 else 20 - fase) * 1.2
         lienzo.create_oval(
             centro - radio, centro - radio, centro + radio, centro + radio,
-            fill=color, outline=borde, width=2,
+            fill=color, outline=borde, width=5,
         )
 
     def _dibujar_puntos(self, lienzo, centro, color, borde) -> None:
@@ -532,7 +541,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             lienzo.create_oval(
                 x - radio, centro - radio, x + radio, centro + radio,
                 fill=color if indice == encendido else PALETA["fondo_crema"],
-                outline=borde, width=2,
+                outline=borde, width=4,
             )
 
     def _dibujar_onda(self, lienzo, centro, color, borde) -> None:
@@ -546,7 +555,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             x = centro + (indice - 2) * 24
             lienzo.create_rectangle(
                 x - 8, centro - altura / 2, x + 8, centro + altura / 2,
-                fill=color, outline=borde, width=2,
+                fill=color, outline=borde, width=3,
             )
 
     def _dibujar_triangulo(self, lienzo, centro, color, borde) -> None:

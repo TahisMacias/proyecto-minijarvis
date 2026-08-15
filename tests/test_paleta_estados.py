@@ -66,3 +66,36 @@ def test_cada_estado_tiene_ademas_su_propia_forma():
     }
     faltantes = esperadas - dibujantes
     assert not faltantes, f"faltan formas propias para: {sorted(faltantes)}"
+
+
+# --- Borde saturado: la senal que si se puede nombrar -----------------------
+
+def test_cada_estado_tiene_borde_saturado_propio():
+    """Defecto reportado por la duena: el verde menta se veia azul en pantalla.
+
+    Los tintes de nivel 50 son casi blancos. Como decoracion funcionan; como senal
+    no. El borde saturado es lo que hace que el estado se pueda nombrar de un vistazo.
+    """
+    from config import COLOR_BORDE_POR_ESTADO
+
+    bordes = [COLOR_BORDE_POR_ESTADO[estado] for estado in ESTADOS_ACTIVOS]
+    assert len(set(bordes)) == 4, f"dos estados comparten borde: {bordes}"
+
+
+def test_el_borde_es_mas_oscuro_que_el_relleno():
+    """Si el borde no contrasta con su relleno, no se distingue la figura."""
+    from config import COLOR_BORDE_POR_ESTADO, COLOR_POR_ESTADO
+
+    def luminosidad(hexadecimal):
+        r, g, b = (int(hexadecimal[i:i + 2], 16) for i in (1, 3, 5))
+        # Coeficientes estandar de luminosidad percibida: el ojo humano es mucho mas
+        # sensible al verde que al azul.
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+    for estado in ESTADOS_ACTIVOS:
+        claro = luminosidad(COLOR_POR_ESTADO[estado])
+        oscuro = luminosidad(COLOR_BORDE_POR_ESTADO[estado])
+        assert claro - oscuro > 80, (
+            f"{estado}: el borde {COLOR_BORDE_POR_ESTADO[estado]} no contrasta lo "
+            f"suficiente con el relleno {COLOR_POR_ESTADO[estado]}"
+        )

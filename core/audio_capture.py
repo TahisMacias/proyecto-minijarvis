@@ -33,6 +33,8 @@ import wave
 import numpy as np
 import sounddevice as sd
 
+from config import DURACION_MINIMA_GRABACION, UMBRAL_DE_SILENCIO
+
 
 # --- Errores tipados --------------------------------------------------------
 
@@ -177,8 +179,46 @@ class GrabadoraDeVoz:
             )
 
         audio = np.concatenate(self._bloques, axis=0)
+        duracion = len(audio) / float(self.frecuencia)
         self._bloques = []
+
+        self._rechazar_si_no_hay_voz(audio, duracion)
         return self._a_wav_en_memoria(audio)
+
+    def _rechazar_si_no_hay_voz(self, audio: np.ndarray, duracion: float) -> None:
+        """Descarta grabaciones demasiado cortas o sin sonido antes de enviarlas.
+
+        POR QUE ESTO EXISTE: Whisper **alucina con el silencio**. Ante un audio vacio
+        no devuelve una cadena vacia, sino una muletilla aprendida de sus datos de
+        entrenamiento: "Gracias", "Subtitulos realizados por...". Es un comportamiento
+        conocido del modelo, no un fallo de este proyecto, pero el efecto es pesimo:
+        la usuaria pulsa sin querer y el asistente contesta a algo que nadie dijo.
+        Se detecto probando la aplicacion el 2026-08-14.
+
+        La defensa correcta es no mandarle nada que no tenga voz dentro. Se comprueban
+        dos cosas independientes, porque fallan por motivos distintos: la duracion
+        atrapa el toque accidental, y el volumen atrapa el caso de tener el boton
+        presionado varios segundos sin hablar o con el microfono silenciado.
+
+        De paso ahorra dinero: cada envio a la API se paga.
+        """
+        if duracion < DURACION_MINIMA_GRABACION:
+            raise GrabacionVacia(
+                "Fue demasiado corto para entender algo. Manten presionado el boton "
+                "mientras hablas y sueltalo al terminar la frase."
+            )
+
+        # RMS = raiz de la media de los cuadrados. Es la forma estandar de medir
+        # "cuanta senal hay" en un audio: eleva al cuadrado para que los valores
+        # negativos no cancelen a los positivos, promedia y vuelve a la escala
+        # original. Se calcula en float64 porque el cuadrado de un int16 se sale de
+        # su rango y daria un resultado sin sentido por desbordamiento.
+        volumen = float(np.sqrt(np.mean(np.square(audio.astype(np.float64)))))
+        if volumen < UMBRAL_DE_SILENCIO:
+            raise GrabacionVacia(
+                "No se escucho nada. Revisa que el microfono no este silenciado y "
+                "habla un poco mas cerca."
+            )
 
     def cancelar(self) -> None:
         """Corta la grabacion y tira el audio. Para cuando la usuaria se arrepiente."""

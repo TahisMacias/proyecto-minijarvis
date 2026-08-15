@@ -89,7 +89,8 @@ class Orquestador:
 
     def __init__(self, grabadora, transcriptor, motor, voz, memoria, notificar,
                  herramientas=None, ejecutar_herramienta=None,
-                 limite_rondas_tool: int = 2) -> None:
+                 limite_rondas_tool: int = 2,
+                 segundos_en_atencion: float = 2.5) -> None:
         self._grabadora = grabadora
         self._transcribir = transcriptor
         self._motor = motor
@@ -99,6 +100,8 @@ class Orquestador:
         self._herramientas = herramientas
         self._ejecutar_herramienta = ejecutar_herramienta
         self._limite_rondas_tool = limite_rondas_tool
+        self._segundos_en_atencion = segundos_en_atencion
+        self._temporizador: threading.Timer | None = None
 
         self._estado = Estado.REPOSO
         self._hilo: threading.Thread | None = None
@@ -139,10 +142,46 @@ class Orquestador:
 
         Todos los errores del turno pasan por aqui. Tener un solo camino es lo que
         garantiza la invariante de que de ATENCION siempre se vuelve a REPOSO.
+
+        LA VUELTA A REPOSO SE RETRASA A PROPOSITO. Antes las dos transiciones ocurrian
+        en la misma linea, asi que el estado ATENCION existia durante microsegundos:
+        la maquina de estados era correcta y aun asi **nadie veia nunca el aviso**. Lo
+        reporto la duena probando la aplicacion sin red el 2026-08-14: veia el mensaje
+        de texto, pero el indicador nunca se ponia en ATENCION. Un aviso que no se
+        alcanza a ver no es un aviso.
         """
         self._avisar(Evento(TipoEvento.ERROR, texto=mensaje))
         self._ir_a(Estado.ATENCION)
-        self._ir_a(Estado.REPOSO)
+        self._programar_vuelta_a_reposo()
+
+    def _programar_vuelta_a_reposo(self) -> None:
+        """Agenda el regreso a REPOSO dejando ATENCION el tiempo suficiente para verse.
+
+        Se usa un temporizador y no una espera bloqueante porque `_fallar` se llama
+        tanto desde el hilo trabajador como desde el hilo de la interfaz: dormir en el
+        segundo congelaria la ventana, que es justo lo que este proyecto no permite.
+        """
+        self._cancelar_temporizador()
+        if self._segundos_en_atencion <= 0:
+            self._ir_a(Estado.REPOSO)
+            return
+        self._temporizador = threading.Timer(
+            self._segundos_en_atencion, self._volver_a_reposo
+        )
+        self._temporizador.daemon = True
+        self._temporizador.start()
+
+    def _volver_a_reposo(self) -> None:
+        self._temporizador = None
+        # Solo si nadie cambio de estado mientras tanto: si la usuaria ya empezo otro
+        # turno, mandarla a REPOSO ahora seria pisarle la escucha en curso.
+        if self.estado is Estado.ATENCION:
+            self._ir_a(Estado.REPOSO)
+
+    def _cancelar_temporizador(self) -> None:
+        if self._temporizador is not None:
+            self._temporizador.cancel()
+            self._temporizador = None
 
     # --- Push to talk (corre en el hilo de la GUI) ---------------------------
 
@@ -158,6 +197,10 @@ class Orquestador:
                 texto="Espera a que termine de responder antes de hablar de nuevo.",
             ))
             return False
+
+        # Si venia de un aviso, empezar a hablar lo da por leido: se cancela la vuelta
+        # agendada para que no aterrice en mitad de la escucha nueva.
+        self._cancelar_temporizador()
 
         try:
             self._grabadora.iniciar()
@@ -203,9 +246,15 @@ class Orquestador:
         self._ir_a(Estado.REPOSO)
 
     def esperar(self, timeout: float | None = None) -> None:
-        """Bloquea hasta que el turno en vuelo termine. Solo para pruebas y cierre."""
+        """Bloquea hasta que el turno termine, incluido el tiempo del aviso.
+
+        Solo para pruebas y para el cierre de la aplicacion.
+        """
         if self._hilo is not None:
             self._hilo.join(timeout)
+        temporizador = self._temporizador
+        if temporizador is not None:
+            temporizador.join(timeout)
 
     # --- El turno (corre en el hilo trabajador) -----------------------------
 

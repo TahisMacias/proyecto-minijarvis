@@ -77,29 +77,84 @@ COLOR_POR_ESTADO = {
     "ATENCION": PALETA["durazno"],
 }
 
+# Borde saturado de cada estado, del MISMO tono que su relleno pastel.
+#
+# POR QUE HACE FALTA (defecto reportado por la duena el 2026-08-14): los tintes de
+# nivel 50 son tan palidos que en pantalla se leen casi blancos. Probando la
+# aplicacion, el verde menta de ESCUCHANDO se veia azul. Como decoracion los pasteles
+# funcionan; como SENAL no: si el usuario no puede nombrar el color, el color no esta
+# comunicando nada.
+#
+# La solucion conserva el aspecto pastel de la ventana (el relleno no cambia) y pone
+# la carga de la senal en un borde grueso y saturado. Son los tintes Material 700-800
+# de las mismas familias que los rellenos, asi que el sistema de color sigue siendo
+# coherente: verde con verde, azul con azul, rosa con rosa, naranja con naranja.
+COLOR_BORDE_POR_ESTADO = {
+    "ESCUCHANDO": "#2E7D32",    # green 800
+    "PENSANDO": "#0277BD",      # light-blue 800
+    "RESPONDIENDO": "#C2185B",  # pink 700
+    "ATENCION": "#EF6C00",      # orange 800
+}
+
 
 # --- Proveedor y modelos (diseno, seccion 4) --------------------------------
 TOGETHER_BASE_URL = "https://api.together.xyz/v1"
 
-# CORREGIDO EL 2026-08-14 TRAS PROBAR CONTRA LA API REAL (T-07). Los identificadores
-# anteriores (Qwen/Qwen2.5-72B-Instruct y meta-llama/Llama-3.3-70B-Instruct) SI
-# aparecen en GET /v1/models, pero al pedirles una respuesta devuelven HTTP 400
-# "Unable to access non-serverless model": estan en el catalogo de Together, no en
-# su servicio compartido. Para usarlos habria que levantar (y pagar) un endpoint
-# dedicado. Aparecer en el listado no significa estar disponible; lo unico que lo
-# demuestra es una peticion de chat real, y por eso se probaron uno por uno.
+# ELEGIDOS PROBANDO CONTRA LA API REAL. Aparecer en GET /v1/models NO significa estar
+# disponible: los identificadores "grandes" mas obvios (Qwen2.5-72B-Instruct,
+# Qwen3-Next-80B, Qwen3.6-Plus, Qwen3.7-Max...) devuelven HTTP 400 "Unable to access
+# non-serverless model". Estan en el catalogo de Together, no en su servicio
+# compartido: usarlos exigiria pagar un endpoint dedicado. Se probaron 26
+# identificadores uno por uno; solo estos dos responden y sirven para el proyecto.
 #
-# Los dos que si responden en esta cuenta son las variantes "-Turbo". "Turbo" es el
-# nombre comercial del despliegue cuantizado de Together: el mismo modelo, servido
-# con menos precision numerica, mas barato y mas rapido. Para un asistente de voz es
-# justo el compromiso que conviene.
-MODELO_LLM_PREDETERMINADO = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
+# Qwen3.8-2.4T-A95B es un modelo de razonamiento: antes de responder escribe su
+# propio borrador de pensamiento, que la API devuelve aparte en un campo `reasoning`.
+# Cuesta mas tokens de salida que un modelo normal, pero razona mejor y responde en
+# ~2.5 s, que es aceptable para voz. No existe ninguna variante de 27B en Together.
+MODELO_LLM_PREDETERMINADO = "Qwen/Qwen3.8-2.4T-A95B"
+
+# El alterno es a proposito MUCHO mas pequeno: el contraste entre un modelo enorme y
+# uno de 7B se nota en vivo, y es lo que hace util el selector durante la sustentacion.
 MODELO_LLM_ALTERNO = "Qwen/Qwen2.5-7B-Instruct-Turbo"
+
+# Precio por millon de tokens en Together, consultado el 2026-08-14. Se anota aqui
+# porque el saldo es limitado y conviene saber que cuesta cada turno.
+#   Qwen3.8-2.4T-A95B          entrada $2.50   salida $6.25
+#   Qwen2.5-7B-Instruct-Turbo  entrada $0.30   salida $0.30
+#   whisper-large-v3           $0.0015 por minuto de audio
 
 MODELO_STT = "openai/whisper-large-v3"
 IDIOMA_STT = "es"
 
 VOZ_TTS = "es-MX-DaliaNeural"
+
+# Ajustes de la voz. edge-tts permite subir el tono y acelerar el habla sin cambiar de
+# voz. Subir el tono acerca el resultado al registro agudo y brillante del personaje
+# que la duena pidió como tematica, sin necesidad de clonar ninguna voz real.
+# Valores conservadores: mas alla de +50Hz la voz empieza a sonar metalica y se pierde
+# claridad, que es lo ultimo que conviene en un asistente que se escucha por altavoz.
+TONO_TTS = "+35Hz"
+RITMO_TTS = "+8%"
+
+
+# --- Captura de audio (correccion del 2026-08-14) ---------------------------
+# Whisper ALUCINA con audio vacio: ante silencio devuelve muletillas como "Gracias" o
+# "Subtitulos realizados por...". Lo detecto la duena pulsando y soltando sin hablar.
+# La defensa es no enviarle nada que no tenga voz dentro: se exige una duracion minima
+# y un volumen minimo. De paso ahorra dinero, porque cada envio se paga.
+DURACION_MINIMA_GRABACION = 0.35  # segundos
+
+# Volumen medio (RMS) por debajo del cual se considera que no se hablo. Las muestras
+# son enteros de 16 bits (-32768 a 32767); el ruido de fondo de un portatil ronda 30-80
+# y la voz normal pasa de 500 con holgura.
+UMBRAL_DE_SILENCIO = 180
+
+
+# --- Interfaz (correccion del 2026-08-14) -----------------------------------
+# Cuanto se queda a la vista el estado ATENCION antes de volver a reposo. Antes la
+# transicion era instantanea: el estado ocurria, pero duraba microsegundos y nadie lo
+# veia nunca. Un aviso que no se alcanza a ver no es un aviso.
+SEGUNDOS_EN_ATENCION = 2.5
 
 
 # --- Memoria conversacional (diseno, seccion 8) -----------------------------

@@ -67,6 +67,7 @@ def main() -> int:
             memoria=memoria,
             notificar=notificar,
             limite_rondas_tool=config.LIMITE_RONDAS_TOOL_CALLING,
+            segundos_en_atencion=config.SEGUNDOS_EN_ATENCION,
         )
 
     aplicacion = AplicacionMiniJarvis(crear_orquestador)
