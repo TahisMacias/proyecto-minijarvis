@@ -190,3 +190,56 @@ Seis entradas compactadas el 2026-08-14. Lo que hay que recordar:
   ella de el OK: el plan dice que la Fase 2 no empieza sin la Fase 1 verificada.
 - Next: **auditoria externa con otro agente**, y despues el OK de la duena para abrir
   la Fase 2 con el alcance nuevo (ver CURRENT > Fase 2 propuesta).
+
+## 2026-08-14 - Auditoria de cierre de la Fase 1: el codigo aguanto, la documentacion no
+
+- Changed: `README.md`, `requirements.txt`, `docs/specs/2026-08-13-mini-jarvis-design.md`
+  (commit `72f1134`); `.agents/` completo (este `[STATE]`).
+- Auditoria que pidio la duena antes de autorizar la Fase 2. Alcance real leido, no
+  hojeado: `config.py`, los seis modulos de `core/`, `gui/desktop_app.py`, `main.py`,
+  `exploration/transformer_lab.py`, los cinco archivos de `tests/`, README, `.gitignore`
+  y la coherencia interna de `.agents/`.
+- **Veredicto: NO APTO.** Tres defectos, y el hallazgo de fondo es que **los tres eran
+  afirmaciones falsas, no fallos de ejecucion**:
+  1. El README declaraba `meta-llama/Llama-3.3-70B-Instruct-Turbo` como modelo
+     predeterminado. El commit `88ac9b4` cambio `config.py` a Qwen3.8 y no toco el
+     README. Rastreado con `git show --stat`: ocho archivos modificados, ninguno el
+     README. Consecuencia real: la cita de modelos es un criterio de la rubrica, el
+     repositorio es publico, y el informe tecnico (T-16) se iba a escribir desde
+     `docs/specs/`, que citaba **tres** modelos que esta cuenta no puede usar.
+  2. `Pillow` no estaba en `requirements.txt` pese a que `gui/desktop_app.py` hace
+     `from PIL import Image`. Se instalaba de rebote: `pip show pillow` da
+     `Required-by: matplotlib`, no customtkinter. Version suelta, y H-18 exige instalar
+     en otra maquina siguiendo solo el README.
+  3. Precio del STT diez veces inflado ($0.015 en vez de $0.0015 por minuto) en el
+     README y en el documento de diseno.
+- **Por que esto importa mas que un defecto de codigo**: ninguna prueba, ningun gate y
+  ningun uso real los habria detectado jamas. La aplicacion funciona perfectamente
+  mientras el README miente. Los gates verifican que el codigo haga lo que hace; nada
+  verificaba que la documentacion dijera lo que el codigo hace. **Regla nueva en
+  CURRENT > Open findings:** cambiar un identificador de modelo, una version fijada o
+  un precio obliga a revisar `README.md` y `docs/specs/` en el mismo commit.
+- Verificado de forma independiente, ejecutado y no reportado: 70 pruebas verdes en
+  4.75 s; `compileall` exit 0; `.env` nunca aparece en el historial; barrido de
+  patrones de secreto sobre **todos** los commits (`git rev-list --all`), limpio.
+- Lo que la auditoria confirmo solido, y conviene no tocar: la cobertura de los 7
+  fallos previstos, con una tabla que declara de frente lo que **no** cubre; la
+  separacion de hilos, que se cumple por construccion — el orquestador no tiene un
+  solo widget a mano — y no por disciplina; y una suite que verifica invariantes de
+  verdad (una lee el AST del orquestador y falla si aparece un import de la GUI, otra
+  falla si dos estados llegaran a compartir color).
+- **Cuatro incoherencias del control plane**, reparadas aqui: el comando del gate en
+  `AGENTS.md` apuntaba a `mini_jarvis`, carpeta que nunca existio — y lo grave es que
+  fallaba con "Can't list" **y aun asi devolvia exit 0**, o sea un gate roto habria
+  pasado por gate verde; `AGENTS.md` daba por pendiente una autenticacion de GitHub ya
+  hecha (verificado con `gh auth status`); H-10 y H-11 figuraban firmados en
+  `docs/pruebas-manuales.md` y pendientes en `TESTING.md`; y un criterio de T-10 estaba
+  sin marcar pese a estar verificado y firmado.
+- **H-10 y H-11 no se firmaron en nombre de la duena.** Quedan marcados `[?]` con la
+  contradiccion escrita. Firmar un check humano por conveniencia es exactamente el
+  atajo que este workflow existe para evitar.
+- **Push pendiente a proposito**: `72f1134` y este `[STATE]` estan solo en local. El
+  repositorio es publico; publicar es decision de la duena, no del cierre de sesion.
+- Next: reprobar 2.3, 5.1 y 5.3; resolver H-10 y H-11; autorizar el push. Despues, y
+  solo con su OK, abrir la Fase 2 (ver CURRENT > Fase 2 propuesta). **La Fase 2 sigue
+  bloqueada: la auditoria no la desbloquea.**

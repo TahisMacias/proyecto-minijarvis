@@ -50,8 +50,14 @@ defecto que esta tabla existe para prevenir (incidente del 2026-08-13 en T-02).
 
 ## Verification surface
 
-- Gate command (objetivo, aun no ejecutable — se habilita en T-01):
-  `python -m compileall mini_jarvis exploration`
+- Gate command: `python -m compileall .`
+  (Hasta la auditoria del 2026-08-14 aqui decia `compileall mini_jarvis exploration`.
+  Esa carpeta nunca existio: era un nombre de la planificacion previa a T-02. El
+  comando fallaba con "Can't list 'mini_jarvis'" y aun asi devolvia exit 0, asi que
+  un gate roto habria pasado por gate verde. El comando de arriba es el que se uso
+  de verdad en todas las tareas.)
+- Gate de pruebas: `pytest` desde la raiz. 70 pruebas, sin red, sin microfono y sin
+  gastar saldo. `pytest.ini` fija `pythonpath = .` para que encuentre `core`.
 - Covers: errores de sintaxis e imports rotos en el codigo versionado.
 - Does not cover: calidad del audio, latencia real del pipeline, correccion de las
   respuestas del LLM, comportamiento de la GUI. Todo eso es verificacion humana —
@@ -111,7 +117,11 @@ igual corren en cada commit.
 - Git: 2.54.0.windows.1, identidad `Tahis Macias <britany.macias@cenestur.edu.ec>`
 - `gh` CLI: instalado v2.97.0 en `C:\Program Files\GitHub CLI\gh.exe`, pero **no estaba
   en el PATH** de la sesion del 2026-08-13 (se instalo con la terminal ya abierta).
-  Requiere reiniciar la terminal. Autenticacion pendiente: `gh auth login`.
+  Requiere reiniciar la terminal, o invocarlo por su ruta completa.
+  **Autenticacion hecha**: verificado el 2026-08-14 con `gh auth status` — cuenta
+  `TahisMacias`, protocolo https, scopes `gist`, `read:org`, `repo`, `workflow`.
+  (Este renglon decia "autenticacion pendiente" hasta la auditoria de esa fecha,
+  mientras `CURRENT.md` la daba por hecha. Contradiccion resuelta contra la maquina.)
 - Build/test quirks:
   - **OneDrive: riesgo dormido, no activo.** Verificado el 2026-08-13: el proceso
     OneDrive NO corre. Pero `Documentos` si esta redirigido a `C:\Users\brith\OneDrive\

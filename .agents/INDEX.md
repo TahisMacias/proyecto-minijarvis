@@ -16,6 +16,9 @@
 
 - `docs/specs/2026-08-13-mini-jarvis-design.md`: documento de diseno aprobado.
   17 secciones. Es la referencia de toda tarea del plan y la base del informe tecnico.
+  **Su tabla de modelos (seccion 4) lleva un aviso de correccion**: los identificadores
+  originales no los sirve esta cuenta. Antes de copiar cualquier dato de este documento
+  al informe, contrastarlo con `config.py`.
 
 ## Important product paths
 
@@ -57,6 +60,10 @@
 - `tests/`: memoria, parseo del LLM, orquestador, paleta de estados y barra
   espaciadora. 70 pruebas, sin red, sin microfono y sin saldo.
 - `pytest.ini`: `pythonpath = .` para que el comando del gate encuentre `core`.
+- `requirements.txt`: 14 dependencias fijadas. `pillow` entro en la auditoria del
+  2026-08-14; hasta entonces se instalaba de rebote via matplotlib.
+- `README.md`: cara publica del proyecto. Su tabla de modelos **debe** coincidir con
+  `config.py`; se desincronizo una vez y no lo detecto ningun gate.
 - Falta `tools/` (T-15, Fase 2 sin abrir).
 
 ## Documentacion para personas
@@ -65,4 +72,4 @@
 - `docs/evidencia/`: salida del laboratorio, captura de la ventana y la tabla de
   cobertura de los 7 fallos previstos.
 
-Last reindexed: 2026-08-14, al cerrar la sesion de la Fase 1.
+Last reindexed: 2026-08-14, al cerrar la sesion de la auditoria de la Fase 1.

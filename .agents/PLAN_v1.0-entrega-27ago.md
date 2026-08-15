@@ -241,7 +241,7 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 - Scope: `gui/desktop_app.py`, `main.py`
 - Acceptance:
   - [x] Ventana CustomTkinter en modo claro con la paleta pastel de `config.py`.
-  - [ ] Los 4 estados son distinguibles a simple vista, sin leer texto, **por color
+  - [x] Los 4 estados son distinguibles a simple vista, sin leer texto, **por color
         y por forma**. Usa la tabla de la seccion 11 del spec (corregida el 2026-08-13):
         cada estado tiene color propio y forma propia. Que dos estados compartan color
         es un NO APTO automatico: incumple H-09 y deja fuera a personas con daltonismo.
@@ -326,11 +326,48 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 - Risk triggers: ninguno
 - STOP when: ninguna prevista.
 
+### Auditoria de cierre de la Fase 1 (2026-08-14)
+
+Auditoria completa pedida por la duena antes de autorizar la Fase 2. Alcance: todo
+`config.py`, los seis modulos de `core/`, `gui/`, `main.py`, `exploration/`, los cinco
+archivos de `tests/`, el README, el `.gitignore` y la coherencia de `.agents/`.
+
+**Veredicto: NO APTO** — tres defectos de producto, todos fuera del codigo que corre.
+Corregidos en el commit `72f1134`:
+
+1. El README declaraba un modelo predeterminado que la aplicacion no usa. El commit
+   `88ac9b4` cambio `config.py` a Qwen3.8 y no toco el README. Afectaba a un criterio
+   de la rubrica en un repositorio publico, y habria contaminado el informe tecnico
+   (T-16), que se escribe desde el documento de diseno — el cual citaba tres modelos
+   que esta cuenta no puede usar.
+2. `Pillow` no estaba en `requirements.txt` pese a importarse en `gui/desktop_app.py`.
+   Se instalaba de rebote via matplotlib, con la version suelta. Riesgo directo
+   contra H-18 (instalar en otra maquina siguiendo solo el README).
+3. Precio del STT diez veces inflado en el README y en el documento de diseno.
+
+Verificado de forma independiente, no por reporte: 70 pruebas verdes en 4.75 s;
+`compileall` exit 0; `.env` nunca versionado; barrido de secretos sobre **todos** los
+commits del historial, limpio.
+
+Lo que la auditoria confirmo como solido: la cobertura de los 7 fallos previstos y su
+tabla de evidencia, que declara de frente lo que NO cubre; la separacion de hilos, que
+se cumple por construccion y no por disciplina; y una suite de pruebas que verifica
+invariantes reales (una lee el AST del orquestador y falla si aparece un import de la
+GUI; otra falla si dos estados llegaran a compartir color).
+
+Cuatro incoherencias del control plane reparadas en el mismo cierre: el comando del
+gate en `AGENTS.md` apuntaba a una carpeta inexistente y devolvia exit 0 igualmente;
+`AGENTS.md` daba por pendiente una autenticacion de GitHub ya hecha; H-10 y H-11
+figuraban a la vez firmadas y pendientes; y este criterio de T-10 estaba sin marcar
+pese a estar verificado y firmado.
+
 ## Cierre de Fase 1 — fecha limite 22 de agosto
 
 - [x] **T-01 a T-12 en APTO** (2026-08-14, ocho dias antes de la fecha limite).
-- [ ] Checks humanos: H-01, H-02 y H-03 hechos. **Faltan H-04, H-07, H-09, H-10 y
-      H-12**, que son de oido, de vista y de uso: los tiene que hacer la duena.
+- [ ] Checks humanos: **H-01 a H-09 firmados** tras el uso real del 2026-08-14.
+      Quedan H-10 y H-11 (en contradiccion, ver `TESTING.md`) y H-12 en su version
+      manual, con el wifi apagado de verdad. Falta ademas **reprobar las pruebas 2.3,
+      5.1 y 5.3** con las correcciones ya aplicadas.
 - [x] El pipeline completo funciona de extremo a extremo. Verificado sin GUI con los
       modulos reales en 21.8 s; falta la pasada con voz humana real (parte de H-10).
 - [x] Auditoria de tarea con gate ejecutado en cada una; commit y push por tarea.

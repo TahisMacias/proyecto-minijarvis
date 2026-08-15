@@ -32,10 +32,19 @@ directa de codigo desde este archivo.
 - [x] H-09. **[OK 2026-08-14, firmado por la duena tras usar la aplicacion]** Apoyado
       ademas por medicion del lienzo: 4 colores distintos y 4 figuras distintas, mas una
       prueba automatica que falla si dos estados llegaran a compartir color.
-- [ ] H-10. Pedir a alguien ajeno al proyecto que use la app sin instrucciones -> logra
+- [?] H-10. Pedir a alguien ajeno al proyecto que use la app sin instrucciones -> logra
       completar un turno de conversacion.
-- [ ] H-11. Ejecutar `exploration/transformer_lab.py` -> imprime tokens, IDs, forma de
+      **CONTRADICCION ABIERTA (auditoria 2026-08-14).** En `docs/pruebas-manuales.md`
+      la prueba 9.1, que es exactamente este check, esta marcada `[X]`. Aqui y en
+      `CURRENT.md` figuraba como pendiente. No se firma en nombre de la duena: hace
+      falta que ella diga cual de las dos es cierta. Si la persona ajena ya uso la
+      aplicacion, H-10 se cierra; si no, sigue pendiente y es de los pocos checks que
+      no se pueden improvisar el mismo dia.
+- [?] H-11. Ejecutar `exploration/transformer_lab.py` -> imprime tokens, IDs, forma de
       embeddings y genera el PNG de atencion, legible para quien no vio el codigo.
+      **Misma contradiccion**: las pruebas 8.1, 8.2 y 8.3 del recorrido manual estan
+      marcadas `[X]`, incluida la de poder explicar la imagen en voz alta. Pendiente
+      de que la duena lo confirme.
 - [ ] H-12. Desconectar la red a mitad de un turno -> mensaje amable, la app sigue viva
       y acepta un turno nuevo al reconectar.
       **Equivalente automatico ya verificado (2026-08-14)**: con el motor apuntando a un
@@ -69,8 +78,13 @@ directa de codigo desde este archivo.
 
 ## Results
 
-- Date: 2026-08-13 (parcial: H-01, H-02)
+- Date: 2026-08-14 (recorrido manual completo de la Fase 1 + auditoria de cierre)
 - Environment: Windows 11 Pro 10.0.26200; **Python 3.14.5** fijado en T-01;
   venv en `.venv/`
-- Verdict: pending (16 de 18 checks por ejecutar)
-- Failures mapped to tasks: ninguno
+- Verdict: Fase 1 tecnicamente completa. **9 checks firmados** (H-01 a H-09),
+  **2 en contradiccion** por resolver (H-10, H-11), **1 con equivalente automatico
+  verificado y la version manual pendiente** (H-12), y los de Fase 2 y 3 sin abrir.
+- Failures mapped to tasks: los tres fallos del recorrido manual (pruebas 2.3, 5.1 y
+  5.3) se corrigieron en los commits `88ac9b4` y `d688954`. **Falta reprobarlos**:
+  es la primera accion pendiente de la duena, y hasta hacerla no hay evidencia de
+  que las correcciones funcionen en uso real.
