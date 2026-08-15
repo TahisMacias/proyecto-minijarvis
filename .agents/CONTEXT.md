@@ -303,3 +303,20 @@ fechas, decisiones, riesgos abiertos, referencias a tareas/commits y un puntero 
 - Unresolved: H-04, H-07, H-09, H-10 y H-12 son de la duena (oido, vista y uso).
   Nadie mas los puede firmar.
 - Next: cierre de la Fase 1 y decision sobre la Fase 2 (T-13 a T-15).
+
+## 2026-08-14 - Cierre de la Fase 1
+
+- La Fase 1 completa (T-01 a T-12) queda en APTO el 2026-08-14, ocho dias antes de su
+  fecha limite del 22 de agosto. El 65 % de la rubrica que protege esta fase esta
+  cubierto, y tambien el 25 % del laboratorio del Transformer.
+- Nota de proceso: el commit de T-12 mezclo el plano de producto y el de control en
+  un solo commit. Es una desviacion menor de la regla de dos planos; se deja anotada
+  aqui en vez de reescribir el historial de un repositorio ya publicado.
+- **La Fase 2 no arranca todavia, y es a proposito.** El plan dice que no empieza
+  hasta que la Fase 1 este *completa y verificada*, y lo que falta para verificada son
+  cinco checks humanos (H-04, H-07, H-09, H-10, H-12) mas H-11. Son de oido, de vista
+  y de uso: ninguna prueba automatica los sustituye, y firmarlos por cuenta propia
+  seria justo el tipo de atajo que este workflow existe para evitar.
+- Decision ya tomada y escrita: como la fase cerro con margen, la Fase 2 entra
+  completa (T-13 pestana Laboratorio, T-14 controles de sustentacion, T-15 tool
+  calling). No se recorta.

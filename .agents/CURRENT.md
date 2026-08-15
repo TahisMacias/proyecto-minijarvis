@@ -5,8 +5,8 @@ updated_at: 2026-08-14
 source_commit: (ver ultimo [STATE]; limpio y sincronizado con origin/main)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
-active_task: T-12 (ultima de la Fase 1)
-last_verdict: T-04 a T-11 APTO (toda la Fase 1 salvo T-12)
+active_task: ninguna — Fase 1 CERRADA, esperando checks humanos
+last_verdict: T-12 APTO — Fase 1 completa (T-01 a T-12)
 backup: remote origin -> https://github.com/TahisMacias/proyecto-minijarvis (publico)
 deadline: 2026-08-27
 ```
@@ -32,10 +32,19 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 
 ## Next action
 
-1. **T-09, el orquestador.** Es la tarea de mayor riesgo tecnico del plan: hilo
-   trabajador por turno, maquina de estados y la regla de que ningun hilo toca un
-   widget. Todas sus dependencias estan cerradas.
-2. Luego T-10 (GUI) y T-12 (cierre del nucleo). Con eso cierra la Fase 1.
+**La Fase 1 cerro el 2026-08-14, ocho dias antes de su fecha limite.** El plan tiene
+una regla propia: *la Fase 2 no empieza hasta que la Fase 1 este completa y
+verificada*. Lo que falta para "verificada" no lo puede hacer nadie mas que la duena:
+
+1. **H-04**: `python -m core.audio_capture` — escuchar si el audio capturado sirve.
+2. **H-07**: `python -m core.tts_engine` — juzgar si la voz suena natural.
+3. **H-09 y H-10**: `python main.py` — usar la aplicacion con voz real, y confirmar
+   que los estados se distinguen sin leer el texto.
+4. **H-11**: mirar `exploration/mapa_atencion.png` y poder explicarlo en voz alta.
+5. **H-12**: seguir el README desde cero como si fuera otra persona.
+
+Con esos cinco firmados, la Fase 2 entra completa (T-13, T-14, T-15): la decision de
+no recortarla ya esta tomada y escrita en el plan, porque la fase cerro con margen.
 
 ## Blockers
 
