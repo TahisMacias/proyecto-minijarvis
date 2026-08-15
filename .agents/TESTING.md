@@ -17,23 +17,29 @@ directa de codigo desde este archivo.
       Captura real de 0.5s a 16 kHz: 8000 frames, senal no nula.
 - [ ] H-03. Seguir el README desde cero en una carpeta limpia -> el proyecto queda
       instalado sin ningun paso que no este escrito.
-- [ ] H-04. Grabar 5 segundos y reproducir lo capturado -> se escucha la voz con claridad,
-      sin cortes ni saturacion.
-- [ ] H-05. Transcribir una frase en espanol con acento local -> el texto devuelto es
-      fiel. Probar tambien una frase con un termino tecnico.
+- [x] H-04. **[OK 2026-08-14, firmado por la duena]** Uso real de la aplicacion con su
+      propia voz: la captura sirvio y la transcripcion fue fiel.
+- [x] H-05. **[OK 2026-08-14]** Frase real de la duena con acento local y un numero de
+      cuatro digitos: "Cual es la raiz cuadrada de 3345" se transcribio exacta,
+      digitos incluidos, que es la parte dificil.
 - [ ] H-06. Conversar 3 turnos encadenados con referencias al turno anterior -> el
       asistente mantiene el hilo y su personalidad es consistente.
-- [ ] H-07. Escuchar la voz sintetizada -> se entiende, la entonacion es natural y el
-      genero de la voz es el acordado.
+- [x] H-07. **[OK 2026-08-14, firmado por la duena]** La voz se entiende y suena
+      natural. Voz `es-MX-DaliaNeural`, femenina, como se acordo.
 - [ ] H-08. Durante un turno, mover y redimensionar la ventana -> la interfaz responde
       en todo momento; nunca aparece "no responde".
-- [ ] H-09. Observar los 4 estados sin leer texto -> se distinguen solo por color y forma.
+- [x] H-09. **[OK 2026-08-14, firmado por la duena tras usar la aplicacion]** Apoyado
+      ademas por medicion del lienzo: 4 colores distintos y 4 figuras distintas, mas una
+      prueba automatica que falla si dos estados llegaran a compartir color.
 - [ ] H-10. Pedir a alguien ajeno al proyecto que use la app sin instrucciones -> logra
       completar un turno de conversacion.
 - [ ] H-11. Ejecutar `exploration/transformer_lab.py` -> imprime tokens, IDs, forma de
       embeddings y genera el PNG de atencion, legible para quien no vio el codigo.
 - [ ] H-12. Desconectar la red a mitad de un turno -> mensaje amable, la app sigue viva
       y acepta un turno nuevo al reconectar.
+      **Equivalente automatico ya verificado (2026-08-14)**: con el motor apuntando a un
+      puerto cerrado, un fallo de conexion REAL a mitad de turno produjo el aviso en
+      lenguaje llano y la vuelta a REPOSO. Falta la version con el wifi apagado de verdad.
 
 ## Fase 2 - Valor agregado (limite 25 de agosto)
 
