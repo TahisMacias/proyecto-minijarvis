@@ -6,9 +6,9 @@ MINI-JARVIS - LABORATORIO DE EXPLORACION DEL TRANSFORMER (T-11)
 Este script no es parte del pipeline de voz de Mini-JARVIS: es un modulo independiente para demostrar, con un Transformer real corriendo en esta misma maquina, los tres conceptos que la rubrica exige poder explicar: tokenizacion, embeddings y self-attention.
 
 ==============================================================================
-NIVEL 1 - TOKENIZACION (tokenizador real de Qwen2.5-72B-Instruct)
+NIVEL 1 - TOKENIZACION (tokenizador real de Qwen2.5-Instruct)
 ==============================================================================
-Se descarga UNICAMENTE el tokenizador (un archivo de vocabulario y reglas de division de texto), sin los pesos del modelo de 72 mil millones de parametros. Pesa pocos megabytes y no necesita GPU.
+Se descarga UNICAMENTE el tokenizador (un archivo de vocabulario y reglas de division de texto), sin un solo peso del modelo. Pesa pocos megabytes, no necesita GPU, y es exactamente el mismo que usa el modelo Qwen que responde en la aplicacion.
 
 --- Frase de ejemplo (propia del proyecto Mini-JARVIS) ---
 "Mini-JARVIS es mi asistente de voz y me avisa cuando la batería del portátil está por agotarse."
@@ -124,6 +124,6 @@ Tamano del archivo: 89415 bytes
 FIN DEL LABORATORIO
 ==============================================================================
 Los tres pilares del Transformer quedaron demostrados sobre modelos reales:
-  1) Tokenizacion  -> tokenizador real de Qwen2.5-72B-Instruct.
+  1) Tokenizacion  -> tokenizador real de Qwen2.5-Instruct.
   2) Embeddings    -> last_hidden_state de BETO, forma (1, N, 768).
   3) Self-attention -> 12 capas de atencion de BETO, filas que suman 1.0.

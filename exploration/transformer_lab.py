@@ -3,15 +3,24 @@ exploration/transformer_lab.py
 
 Modulo de exploracion del Transformer para Mini-JARVIS (tarea T-11).
 
-Por que existe este archivo: el LLM de produccion del proyecto (Qwen2.5-72B-Instruct)
-corre en los servidores de Together AI, detras de un endpoint HTTP. Un endpoint HTTP
-solo devuelve texto: es fisicamente imposible pedirle las matrices internas de
-self-attention a un modelo que no esta cargado en nuestra propia memoria. Por eso este
-laboratorio se hace en dos niveles, tal como describe la seccion 10 del documento de
-diseno (docs/specs/2026-08-13-mini-jarvis-design.md):
+Por que existe este archivo: los LLM de produccion del proyecto corren en los
+servidores de Together AI, detras de un endpoint HTTP. Un endpoint HTTP solo devuelve
+texto: es fisicamente imposible pedirle las matrices internas de self-attention a un
+modelo que no esta cargado en nuestra propia memoria. Por eso este laboratorio se hace
+en dos niveles, tal como describe la seccion 10 del documento de diseno
+(docs/specs/2026-08-13-mini-jarvis-design.md):
 
-  Nivel 1 - Se descarga SOLO el tokenizador real de Qwen (pocos MB, sin pesos del
+  Nivel 1 - Se descarga SOLO el tokenizador real de Qwen2.5 (pocos MB, sin pesos del
             modelo, sin GPU) para mostrar como el texto se convierte en tokens e IDs.
+
+            Se usa el de Qwen y no el de Llama por dos razones concretas. Primera:
+            Qwen2.5-7B-Instruct-Turbo es uno de los dos modelos que el proyecto usa
+            de verdad (el alterno del selector de la GUI), asi que este es su
+            tokenizador real, no un sustituto didactico. Segunda: el repositorio del
+            tokenizador de Llama 3.3 en Hugging Face esta restringido — exige una
+            cuenta con la licencia de Meta aceptada — y una demostracion que depende
+            de un permiso ajeno es una demostracion fragil. El tokenizador de Qwen2.5
+            es publico y ademas es el mismo para todos los tamanos de la familia.
   Nivel 2 - Se usa un Transformer pequeno que si corre completo en esta maquina,
             BETO (dccuchile/bert-base-spanish-wwm-cased, ~110M parametros, entrenado
             en espanol), para extraer de verdad los embeddings y las matrices de
@@ -67,8 +76,11 @@ hf_logging.disable_progress_bar()
 # Constantes del laboratorio
 # ---------------------------------------------------------------------------------
 
-# Nivel 1: el tokenizador real del LLM de produccion (sin descargar sus pesos).
-NOMBRE_TOKENIZADOR_QWEN = "Qwen/Qwen2.5-72B-Instruct"
+# Nivel 1: el tokenizador real de uno de los LLM del proyecto (sin sus pesos).
+# Together sirve este modelo como "Qwen/Qwen2.5-7B-Instruct-Turbo"; el sufijo Turbo
+# es el nombre de su despliegue cuantizado, no otro tokenizador. En Hugging Face el
+# repositorio se llama sin ese sufijo, y es de donde se descarga aqui.
+NOMBRE_TOKENIZADOR_QWEN = "Qwen/Qwen2.5-7B-Instruct"
 
 # Nivel 2: el Transformer pequeno y local sobre el que si podemos mirar "por dentro".
 NOMBRE_MODELO_BETO = "dccuchile/bert-base-spanish-wwm-cased"
@@ -171,11 +183,12 @@ def nivel_1_tokenizacion():
     al entrenar el modelo; una palabra que no aparecio (o aparecio poco) en los datos
     de entrenamiento se parte en varios sub-tokens mas pequenos que si son conocidos.
     """
-    _encabezado("NIVEL 1 - TOKENIZACION (tokenizador real de Qwen2.5-72B-Instruct)")
+    _encabezado("NIVEL 1 - TOKENIZACION (tokenizador real de Qwen2.5-Instruct)")
     print(
         "Se descarga UNICAMENTE el tokenizador (un archivo de vocabulario y reglas "
-        "de division de texto), sin los pesos del modelo de 72 mil millones de "
-        "parametros. Pesa pocos megabytes y no necesita GPU."
+        "de division de texto), sin un solo peso del modelo. Pesa pocos megabytes, "
+        "no necesita GPU, y es exactamente el mismo que usa el modelo Qwen que "
+        "responde en la aplicacion."
     )
 
     tokenizador = _cargar_o_fallar(
@@ -520,7 +533,7 @@ def main():
 
     _encabezado("FIN DEL LABORATORIO")
     print("Los tres pilares del Transformer quedaron demostrados sobre modelos reales:")
-    print("  1) Tokenizacion  -> tokenizador real de Qwen2.5-72B-Instruct.")
+    print("  1) Tokenizacion  -> tokenizador real de Qwen2.5-Instruct.")
     print("  2) Embeddings    -> last_hidden_state de BETO, forma (1, N, 768).")
     print("  3) Self-attention -> 12 capas de atencion de BETO, filas que suman 1.0.")
 
