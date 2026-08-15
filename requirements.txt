@@ -12,6 +12,13 @@ sounddevice==0.5.5
 # --- GUI de escritorio ---
 customtkinter==6.0.0
 
+# Pillow lo importa directamente gui/desktop_app.py ("from PIL import Image") para
+# cargar el mapa de atencion en la pestana Laboratorio. Hasta la auditoria del
+# 2026-08-14 no estaba declarado aqui: se instalaba de rebote porque matplotlib
+# depende de el. Eso hacia que la version quedara suelta y que la ventana dependiera
+# de una dependencia ajena. Lo que se importa se declara y se fija.
+pillow==12.3.0
+
 # --- Herramientas (Tool Calling) ---
 psutil==7.2.2
 duckduckgo-search==8.1.1

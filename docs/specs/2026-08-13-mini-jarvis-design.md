@@ -108,13 +108,30 @@ todo lo obligatorio. Si el 25 falta el pipeline, no hay proyecto.
 
 Proveedores y modelos exactos, para citar en el informe segun exige la seccion 11 del enunciado:
 
+> **CORRECCION DEL 2026-08-14 — LEER ANTES DE COPIAR ESTA TABLA AL INFORME.**
+> La tabla de abajo es la del diseno original y **ya no describe lo que el proyecto
+> usa**. Los dos modelos de lenguaje que aqui figuran (`Qwen2.5-72B-Instruct` y
+> `Llama-3.3-70B-Instruct`) se probaron contra la API en T-07 y **esta cuenta no los
+> puede usar**: devuelven `HTTP 400 non-serverless model`. Se sustituyeron por
+> `Qwen/Qwen3.8-2.4T-A95B` (predeterminado) y `Qwen/Qwen2.5-7B-Instruct-Turbo`
+> (alterno). El precio del STT tambien estaba mal: es **$0.0015** por minuto, no
+> $0.015.
+>
+> La tabla vigente esta en el `README.md`, y la fuente unica de verdad es
+> `config.py`. El informe tecnico (T-16) debe citar esos, no estos.
+>
+> Se conserva la tabla original tachada, y no borrada, porque la diferencia entre lo
+> que se planeo y lo que resulto ser posible **es en si misma un hallazgo del
+> proyecto**: aparecer en el catalogo de un proveedor no prueba disponibilidad. Vale
+> la pena contarlo en el informe y en la sustentacion.
+
 | Etapa | Proveedor | Modelo | Costo |
 |---|---|---|---|
-| STT | Together AI | `openai/whisper-large-v3` | $0.015 / min de audio |
-| LLM | Together AI | `Qwen/Qwen2.5-72B-Instruct` (predeterminado) | por token |
-| LLM alterno | Together AI | `meta-llama/Llama-3.3-70B-Instruct` | por token |
+| STT | Together AI | `openai/whisper-large-v3` | ~~$0.015~~ → **$0.0015** / min de audio |
+| LLM | Together AI | ~~`Qwen/Qwen2.5-72B-Instruct`~~ → **`Qwen/Qwen3.8-2.4T-A95B`** | por token |
+| LLM alterno | Together AI | ~~`meta-llama/Llama-3.3-70B-Instruct`~~ → **`Qwen/Qwen2.5-7B-Instruct-Turbo`** | por token |
 | TTS | Microsoft `edge-tts` | `es-MX-DaliaNeural` | sin costo |
-| Exploracion (tokens) | Hugging Face | tokenizador de `Qwen/Qwen2.5-72B-Instruct`, sin pesos | sin costo |
+| Exploracion (tokens) | Hugging Face | ~~tokenizador de `Qwen/Qwen2.5-72B-Instruct`~~ → **tokenizador de `Qwen/Qwen2.5-7B-Instruct`**, sin pesos | sin costo |
 | Exploracion (atencion) | Hugging Face | `dccuchile/bert-base-spanish-wwm-cased` (BETO) | sin costo |
 
 `base_url = "https://api.together.xyz/v1"` con el SDK oficial de `openai`. La misma

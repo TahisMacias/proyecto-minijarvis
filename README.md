@@ -128,16 +128,28 @@ pytest
 
 | Etapa | Proveedor | Modelo | Costo |
 |---|---|---|---|
-| Transcripcion (STT) | Together AI | `openai/whisper-large-v3` | $0.015 / min de audio |
-| LLM (predeterminado) | Together AI | `meta-llama/Llama-3.3-70B-Instruct-Turbo` | por token |
-| LLM (alterno) | Together AI | `Qwen/Qwen2.5-7B-Instruct-Turbo` | por token |
+| Transcripcion (STT) | Together AI | `openai/whisper-large-v3` | $0.0015 / min de audio |
+| LLM (predeterminado) | Together AI | `Qwen/Qwen3.8-2.4T-A95B` | $2.50 entrada / $6.25 salida por millon de tokens |
+| LLM (alterno) | Together AI | `Qwen/Qwen2.5-7B-Instruct-Turbo` | $0.30 entrada / $0.30 salida por millon de tokens |
 | Sintesis de voz (TTS) | Microsoft `edge-tts` | `es-MX-DaliaNeural` | sin costo |
 | Exploracion (tokenizacion) | Hugging Face | tokenizador de `Qwen/Qwen2.5-7B-Instruct`, sin pesos | sin costo |
 | Exploracion (embeddings y atencion) | Hugging Face | `dccuchile/bert-base-spanish-wwm-cased` (BETO) | sin costo |
 
-Los modelos llevan el sufijo `-Turbo` porque son los que Together AI sirve de forma
-compartida. Sus versiones sin ese sufijo aparecen en el catalogo pero **no responden**
-sin contratar un endpoint dedicado: devuelven `HTTP 400 non-serverless model`.
+Estos dos modelos de lenguaje **se eligieron probandolos uno por uno contra la API
+real**, no leyendo el catalogo. Aparecer en `GET /v1/models` no significa estar
+disponible: los identificadores "grandes" mas obvios (`Qwen2.5-72B-Instruct`,
+`Llama-3.3-70B-Instruct`, `Qwen3-Next-80B` y otros) devuelven `HTTP 400 non-serverless
+model`, porque estan en el catalogo de Together pero no en su servicio compartido:
+usarlos exigiria pagar un endpoint dedicado. Se probaron 26 identificadores; estos dos
+son los que responden.
+
+El predeterminado es un modelo de razonamiento (escribe un borrador interno antes de
+contestar, y por eso gasta mas tokens de salida). El alterno es a proposito mucho mas
+pequeno: el contraste entre ambos se nota en vivo, y es lo que hace util el selector
+de modelo durante la sustentacion.
+
+La fuente unica de verdad de estos identificadores es [`config.py`](config.py); si
+alguna vez esta tabla y ese archivo no coinciden, manda `config.py`.
 
 Detalle completo de la arquitectura y las decisiones de diseno en
 `docs/specs/2026-08-13-mini-jarvis-design.md`.
