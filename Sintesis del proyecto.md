@@ -1,3 +1,30 @@
+> # ⚠️ DOCUMENTO HISTORICO — SUPERADO. NO CITAR EN EL INFORME NI EN LA SUSTENTACION.
+>
+> Esta es la sintesis que el equipo escribio **antes de construir nada**, el 13 de
+> agosto de 2026. Se conserva porque muestra de donde partio el proyecto, pero
+> **varias de sus decisiones no sobrevivieron al contacto con la realidad** y hoy
+> contradicen a la aplicacion que existe.
+>
+> **La verdad vigente esta, en este orden:** `config.py` (identificadores y
+> constantes), `README.md` (como se instala y que modelos usa) y
+> `docs/specs/2026-08-13-mini-jarvis-design.md` (arquitectura y decisiones, con sus
+> propias correcciones marcadas).
+>
+> ## Lo que este documento dice y ya no es cierto
+>
+> | Dice aqui | Realidad, y por que cambio |
+> |---|---|
+> | LLM `Qwen2.5-72B-Instruct` o `Llama-3.3-70B-Instruct` (seccion 2) | **Esta cuenta no puede usar ninguno de los dos.** Devuelven `HTTP 400 non-serverless`. Se probaron 26 identificadores uno por uno; hoy corre `Qwen/Qwen3.8-2.4T-A95B` con `Qwen/Qwen2.5-7B-Instruct-Turbo` de alterno. |
+> | Orquestacion con `asyncio` (seccion 2) | **Descartado a proposito.** Tkinter exige su bucle en el hilo principal; sostener un bucle `asyncio` en paralelo es donde se pierden dias depurando ventanas congeladas. Se usa **un hilo trabajador efimero por turno**. Ver seccion 5 del documento de diseno. |
+> | 7 herramientas: Kiosk, Gmail, Calendar, Vision de pantalla, Busqueda web, Resumen de YouTube, Telemetria (seccion 4) | **Son 3, y ninguna esta construida todavia.** T-15 planea `estado_laptop`, `buscar_web` y `abrir_kiosk`, mas una cuarta (`calcular`) que pidio la duena. Gmail, Calendar, Vision y YouTube se descartaron por costo en tiempo: OAuth era la integracion mas cara del plan. |
+> | PENSANDO en "lavanda/azul cielo" (seccion 3) | Es **azul cielo** `#E1F5FE`, con borde saturado `#0277BD`. Cada estado tiene un color y una forma propios; que dos compartan color es NO APTO por H-09. |
+> | Carpeta raiz `mini_jarvis/` (seccion 5) | **Nunca existio.** Los modulos viven en la raiz del repositorio (`core/`, `gui/`, `exploration/`). Ese nombre fantasma sobrevivio en el comando del gate de `AGENTS.md` hasta la auditoria del 14 de agosto, donde fallaba en silencio devolviendo exit 0. |
+>
+> Marcado como superado el 2026-08-17, cerrando un hallazgo abierto desde el
+> 2026-08-14 en `.agents/CURRENT.md`.
+
+---
+
 Aquí tienes la síntesis final, completa y actualizada del proyecto **Mini-JARVIS**, incorporando la decisión definitiva de arquitectura de software, su interfaz de escritorio y todos los requisitos acordados.
 
 ## **1\. Visión General e Identidad del Proyecto**
