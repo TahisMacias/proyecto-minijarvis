@@ -34,6 +34,8 @@ def main() -> int:
         from core.stt_client import transcribir
         from core.tts_engine import hablar
         from gui.desktop_app import AplicacionMiniJarvis
+        from tools.manifest import MANIFIESTO
+        from tools.system_skills import ejecutar_herramienta
     except Exception as excepcion:  # noqa: BLE001
         print(f"\nNo se pudo iniciar Mini-JARVIS.\n\n{excepcion}\n")
         return 1
@@ -46,6 +48,8 @@ def main() -> int:
         return 1
 
     print(f"Modelo: {config.MODELO_LLM_PREDETERMINADO}")
+    print(f"Herramientas: {len(MANIFIESTO)} disponibles "
+          f"({', '.join(sorted(h['function']['name'] for h in MANIFIESTO))})")
     print("Abriendo la ventana...")
 
     memoria = MemoriaConversacional(
@@ -66,6 +70,12 @@ def main() -> int:
             voz=hablar,
             memoria=memoria,
             notificar=notificar,
+            # Aqui es donde el Tool Calling entra en la aplicacion (T-15). El
+            # orquestador ya sabia hacerlo desde T-09: recibe la lista de lo que se
+            # puede pedir y la funcion que lo ejecuta. Hasta ahora se llamaba sin
+            # estos dos argumentos, asi que respondia solo con texto.
+            herramientas=MANIFIESTO,
+            ejecutar_herramienta=ejecutar_herramienta,
             limite_rondas_tool=config.LIMITE_RONDAS_TOOL_CALLING,
             segundos_en_atencion=config.SEGUNDOS_EN_ATENCION,
         )
