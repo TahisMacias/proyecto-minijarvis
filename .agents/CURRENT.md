@@ -1,13 +1,14 @@
 # CURRENT - Mini-JARVIS
 
 ```yaml
-updated_at: 2026-08-14 (sesion 3, cierre)
-source_commit: (ver ultimo [STATE]; limpio, pendiente de push a origin/main)
+updated_at: 2026-08-17 (sesion 4)
+source_commit: (ver ultimo [STATE]; limpio)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
 active_task: ninguna — sesion cerrada, Fase 2 bloqueada esperando el OK de la duena
 last_verdict: auditoria de cierre de Fase 1 = NO APTO; los 3 defectos corregidos en
-  el commit 72f1134. Fase 1 tecnicamente completa.
+  72f1134 y publicados. Los 2 hallazgos que quedaban abiertos, cerrados en b215812.
+  Fase 1 tecnicamente completa y sin deuda de auditoria pendiente.
 backup: remote origin -> https://github.com/TahisMacias/proyecto-minijarvis (publico)
 deadline: 2026-08-27
 ```
@@ -22,16 +23,36 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 
 **BLOQUEADO A PROPOSITO. No abrir la Fase 2 sin el OK explicito de la duena.**
 
-La auditoria que pidio **ya se hizo** (2026-08-14, ver el plan). Lo que queda antes
-de reanudar, en este orden:
+La auditoria que pidio ya se hizo (2026-08-14) y **toda la deuda que dejo esta
+saldada**: los 3 defectos en `72f1134`, los 2 hallazgos abiertos en `b215812`, todo
+publicado. **No queda trabajo de agente pendiente en la Fase 1.**
 
-1. **Push pendiente**: los commits `72f1134` y el `[STATE]` de este cierre estan solo
-   en local. Preguntarle antes de publicarlos: el repositorio es publico.
-2. **Reprobar las pruebas 2.3, 5.1 y 5.3** de `docs/pruebas-manuales.md` con las
-   correcciones ya aplicadas. Sin esto no hay evidencia de que funcionen en uso real.
-3. **Resolver H-10 y H-11**: figuran firmados en el recorrido manual y pendientes en
-   `TESTING.md`. Solo ella puede decir cual es cierto.
-4. Con su OK, abrir la **Fase 2 con alcance ampliado** (ver la seccion siguiente).
+Lo que queda son tres cosas, y **las tres las tiene que hacer la duena en persona**.
+Ningun agente puede firmarlas por ella:
+
+1. **Reprobar las pruebas 2.3, 5.1 y 5.3** de `docs/pruebas-manuales.md`. Es la mas
+   urgente. Las correcciones estan aplicadas y publicadas, pero **nadie ha comprobado
+   que funcionen en uso real**: hace falta hablarle a la aplicacion, apagar el wifi y
+   mirar el indicador. Ninguna prueba automatica sustituye esto — los tres defectos
+   originales los encontro ella, no la suite.
+2. **Decir si H-10 y H-11 ya estan hechos.** Figuran firmados en el recorrido manual y
+   pendientes en `TESTING.md`. No se firmaron en su nombre a proposito. H-10 (una
+   persona ajena usa la app sin instrucciones) es de los que no se improvisan el
+   mismo dia.
+3. **Decidir si se abre la Fase 2**, y con que alcance (ver la seccion siguiente).
+
+### AVISO DE ALCANCE, para cuando toque decidir la Fase 2
+
+Quedan **10 dias** para la entrega, y los dos ultimos (26 y 27) son intocables:
+informe, video y ensayo, sin codigo. O sea que la Fase 2 dispone de 8 dias como
+mucho. El bloque C (rediseno de ventana) es, por escrito en el propio plan, "la clase
+de tarea que se come los dias que hacen falta para el informe y el video".
+
+Recomendacion si pregunta: **abrir solo el bloque A** (la calculadora de T-15). Es el
+que arregla un fallo que ella misma vio, el que mejor demuestra Tool Calling —que es
+un requisito de la rubrica— y el mas acotado. El rediseno visual es el que mas ilusion
+le hace y el que menos puntos suma; si entra, que entre despues de que el informe y el
+video esten grabados, no antes.
 
 ## Fase 2 propuesta — pedida por la duena, NO empezada
 
@@ -105,11 +126,11 @@ Tres bloques nuevos que se suman a lo ya planificado. Ninguno se ha tocado.
   prueba automatica los habria visto. Conviene seguir alternando pruebas y uso real.
 - El nivel Ingeniero de la jerarquia de tres niveles quedo sin segunda observacion: las
   ultimas sesiones no lo usaron. El criterio escrito sigue vigente por si se retoma.
-- `Sintesis del proyecto.md` sigue en el repositorio como documento historico y ya
-  contradice varias decisiones vigentes (`asyncio`, 7 herramientas, modelos). Conviene
-  marcarlo como superado antes de la entrega. **Sigue abierto**: la auditoria del
-  2026-08-14 puso el aviso equivalente en `docs/specs/`, que es el que alimenta el
-  informe, pero no toco este archivo por estar fuera del alcance autorizado.
+- ~~`Sintesis del proyecto.md` contradice decisiones vigentes.~~ **CERRADO**
+  (2026-08-17, commit `b215812`). Lleva un aviso de documento superado con la tabla de
+  las cinco contradicciones: los dos modelos inservibles, `asyncio`, las 7 herramientas
+  que son 3, el color de PENSANDO y la carpeta raiz `mini_jarvis/` que nunca existio.
+  No se borro: la distancia entre lo planeado y lo posible es material de sustentacion.
 - **La documentacion se desincroniza en silencio; el codigo no.** Los tres defectos de
   la auditoria eran afirmaciones falsas, no fallos de ejecucion: ninguna prueba, ningun
   gate y ningun uso real los habria detectado nunca, porque la aplicacion funciona
@@ -117,17 +138,21 @@ Tres bloques nuevos que se suman a lo ya planificado. Ninguno se ha tocado.
   `config.py` y dejo el README como estaba. **Regla que sale de aqui:** todo cambio de
   un identificador de modelo, de una version fijada o de un precio obliga a revisar
   `README.md` y `docs/specs/` en el mismo commit.
-- **Lo que se importa se declara.** Pillow funcionaba de rebote. Antes de T-18 conviene
-  revisar si algun otro `import` del proyecto depende de una dependencia que nadie
-  pidio explicitamente.
+- ~~**Lo que se importa se declara.**~~ **CERRADO CON EVIDENCIA** (2026-08-17, commit
+  `b215812`). Se recorrio el AST de los 19 archivos `.py` y se mapeo cada import a su
+  distribucion: **los 11 de terceros estan declarados**. Pillow era el unico hueco.
+  El barrido inverso encontro tres pines que nadie importa —`psutil`,
+  `duckduckgo-search` (T-15) y `tiktoken` (T-14)— y que el comentario de `tiktoken`
+  era **falso**: decia servir al indicador de memoria, y `core/memory.py` no usa
+  ningun tokenizador a proposito. Comentarios corregidos; ninguna dependencia borrada,
+  porque eso es decision de alcance de la duena.
 
 ## Human actions
 
 - [x] Autenticacion con GitHub, `TOGETHER_API_KEY` validada, proveedor de STT decidido.
 - [x] **Recorrido completo de `docs/pruebas-manuales.md`** (2026-08-14). Todo el lado
       tecnico paso; los tres fallos reportados estan corregidos y publicados.
-- [ ] **Autorizar el push** de `72f1134` y del `[STATE]` de este cierre. El
-      repositorio es publico, asi que no se publica sin su OK.
+- [x] **Push autorizado y hecho** (2026-08-14). Local y remoto sincronizados.
 - [ ] **Reprobar 5.1, 5.3 y 2.3** con las correcciones ya aplicadas. Es la mas urgente:
       hasta hacerla, las tres correcciones del uso real no tienen evidencia.
 - [ ] **Decir si H-10 y H-11 ya estan hechos.** En `docs/pruebas-manuales.md` las

@@ -27,8 +27,9 @@
   **No esta versionado**: es documento del docente y el repositorio es publico.
   Vive solo en la carpeta local, excluido por `.gitignore`. Su contenido esta
   reflejado en `APPCORE.md` y en `docs/specs/2026-08-13-mini-jarvis-design.md`.
-- `Sintesis del proyecto.md`: decisiones de diseno del equipo — stack, paleta,
-  catalogo de herramientas y estructura modular objetivo.
+- `Sintesis del proyecto.md`: **DOCUMENTO SUPERADO**, marcado como tal el 2026-08-17.
+  Es la sintesis previa a construir nada. Contradice cinco decisiones vigentes y lleva
+  la tabla de contradicciones al principio. No citarlo en el informe.
 - `.gitignore`: primera linea de defensa contra publicar credenciales.
 - `.claude/skills/agents-workflow/SKILL.md`: la skill que gobierna este workflow.
 
@@ -60,8 +61,9 @@
 - `tests/`: memoria, parseo del LLM, orquestador, paleta de estados y barra
   espaciadora. 70 pruebas, sin red, sin microfono y sin saldo.
 - `pytest.ini`: `pythonpath = .` para que el comando del gate encuentre `core`.
-- `requirements.txt`: 14 dependencias fijadas. `pillow` entro en la auditoria del
-  2026-08-14; hasta entonces se instalaba de rebote via matplotlib.
+- `requirements.txt`: 14 dependencias fijadas. Auditado con AST el 2026-08-17: los 11
+  imports de terceros estan declarados. Tres pines (`psutil`, `duckduckgo-search`,
+  `tiktoken`) estan reservados para tareas sin construir y marcados como tales.
 - `README.md`: cara publica del proyecto. Su tabla de modelos **debe** coincidir con
   `config.py`; se desincronizo una vez y no lo detecto ningun gate.
 - Falta `tools/` (T-15, Fase 2 sin abrir).
@@ -72,4 +74,4 @@
 - `docs/evidencia/`: salida del laboratorio, captura de la ventana y la tabla de
   cobertura de los 7 fallos previstos.
 
-Last reindexed: 2026-08-14, al cerrar la sesion de la auditoria de la Fase 1.
+Last reindexed: 2026-08-17, al saldar la deuda de la auditoria de la Fase 1.

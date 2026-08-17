@@ -243,3 +243,45 @@ Seis entradas compactadas el 2026-08-14. Lo que hay que recordar:
 - Next: reprobar 2.3, 5.1 y 5.3; resolver H-10 y H-11; autorizar el push. Despues, y
   solo con su OK, abrir la Fase 2 (ver CURRENT > Fase 2 propuesta). **La Fase 2 sigue
   bloqueada: la auditoria no la desbloquea.**
+
+## 2026-08-17 - Sesion automatica: saldar la deuda de la auditoria
+
+- Changed: `requirements.txt`, `Sintesis del proyecto.md` (commit `b215812`);
+  `.agents/` (este `[STATE]`).
+- La duena pidio "empieza sesion, continua en automatico". Se interpreto como los dos
+  hallazgos que quedaban abiertos y **no** como permiso para abrir la Fase 2: ese gate
+  lo puso ella dos veces y lo levanta ella. Lo demas pendiente son checks humanos que
+  ningun agente puede firmar.
+- **Auditoria de dependencias, cerrada con evidencia.** Se recorrio el AST de los 19
+  archivos `.py` del repositorio y se mapeo cada modulo importado a su distribucion con
+  `importlib.metadata.packages_distributions()`. Los **11 imports de terceros estan
+  declarados**; `pillow` era el unico hueco y ya se habia tapado. Los tres casos donde
+  el nombre que se importa no es el que se instala (`PIL`->pillow, `dotenv`->
+  python-dotenv, `edge_tts`->edge-tts) estan bien.
+- **El barrido inverso encontro otra afirmacion falsa.** `requirements.txt` decia que
+  `tiktoken` servia para "el conteo de tokens del indicador de memoria". No es cierto:
+  `core/memory.py` no importa ningun tokenizador y su docstring argumenta a proposito
+  por que estima con 4 caracteres por token. Tercera vez que aparece el mismo patron:
+  **una afirmacion que ningun gate desmiente porque no rompe nada al ejecutarse.** Si
+  en la sustentacion preguntan como se cuentan los tokens, el archivo y el codigo daban
+  respuestas distintas.
+- Decision: **no se borro ninguna dependencia.** `psutil` y `duckduckgo-search` esperan
+  a T-15, `tiktoken` a T-14. Quitarlas es una decision de alcance de la duena, y
+  mantenerlas cuesta tiempo de instalacion, no correccion. Se corrigieron los
+  comentarios y se agruparon como reservadas, diciendo cual espera a cual.
+- **`Sintesis del proyecto.md` marcada como superada**, cerrando un hallazgo abierto
+  desde el 2026-08-14. Cinco contradicciones tabuladas. Una tiene gracia y valor
+  forense: el documento define la carpeta raiz como `mini_jarvis/`, que **nunca
+  existio**, y ese nombre fantasma es exactamente el que sobrevivio tres dias dentro
+  del comando del gate de `AGENTS.md`, fallando en silencio con exit 0. Un documento
+  superado no es inofensivo: siembra nombres que despues aparecen en sitios que si se
+  ejecutan.
+- Se anadio a CURRENT un **aviso de alcance para la decision de la Fase 2**: quedan 8
+  dias utiles antes de los dos reservados al informe y al video. Recomendacion escrita:
+  abrir solo el bloque A (la calculadora), que arregla un fallo real, demuestra Tool
+  Calling —requisito de rubrica— y es el mas acotado. El rediseno visual es el que mas
+  ilusion le hace y el que menos puntos suma.
+- Gates: 70 pruebas verdes; `compileall` exit 0; `pip install -r requirements.txt
+  --dry-run` resuelve sin conflictos con los 14 pines intactos.
+- Next: **nada de agente.** Los tres pendientes son suyos: reprobar 2.3, 5.1 y 5.3;
+  decir si H-10 y H-11 estan hechos; decidir la Fase 2.
