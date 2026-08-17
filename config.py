@@ -52,48 +52,51 @@ def _leer_api_key() -> str:
 TOGETHER_API_KEY = _leer_api_key()
 
 
-# --- Paleta pastel (diseno, seccion 11) -------------------------------------
+# --- Paleta (rediseno T-19, 2026-08-17) -------------------------------------
+#
+# CAMBIO DE TEMA, pedido por la duena: la interfaz pastel clara le parecia "limpia y
+# profesional" pero sin personalidad. Se pasa a un tema OSCURO con la paleta del
+# personaje que eligio como tematica: turquesa y rosa.
+#
+# NO SE USA NINGUN ARTE DE TERCEROS. El repositorio es publico y el diseno del
+# personaje es propiedad de Crypton Future Media. Lo que se hace es tomar sus dos
+# colores -que no son propiedad de nadie- y dibujar por codigo. Ver gui/desktop_app.py.
+#
+# LO QUE NO CAMBIA, PORQUE NO SE NEGOCIA (H-09): los cuatro estados se siguen
+# distinguiendo por COLOR Y POR FORMA. Que dos compartan color sigue siendo NO APTO
+# automatico. Lo que si se invirtio es la direccion del contraste: sobre fondo oscuro
+# el borde legible es el CLARO, no el oscuro. La prueba de contraste se actualizo para
+# medir la diferencia en valor absoluto en vez de asumir una direccion.
 PALETA = {
-    "fondo_crema": "#F9F9FB",
-    "verde_menta": "#E8F5E9",
-    "rosa_palido": "#FCE4EC",
-    "azul_cielo": "#E1F5FE",
-    "durazno": "#FFF3E0",
-    "texto_gris_marengo": "#37474F",
+    "fondo_profundo": "#101F27",   # el fondo de la ventana
+    "superficie": "#18303B",       # paneles sobre el fondo
+    "superficie_alta": "#1F3F4C",  # controles sobre los paneles
+    "turquesa": "#39C5BB",         # el color del personaje; acento principal
+    "rosa": "#FF6B9D",             # acento secundario
+    "texto_claro": "#E8F6F5",
+    "texto_tenue": "#8FB3B8",
 }
 
-# Los cinco acentos son tintes Material de nivel 50 (green, pink, light-blue,
-# orange). Mantener ese nivel al anadir cualquier color nuevo: es lo que da
-# coherencia visual a la paleta.
-
-# Mapeo estado -> color segun la tabla de estados del diseno (seccion 11).
-# Cada estado tiene color propio: que dos compartan color reprueba H-09, que
-# exige distinguir los cuatro estados sin leer texto, y deja fuera a personas
-# con daltonismo. La GUI (T-10) debe ademas diferenciarlos por forma.
+# Relleno de cada estado: version apagada del color, para que la figura tenga cuerpo
+# sin competir con el borde.
 COLOR_POR_ESTADO = {
-    "ESCUCHANDO": PALETA["verde_menta"],
-    "PENSANDO": PALETA["azul_cielo"],
-    "RESPONDIENDO": PALETA["rosa_palido"],
-    "ATENCION": PALETA["durazno"],
+    "ESCUCHANDO": "#1F5F5B",    # turquesa apagado
+    "PENSANDO": "#2A3D6B",      # azul profundo
+    "RESPONDIENDO": "#6B2647",  # rosa apagado
+    "ATENCION": "#6B4A1F",      # ambar apagado
 }
 
-# Borde saturado de cada estado, del MISMO tono que su relleno pastel.
+# Borde luminoso de cada estado, del mismo tono que su relleno.
 #
-# POR QUE HACE FALTA (defecto reportado por la duena el 2026-08-14): los tintes de
-# nivel 50 son tan palidos que en pantalla se leen casi blancos. Probando la
-# aplicacion, el verde menta de ESCUCHANDO se veia azul. Como decoracion los pasteles
-# funcionan; como SENAL no: si el usuario no puede nombrar el color, el color no esta
-# comunicando nada.
-#
-# La solucion conserva el aspecto pastel de la ventana (el relleno no cambia) y pone
-# la carga de la senal en un borde grueso y saturado. Son los tintes Material 700-800
-# de las mismas familias que los rellenos, asi que el sistema de color sigue siendo
-# coherente: verde con verde, azul con azul, rosa con rosa, naranja con naranja.
+# POR QUE EXISTE (defecto que reporto la duena el 2026-08-14, y que sigue vigente en el
+# tema oscuro): un color que el usuario no puede nombrar no esta comunicando nada. En el
+# tema claro el problema era que los pasteles se leian casi blancos; aqui seria que los
+# rellenos apagados se leen casi negros. La carga de la senal la lleva el borde.
 COLOR_BORDE_POR_ESTADO = {
-    "ESCUCHANDO": "#2E7D32",    # green 800
-    "PENSANDO": "#0277BD",      # light-blue 800
-    "RESPONDIENDO": "#C2185B",  # pink 700
-    "ATENCION": "#EF6C00",      # orange 800
+    "ESCUCHANDO": "#39C5BB",    # turquesa vivo
+    "PENSANDO": "#7AA5FF",      # azul claro
+    "RESPONDIENDO": "#FF6B9D",  # rosa vivo
+    "ATENCION": "#FFB347",      # ambar
 }
 
 

@@ -32,12 +32,29 @@ def test_todos_los_estados_del_diseno_tienen_color():
         assert estado in COLOR_POR_ESTADO, f"falta el color de {estado}"
 
 
-def test_los_colores_de_estado_salen_de_la_paleta():
-    """Ningun color suelto: la coherencia visual depende de usar los mismos tintes."""
-    for estado, color in COLOR_POR_ESTADO.items():
-        assert color in PALETA.values(), (
-            f"{estado} usa {color}, que no esta en la paleta del proyecto"
-        )
+def test_los_colores_de_estado_son_hexadecimales_validos():
+    """Ningun color suelto ni mal escrito.
+
+    NOTA DEL REDISENO T-19 (2026-08-17): antes esta prueba exigia que cada color de
+    estado estuviera literalmente dentro de `PALETA`. Con el tema claro tenia sentido,
+    porque los rellenos eran los mismos tintes pastel que el resto de la ventana. En el
+    tema oscuro los estados forman su propia familia (relleno apagado + borde luminoso)
+    y no se reutilizan en ningun otro sitio, asi que esa exigencia dejaba de describir
+    la realidad. Lo que se conserva es la intencion: que sean colores bien formados y
+    que la paleta general no tenga duplicados escondidos.
+    """
+    import re
+    for origen in (COLOR_POR_ESTADO, PALETA):
+        for nombre, color in origen.items():
+            assert re.fullmatch(r"#[0-9A-Fa-f]{6}", color), (
+                f"{nombre} usa {color}, que no es un color hexadecimal valido"
+            )
+
+
+def test_la_paleta_general_no_tiene_colores_repetidos():
+    """Dos nombres distintos con el mismo valor es casi siempre un descuido."""
+    valores = list(PALETA.values())
+    assert len(valores) == len(set(valores)), f"hay colores repetidos en PALETA: {valores}"
 
 
 def test_cada_estado_tiene_ademas_su_propia_forma():
@@ -82,8 +99,15 @@ def test_cada_estado_tiene_borde_saturado_propio():
     assert len(set(bordes)) == 4, f"dos estados comparten borde: {bordes}"
 
 
-def test_el_borde_es_mas_oscuro_que_el_relleno():
-    """Si el borde no contrasta con su relleno, no se distingue la figura."""
+def test_el_borde_contrasta_con_su_relleno():
+    """Si el borde no contrasta con su relleno, no se distingue la figura.
+
+    CAMBIO DEL REDISENO T-19: antes se exigia que el borde fuera mas OSCURO que el
+    relleno, porque el tema era claro. Sobre fondo oscuro el borde legible es el mas
+    CLARO, asi que exigir una direccion concreta habria hecho fallar un diseno
+    correcto. Se mide la diferencia en valor absoluto: lo que protege H-09 es que haya
+    contraste, no hacia que lado.
+    """
     from config import COLOR_BORDE_POR_ESTADO, COLOR_POR_ESTADO
 
     def luminosidad(hexadecimal):
@@ -93,9 +117,30 @@ def test_el_borde_es_mas_oscuro_que_el_relleno():
         return 0.2126 * r + 0.7152 * g + 0.0722 * b
 
     for estado in ESTADOS_ACTIVOS:
-        claro = luminosidad(COLOR_POR_ESTADO[estado])
-        oscuro = luminosidad(COLOR_BORDE_POR_ESTADO[estado])
-        assert claro - oscuro > 80, (
+        relleno = luminosidad(COLOR_POR_ESTADO[estado])
+        borde = luminosidad(COLOR_BORDE_POR_ESTADO[estado])
+        assert abs(borde - relleno) > 80, (
             f"{estado}: el borde {COLOR_BORDE_POR_ESTADO[estado]} no contrasta lo "
             f"suficiente con el relleno {COLOR_POR_ESTADO[estado]}"
+        )
+
+
+def test_los_estados_tambien_contrastan_contra_el_fondo_de_la_ventana():
+    """Una figura del color del fondo es una figura invisible.
+
+    Prueba nueva del tema oscuro: en el tema claro esto no podia fallar porque los
+    pasteles eran mas claros que todo. Ahora los rellenos son apagados y el fondo es
+    oscuro, asi que conviene comprobarlo de verdad.
+    """
+    from config import COLOR_BORDE_POR_ESTADO, PALETA
+
+    def luminosidad(hexadecimal):
+        r, g, b = (int(hexadecimal[i:i + 2], 16) for i in (1, 3, 5))
+        return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+    fondo = luminosidad(PALETA["fondo_profundo"])
+    for estado in ESTADOS_ACTIVOS:
+        borde = luminosidad(COLOR_BORDE_POR_ESTADO[estado])
+        assert borde - fondo > 80, (
+            f"{estado}: su borde no se distingue del fondo de la ventana"
         )

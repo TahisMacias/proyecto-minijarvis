@@ -128,6 +128,12 @@ class MotorLLM:
 
     def __init__(self, modelo: str = MODELO_LLM_PREDETERMINADO, cliente=None) -> None:
         self.modelo = modelo
+        # Muestreo como ATRIBUTOS de la instancia, no solo como argumentos de la
+        # llamada (T-14). Los sliders de la GUI los mueven en vivo, y el orquestador
+        # llama a `responder()` sin pasarlos: si vivieran solo en la firma, mover un
+        # slider no habria cambiado nada y el control seria decorativo.
+        self.temperatura = TEMPERATURA_PREDETERMINADA
+        self.top_p = TOP_P_PREDETERMINADO
         self._cliente = cliente or openai.OpenAI(
             api_key=TOGETHER_API_KEY,
             base_url=TOGETHER_BASE_URL,
@@ -141,20 +147,24 @@ class MotorLLM:
         self.modelo = modelo
 
     def responder(self, mensajes: list[dict],
-                  temperatura: float = TEMPERATURA_PREDETERMINADA,
-                  top_p: float = TOP_P_PREDETERMINADO,
+                  temperatura: float | None = None,
+                  top_p: float | None = None,
                   herramientas: list[dict] | None = None) -> RespuestaDelModelo:
         """Pide una respuesta al modelo con el historial completo.
 
         `mensajes` viene de `core/memory.py` y ya trae el system prompt. Este modulo
         no lo agrega por su cuenta para no terminar con dos mensajes de sistema
         contradictorios.
+
+        Si no se pasan `temperatura` ni `top_p` se usan los de la instancia, que es lo
+        que mueven los sliders. Pasarlos explicitamente sigue funcionando y tiene
+        prioridad: las pruebas lo aprovechan para fijar valores sin tocar el objeto.
         """
         peticion = {
             "model": self.modelo,
             "messages": mensajes,
-            "temperature": temperatura,
-            "top_p": top_p,
+            "temperature": self.temperatura if temperatura is None else temperatura,
+            "top_p": self.top_p if top_p is None else top_p,
         }
         # Solo se envia el campo de herramientas si de verdad hay alguna: mandar una
         # lista vacia hace que algunos proveedores rechacen la peticion.

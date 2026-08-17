@@ -116,12 +116,17 @@ TOKENS_ESPERADOS_NIVEL_2 = 20
 CAPA_ELEGIDA_BASE0 = 5
 CABEZA_ELEGIDA_BASE0 = 3
 
-# Paleta pastel del proyecto (seccion 11 del documento de diseno).
-COLOR_CREMA = "#F9F9FB"
-COLOR_MENTA = "#E8F5E9"
-COLOR_ROSA = "#FCE4EC"
-COLOR_CIELO = "#E1F5FE"
-COLOR_TEXTO = "#37474F"  # gris marengo, tambien sirve como "tono saturado" del mapa
+# Paleta del proyecto tras el rediseno T-19 (2026-08-17): tema oscuro, turquesa y
+# rosa. El mapa se muestra dentro de la ventana, asi que si se quedara con el fondo
+# crema del tema anterior apareceria como un rectangulo blanco en medio de una
+# interfaz oscura. Los valores se repiten aqui en vez de importarlos de config.py a
+# proposito: este modulo corre solo, sin `.env` ni credenciales, y esa independencia
+# es un criterio de aceptacion de T-11.
+COLOR_FONDO = "#101F27"      # fondo profundo
+COLOR_SUPERFICIE = "#18303B"
+COLOR_TURQUESA = "#39C5BB"
+COLOR_ROSA = "#FF6B9D"
+COLOR_TEXTO = "#E8F6F5"      # texto claro sobre fondo oscuro
 
 NOMBRE_PNG_SALIDA = "mapa_atencion.png"
 
@@ -553,18 +558,19 @@ def dibujar_mapa_de_atencion(tokens, atenciones, capa_base0, cabeza_base0,
 
     matriz = atenciones[capa_base0][0, cabeza_base0].numpy()  # (n_tokens, n_tokens)
 
-    # Colormap continuo construido con la paleta pastel del proyecto: va del crema
-    # claro (valores bajos de atencion) hasta el gris marengo saturado de la paleta
-    # (valores altos), pasando por el azul cielo como tono intermedio. Asi los
-    # valores altos de atencion se distinguen con claridad sobre el fondo pastel.
+    # Colormap continuo con los colores del tema: va del fondo oscuro (atencion casi
+    # nula) al turquesa y de ahi al rosa vivo (atencion maxima). Se eligio que el
+    # valor alto sea el mas luminoso porque sobre fondo oscuro la vista busca la luz:
+    # las celdas que importan son las que brillan, y la franja de la diagonal se
+    # senala sola en un proyector.
     mapa_de_color = LinearSegmentedColormap.from_list(
         "mini_jarvis_atencion",
-        [COLOR_CREMA, COLOR_CIELO, COLOR_TEXTO],
+        [COLOR_FONDO, COLOR_SUPERFICIE, COLOR_TURQUESA, COLOR_ROSA],
     )
 
     figura, ejes = plt.subplots(figsize=(10.5, 9))
-    figura.patch.set_facecolor(COLOR_CREMA)
-    ejes.set_facecolor(COLOR_CREMA)
+    figura.patch.set_facecolor(COLOR_FONDO)
+    ejes.set_facecolor(COLOR_FONDO)
 
     imagen = ejes.imshow(matriz, cmap=mapa_de_color, vmin=0.0, vmax=float(matriz.max()))
 

@@ -21,38 +21,37 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 
 ## Next action
 
-**BLOQUEADO A PROPOSITO. No abrir la Fase 2 sin el OK explicito de la duena.**
+**FASE 2 ABIERTA CON ALCANCE COMPLETO (A + B + C), autorizado por la duena el
+2026-08-17.** Se le advirtio que con 8 dias utiles el riesgo cae sobre el informe y el
+video, no sobre el codigo. Lo reafirmo. Queda ejecutado entero y la advertencia no se
+repite.
 
-La auditoria que pidio ya se hizo (2026-08-14) y **toda la deuda que dejo esta
-saldada**: los 3 defectos en `72f1134`, los 2 hallazgos abiertos en `b215812`, todo
-publicado. **No queda trabajo de agente pendiente en la Fase 1.**
+### Orden de ejecucion — CAMBIADO respecto al plan original, con motivo
 
-Lo que queda son tres cosas, y **las tres las tiene que hacer la duena en persona**.
-Ningun agente puede firmarlas por ella:
+El plan decia T-13, T-14, T-15. Ese orden **construye la misma cosa dos veces**: T-14
+mete sliders, indicadores y selector de modelo en la ventana actual, y T-19 acto
+seguido elimina las pestanas y redistribuye todo. Orden nuevo:
 
-1. **Reprobar las pruebas 2.3, 5.1 y 5.3** de `docs/pruebas-manuales.md`. Es la mas
-   urgente. Las correcciones estan aplicadas y publicadas, pero **nadie ha comprobado
-   que funcionen en uso real**: hace falta hablarle a la aplicacion, apagar el wifi y
-   mirar el indicador. Ninguna prueba automatica sustituye esto — los tres defectos
-   originales los encontro ella, no la suite.
-2. **Decir si H-10 y H-11 ya estan hechos.** Figuran firmados en el recorrido manual y
-   pendientes en `TESTING.md`. No se firmaron en su nombre a proposito. H-10 (una
-   persona ajena usa la app sin instrucciones) es de los que no se improvisan el
-   mismo dia.
-3. **Decidir si se abre la Fase 2**, y con que alcance (ver la seccion siguiente).
+1. **T-15 — herramientas + calculadora.** Backend puro, no toca la ventana, asi que no
+   compite con nada. Es ademas lo de mayor peso en la rubrica (Tool Calling es
+   requisito) y lo que arregla un fallo que la duena vio con sus ojos.
+2. **T-19 + T-14 juntas.** Se disena la ventana nueva **ya con** los controles de
+   sustentacion dentro, en vez de ponerlos y moverlos. Sin pestanas, con el modulo de
+   estado grande y el mapa de atencion en superposicion.
+3. **T-13 queda absorbida por T-19**: su contenido pasa a verse junto a la
+   conversacion. Su veredicto en suspenso se resuelve ahi.
 
-### AVISO DE ALCANCE, para cuando toque decidir la Fase 2
+### Restriccion de derechos del bloque B, ya resuelta por la via segura
 
-Quedan **10 dias** para la entrega, y los dos ultimos (26 y 27) son intocables:
-informe, video y ensayo, sin codigo. O sea que la Fase 2 dispone de 8 dias como
-mucho. El bloque C (rediseno de ventana) es, por escrito en el propio plan, "la clase
-de tarea que se come los dias que hacen falta para el informe y el video".
+El repositorio es publico y el personaje es propiedad de Crypton Future Media. **No se
+sube arte de terceros.** Se hace arte original generado por codigo con esa estetica
+(turquesa `#39C5BB` y rosa). Si la duena consigue una imagen cuyos derechos tenga, se
+sustituye en un commit de una linea.
 
-Recomendacion si pregunta: **abrir solo el bloque A** (la calculadora de T-15). Es el
-que arregla un fallo que ella misma vio, el que mejor demuestra Tool Calling —que es
-un requisito de la rubrica— y el mas acotado. El rediseno visual es el que mas ilusion
-le hace y el que menos puntos suma; si entra, que entre despues de que el informe y el
-video esten grabados, no antes.
+### Sigue pendiente de la duena, en paralelo
+
+- **Reprobar 2.3, 5.1 y 5.3** de `docs/pruebas-manuales.md`.
+- **Decir si H-10 y H-11 estan hechos.**
 
 ## Fase 2 propuesta — pedida por la duena, NO empezada
 

@@ -80,7 +80,10 @@ def main() -> int:
             segundos_en_atencion=config.SEGUNDOS_EN_ATENCION,
         )
 
-    aplicacion = AplicacionMiniJarvis(crear_orquestador)
+    # La ventana recibe tambien el motor y la memoria: los controles de
+    # sustentacion (T-14) actuan sobre ellos -sliders sobre el motor, indicador de
+    # turnos sobre la memoria- sin pasar por el orquestador, que ya estaba cerrado.
+    aplicacion = AplicacionMiniJarvis(crear_orquestador, motor=motor, memoria=memoria)
     aplicacion.mainloop()
     return 0
 
