@@ -21,66 +21,33 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 
 ## Next action
 
-**FASE 2 ABIERTA CON ALCANCE COMPLETO (A + B + C), autorizado por la duena el
-2026-08-17.** Se le advirtio que con 8 dias utiles el riesgo cae sobre el informe y el
-video, no sobre el codigo. Lo reafirmo. Queda ejecutado entero y la advertencia no se
-repite.
+**FASE 2 COMPLETA.** Las cuatro tareas en APTO el 2026-08-17, ocho dias antes de su
+fecha limite, y con los tres bloques que pidio la duena, no un subconjunto.
 
-### Orden de ejecucion — CAMBIADO respecto al plan original, con motivo
+Lo que queda antes de la Fase 3 **es todo suyo**. Ningun agente puede firmarlo:
 
-El plan decia T-13, T-14, T-15. Ese orden **construye la misma cosa dos veces**: T-14
-mete sliders, indicadores y selector de modelo en la ventana actual, y T-19 acto
-seguido elimina las pestanas y redistribuye todo. Orden nuevo:
+1. **H-15 — probar las herramientas por voz.** Empezar por *"cual es la raiz cuadrada
+   de 3340"*, que es el fallo que origino la calculadora. Despues la bateria, una
+   busqueda, y abrir Wikipedia. Por ultimo pedirle un sitio prohibido: debe negarse
+   con palabras, sin abrir nada.
+2. **H-09 BIS — volver a firmar los estados sobre la ventana nueva.** El tema cambio
+   de claro a oscuro por completo; la firma del 14 de agosto era sobre la ventana
+   pastel y no vale. Es el unico criterio del proyecto marcado como NO APTO
+   automatico, asi que conviene mirarlo en serio.
+3. **H-14 — mover los sliders** y comprobar que la diferencia se nota y se explica.
+4. **Reprobar 2.3, 5.1 y 5.3** de `docs/pruebas-manuales.md`, que sigue pendiente
+   desde la Fase 1.
+5. **R-01 — regresion**: repetir H-06 y H-12 para comprobar que las herramientas y los
+   controles nuevos no rompieron la conversacion basica ni el manejo de errores.
 
-1. **T-15 — herramientas + calculadora.** Backend puro, no toca la ventana, asi que no
-   compite con nada. Es ademas lo de mayor peso en la rubrica (Tool Calling es
-   requisito) y lo que arregla un fallo que la duena vio con sus ojos.
-2. **T-19 + T-14 juntas.** Se disena la ventana nueva **ya con** los controles de
-   sustentacion dentro, en vez de ponerlos y moverlos. Sin pestanas, con el modulo de
-   estado grande y el mapa de atencion en superposicion.
-3. **T-13 queda absorbida por T-19**: su contenido pasa a verse junto a la
-   conversacion. Su veredicto en suspenso se resuelve ahi.
+Despues, **Fase 3**: informe (T-16), video (T-17) y ensayo (T-18). Los dias 26 y 27
+son intocables y no se escribe codigo de producto.
 
-### Restriccion de derechos del bloque B, ya resuelta por la via segura
+### Aviso sobre el calendario
 
-El repositorio es publico y el personaje es propiedad de Crypton Future Media. **No se
-sube arte de terceros.** Se hace arte original generado por codigo con esa estetica
-(turquesa `#39C5BB` y rosa). Si la duena consigue una imagen cuyos derechos tenga, se
-sustituye en un commit de una linea.
-
-### Sigue pendiente de la duena, en paralelo
-
-- **Reprobar 2.3, 5.1 y 5.3** de `docs/pruebas-manuales.md`.
-- **Decir si H-10 y H-11 estan hechos.**
-
-## Fase 2 propuesta — pedida por la duena, NO empezada
-
-Tres bloques nuevos que se suman a lo ya planificado. Ninguno se ha tocado.
-
-### A. Tool calling con calculadora (amplia T-15)
-- La duena probo "raiz cuadrada de 3340" y el modelo respondio "no tengo calculadora
-  pero puedo dar una respuesta aproximada". Un LLM **no calcula: predice texto**.
-- Se anade `calcular` como cuarta herramienta. No hace falta ningun servicio externo:
-  Python es la calculadora. **Nunca con `eval` sobre lo que diga el modelo**; hay que
-  analizar la expresion con `ast` y una lista blanca de operaciones y funciones.
-- Valor doble: arregla el sintoma y da una demostracion muy clara del antes y despues.
-
-### B. Rediseno visual con tematica Hatsune Miku
-- Paleta del personaje (turquesa `#39C5BB` y rosa) y un fondo con el personaje.
-- **Punto abierto de derechos**: el repositorio es publico y el diseno del personaje es
-  propiedad de Crypton Future Media. No conviene subir arte de terceros. Alternativas:
-  arte original generado por codigo con esa estetica, o que la duena aporte una imagen
-  cuyos derechos tenga. Hay que decidirlo antes de implementar.
-- Voz "tipo Miku": no existe un TTS libre con esa voz. Lo viable es subir tono y ritmo
-  de una voz de edge-tts; ya esta preparado en `config.py` (`TONO_TTS`, `RITMO_TTS`),
-  sin aplicar todavia en el motor de voz.
-
-### C. Nueva distribucion de la ventana
-- Modulo de estado mas grande.
-- **Quitar las pestanas**: conversacion y laboratorio visibles a la vez, para que la
-  presentacion sea mas vistosa.
-- El mapa de atencion pasa a ser un boton que lo abre **expandido sobre la ventana**,
-  con boton de cerrar visible.
+Quedan 10 dias. La Fase 2 se hizo en uno, asi que el margen sigue intacto: el riesgo
+que se advirtio al abrirla con alcance completo **no se materializo**. Ahora el camino
+critico ya no es el codigo, es el informe y el video.
 
 ## Blockers
 
@@ -105,14 +72,18 @@ Tres bloques nuevos que se suman a lo ya planificado. Ninguno se ha tocado.
   instalaba de rebote porque matplotlib depende de ella.
   Instalacion desde cero verificada en un entorno limpio **antes** de ese cambio; la
   verificacion con el `requirements.txt` nuevo queda para T-18.
-- **70 pruebas verdes en ~4 s**, sin red, sin microfono y sin gastar saldo.
+- **128 pruebas verdes en ~4 s**, sin red, sin microfono y sin gastar saldo.
 - Codigo entregado: `config.py`, los seis modulos de `core/`, `gui/desktop_app.py`,
   `main.py`, `exploration/transformer_lab.py`, `Iniciar Mini-JARVIS.bat`.
-- Falta `tools/` (T-15). El orquestador ya lo soporta: recibe `ejecutar_herramienta` y
-  respeta el limite de 2 rondas; sin ese argumento responde con el texto disponible.
-- **T-13 (pestana Laboratorio) esta construida y verificada**, pero se hizo antes de
-  que la duena pidiera detener la Fase 2. Su veredicto queda en suspenso. Si el
-  rediseno de la ventana sigue adelante, esa pestana desaparece como tal.
+- **`tools/` entregado (T-15)**: `calcular`, `estado_laptop`, `buscar_web` y
+  `abrir_kiosk`. La calculadora **no usa `eval`**: analiza con `ast` contra lista
+  blanca y evalua el arbol a mano. Verificado contra la API real: el modelo las pide
+  por su cuenta.
+- **Ventana rediseñada (T-19 + T-14)**: tema oscuro turquesa y rosa, tres columnas sin
+  pestanas, mapa de atencion en superposicion, sliders, indicador de memoria, visor de
+  system prompt y selector de modelo en caliente.
+- **T-13 cerrada en APTO**: su contenido quedo absorbido por T-19. Ya no es una
+  pestana; el laboratorio se ve a la vez que la conversacion.
 - La extraccion de atencion sobre BETO exige `attn_implementation="eager"`; el
   laboratorio lo verifica en tiempo de ejecucion y falla con mensaje explicito si no.
 - El enunciado en PDF **no esta versionado** a proposito: es material del docente y el

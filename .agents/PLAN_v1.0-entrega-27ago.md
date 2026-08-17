@@ -382,7 +382,11 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ### T-13 - Pestana Laboratorio en la GUI
 
-- Status: **construida y verificada, veredicto EN SUSPENSO** (2026-08-14).
+- Status: **done** (2026-08-17). Veredicto: **APTO**, resuelto al aprobarse la
+  Fase 2. Su contenido quedo **absorbido por T-19**: ya no es una pestana, se ve a
+  la vez que la conversacion, y el mapa se abre en superposicion.
+- Historico (2026-08-14): construida y verificada antes de que la duena detuviera
+  la Fase 2, por eso su veredicto quedo en suspenso hasta ahora.
   Se implemento antes de que la duena pidiera detener la Fase 2, asi que su cierre
   formal espera su OK. Verificado con un `mainloop` real: 20.3 s el primer analisis
   (carga de BETO) y 0.8 s los siguientes; la ventana latio 309 veces mientras
@@ -405,7 +409,12 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ### T-14 - Controles de sustentacion
 
-- Status: blocked (T-13)
+- Status: **done** (2026-08-17). Veredicto: **APTO** (commit `465fe6c`).
+  Construida DENTRO del rediseno T-19 y no encima de la ventana vieja: el orden
+  del plan habria construido lo mismo dos veces.
+  Hallazgo: el muestreo tuvo que pasar a atributo del motor. Como argumento de
+  `responder()` los sliders habrian sido decorativos, porque el orquestador llama
+  sin pasarlos.
 - Depends on: T-10
 - Scope: `gui/desktop_app.py`
 - Acceptance:
@@ -420,7 +429,13 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ### T-15 - Tool calling
 
-- Status: blocked (Fase 2 sin abrir)
+- Status: **done** (2026-08-17). Veredicto: **APTO** (commit `b06a2eb`).
+  Ejecutada por el Arquitecto, **excepcion declarada** al reparto de roles: la
+  duena pidio continuar en automatico en una sola sesion. La separacion que si se
+  mantuvo es la que importa: gate ejecutado, no reportado.
+  Gate: 56 pruebas nuevas. Verificacion contra la API real: el modelo pidio
+  `calcular` por su cuenta ante la raiz cuadrada de 3340 y `estado_laptop` ante la
+  bateria, con telemetria real. Secuencia de roles correcta en memoria.
 - Depends on: T-07, T-09
 - Scope: `tools/manifest.py`, `tools/system_skills.py`, `tests/test_tools.py`
 - **ALCANCE AMPLIADO a peticion de la duena (2026-08-14): cuarta herramienta
@@ -445,7 +460,14 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ### T-19 - Rediseno visual y de distribucion (NUEVA, pedida el 2026-08-14)
 
-- Status: **propuesta, sin abrir**. Requiere el OK de la duena.
+- Status: **done** (2026-08-17). Veredicto: **APTO** (commit `465fe6c`).
+  Punto de derechos resuelto por la via segura: **ningun arte de terceros**. Solo
+  los dos colores, y lo decorativo dibujado por codigo.
+  Tres defectos reales encontrados **abriendo la ventana**, no leyendo el codigo:
+  la superposicion reventaba por cerrar el PNG antes de que Pillow lo cargara
+  (carga perezosa); el aviso de memoria llena aplastaba la columna del
+  laboratorio; y la frase analizada se salia de su columna con el escalado al
+  133 %. Evidencia en `docs/evidencia/T-19-*.png`.
 - Depends on: cierre de la Fase 1 (hecho)
 - Scope: `gui/desktop_app.py`, `config.py`, posible `gui/assets/`
 - Motivo: la duena considera la interfaz "limpia y profesional" pero sin personalidad,
@@ -470,10 +492,16 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ## Cierre de Fase 2 — fecha limite 25 de agosto
 
-- [ ] Las tareas que alcanzaron a hacerse estan en APTO.
-- [ ] Lo no completado se documenta como trabajo diferido, sin dejarlo a medias.
-- [ ] Nada queda a medio implementar en el repositorio.
-- [ ] Auditoria de fase; commit y push.
+- [x] **T-13, T-14, T-15 y T-19 en APTO** (2026-08-17, ocho dias antes de la fecha
+      limite y con los tres bloques que pidio la duena, no un subconjunto).
+- [x] Nada quedo a medio implementar: las cuatro tareas tienen gate ejecutado y
+      commit propio.
+- [ ] **Checks humanos de la fase: H-14 y H-15**, mas **volver a firmar H-09** sobre
+      la ventana nueva. El tema cambio por completo: la firma anterior era sobre la
+      ventana clara y no se puede reutilizar.
+- [ ] **R-01**: repetir H-06 y H-12 para comprobar que las herramientas y los
+      controles nuevos no rompieron la conversacion basica ni el manejo de errores.
+- [x] Auditoria de tarea con gate ejecutado en cada una; commit y push.
 
 ---
 

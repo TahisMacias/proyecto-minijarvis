@@ -53,14 +53,21 @@ directa de codigo desde este archivo.
 
 ## Fase 2 - Valor agregado (limite 25 de agosto)
 
-- [~] H-13. **[OK 2026-08-14, prueba 7 del recorrido manual]** Verificado, pero la
-      tarea T-13 tiene el veredicto en suspenso hasta el OK de la duena.
-      Abrir la pestana Laboratorio tras hablar -> muestra los tokens y el mapa de
-      atencion de lo que se acaba de decir, sin congelar la ventana.
+- [x] H-13. **[OK 2026-08-14, prueba 7 del recorrido manual]** T-13 quedo en APTO al
+      aprobarse la Fase 2 el 2026-08-17. **Ya no hay pestana**: el laboratorio se ve a
+      la vez que la conversacion (T-19), asi que este check queda cubierto por el H-09
+      nuevo y por H-14.
 - [ ] H-14. Poner `temperature` en 0.1, repetir una frase, subirla a 1.5 y repetirla ->
-      la diferencia entre ambas respuestas es perceptible y explicable.
-- [ ] H-15. Pedir por voz las tres herramientas, una por una -> cada una se invoca y
-      responde. Intentar abrir un dominio fuera de la lista blanca -> se rechaza.
+      la diferencia entre ambas respuestas es perceptible y explicable. Aprovechar para
+      mirar el indicador de memoria y el selector de modelo en caliente.
+- [ ] H-15. Pedir por voz las **cuatro** herramientas, una por una -> cada una se
+      invoca y responde. Empezar por **la raiz cuadrada de 3340**, que es el fallo que
+      origino la calculadora. Intentar abrir un dominio fuera de la lista blanca -> se
+      rechaza con palabras, sin abrir nada.
+- [ ] **H-09 BIS. Volver a firmar H-09 sobre la ventana nueva.** El tema cambio por
+      completo de claro a oscuro: la firma del 2026-08-14 era sobre la ventana pastel y
+      **no se puede reutilizar**. Mirar de lejos, sin leer el texto, y despues
+      entrecerrando los ojos: ¿se distinguen los cuatro estados por color y por forma?
 
 ## Fase 3 - Cierre (26 y 27 de agosto)
 

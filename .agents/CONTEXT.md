@@ -285,3 +285,70 @@ Seis entradas compactadas el 2026-08-14. Lo que hay que recordar:
   --dry-run` resuelve sin conflictos con los 14 pines intactos.
 - Next: **nada de agente.** Los tres pendientes son suyos: reprobar 2.3, 5.1 y 5.3;
   decir si H-10 y H-11 estan hechos; decidir la Fase 2.
+
+## 2026-08-17 - Fase 2 completa en una sesion: herramientas y ventana nueva
+
+- Changed: `tools/manifest.py`, `tools/system_skills.py`, `tests/test_tools.py`,
+  `gui/desktop_app.py` (reescrito), `config.py`, `core/llm_engine.py`, `main.py`,
+  `exploration/transformer_lab.py`, `tests/test_paleta_estados.py`, evidencia.
+  Commits `b06a2eb` (T-15) y `465fe6c` (T-19 + T-14).
+- **La duena abrio la Fase 2 con alcance completo (A + B + C).** Se le advirtio que con
+  8 dias utiles el riesgo caia sobre el informe y el video, no sobre el codigo. Lo
+  reafirmo. Se ejecuto entero y la advertencia no se repitio. Nota para el futuro: el
+  riesgo **no se materializo**, la fase entera se hizo en un dia, y el margen sigue
+  intacto. La advertencia era razonable y aun asi ella tenia razon.
+- **Cambio de orden respecto al plan, con motivo.** El plan decia T-13, T-14, T-15. Ese
+  orden construye lo mismo dos veces: T-14 mete controles en la ventana vieja y T-19
+  acto seguido la desmonta. Se hizo T-15 primero -backend puro, sin conflicto- y
+  despues T-19 y T-14 juntas, disenando la ventana nueva ya con los controles dentro.
+- **T-15: la calculadora no usa `eval`, y esa es la decision de diseno del dia.** La
+  forma perezosa habria sido pasarle la expresion del modelo a `eval`. En su lugar se
+  analiza con `ast`, se rechaza todo nodo fuera de una lista blanca y **se evalua el
+  arbol a mano**. Hay una prueba que lee el AST de cada archivo de `tools/` y falla si
+  alguien anade `eval`, `exec` o `compile`. Esa prueba no verifica un comportamiento:
+  verifica una PROHIBICION, que es lo unico que sigue protegiendo cuando ya nadie
+  recuerda por que estaba prohibido.
+- `abrir_kiosk` valida por **hostname**, no buscando el dominio dentro del texto de la
+  url. La diferencia no es teorica: `youtube.com.sitio-ajeno.ru` contiene la cadena
+  "youtube.com" y es de otro dueno. Hay una prueba dedicada a ese caso concreto.
+- **Verificacion contra la API real, no solo con dobles**: el modelo pidio `calcular`
+  por su cuenta ante la raiz cuadrada de 3340 -el fallo que origino la herramienta- y
+  `estado_laptop` ante la bateria, leyendo telemetria real. La secuencia de roles en
+  memoria salio correcta: user, assistant con tool_calls, tool, assistant.
+- **T-19: el punto de derechos se resolvio por la via segura.** El repositorio es
+  publico y el personaje es propiedad de Crypton Future Media. No se subio arte de
+  terceros: solo los dos colores, que no son de nadie, y lo decorativo dibujado por
+  codigo. Si la duena consigue una imagen cuyos derechos tenga, se sustituye en un
+  commit de una linea.
+- **H-09 no se negocio, pero su prueba tuvo que cambiar de forma.** Sobre fondo oscuro
+  el borde legible es el claro, no el oscuro, asi que exigir una direccion concreta de
+  contraste habria hecho fallar un diseno correcto. Se paso a medir el valor absoluto
+  y se ANADIO una prueba que en el tema claro no hacia falta: que el borde de cada
+  estado contraste tambien contra el fondo de la ventana. Se cambio la forma de medir,
+  no el criterio.
+- **TRES DEFECTOS REALES, LOS TRES ENCONTRADOS ABRIENDO LA VENTANA.** Ninguna prueba
+  los habria visto, igual que en el testeo manual del 14 de agosto:
+  1. La superposicion del mapa reventaba con "Operation on closed image". Se cerraba el
+     PNG en un `finally`, pero Pillow carga los pixeles de forma **perezosa** y
+     CustomTkinter no los pide hasta que dibuja, que ocurre despues. Ironia util: en la
+     auditoria del 14 se anoto que el codigo viejo **no** cerraba la imagen y filtraba
+     el descriptor; al corregirlo se sobrecorrigio al extremo contrario. Ahora se
+     guarda viva y se cierra la anterior al abrir una nueva.
+  2. Al llenarse la memoria, el aviso de descarte ensanchaba su columna y aplastaba la
+     del laboratorio: titulo y boton cortados. Las columnas llevan ancho minimo.
+  3. La frase analizada se salia de su columna por los dos lados: con el escalado de
+     Windows al 133 % el `wraplength` se dibuja mas ancho de lo declarado. **Es la
+     tercera vez en el proyecto que el escalado de Windows produce un defecto visual**
+     (las otras: la altura de ventana en T-10 y este mismo wraplength). Conviene
+     asumirlo como regla: nada de medidas fijas en pixeles sin comprobarlas en pantalla.
+- Se regenero `exploration/mapa_atencion.png` con el colormap oscuro. El anterior era
+  del tema claro y aparecia como un rectangulo blanco dentro de la ventana. De paso la
+  franja de la cabeza de token anterior se lee mucho mejor en rosa sobre oscuro que en
+  gris sobre blanco.
+- Gates: 128 pruebas verdes en 4.29 s (70 antes de esta sesion, 56 nuevas de
+  herramientas, 2 nuevas de paleta); `compileall` exit 0.
+- Unresolved: H-10 y H-11 siguen en contradiccion desde la auditoria del 14 y solo la
+  duena puede resolverlos. Se suman H-14, H-15, **H-09 BIS** (la firma anterior era
+  sobre la ventana clara y no vale) y la regresion R-01.
+- Next: **nada de agente en el codigo de producto.** Todo lo que queda antes de la
+  Fase 3 son checks humanos. Despues, informe (T-16), video (T-17) y ensayo (T-18).

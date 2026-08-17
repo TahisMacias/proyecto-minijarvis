@@ -55,18 +55,26 @@
   como comprobacion manual (H-07).
 - `core/orchestrator.py` (T-09): maquina de estados y el hilo de cada turno. **No
   importa nada de la GUI**; una prueba lee su AST para que siga siendo cierto.
-- `gui/desktop_app.py` (T-10, T-13): la ventana, el puente `after(0, ...)` entre hilos
-  y la pestana Laboratorio.
+- `gui/desktop_app.py` (T-10, T-13, T-14, T-19): la ventana, el puente `after(0, ...)`
+  entre hilos, los controles de sustentacion y la superposicion del mapa. Tema oscuro,
+  tres columnas, **sin pestanas** desde el rediseno del 2026-08-17.
 - `main.py`: punto de entrada. `Iniciar Mini-JARVIS.bat`: lanzador con doble clic.
-- `tests/`: memoria, parseo del LLM, orquestador, paleta de estados y barra
-  espaciadora. 70 pruebas, sin red, sin microfono y sin saldo.
+- `tests/`: memoria, parseo del LLM, orquestador, paleta de estados, barra
+  espaciadora y herramientas. **128 pruebas**, sin red, sin microfono y sin saldo.
 - `pytest.ini`: `pythonpath = .` para que el comando del gate encuentre `core`.
 - `requirements.txt`: 14 dependencias fijadas. Auditado con AST el 2026-08-17: los 11
   imports de terceros estan declarados. Tres pines (`psutil`, `duckduckgo-search`,
   `tiktoken`) estan reservados para tareas sin construir y marcados como tales.
 - `README.md`: cara publica del proyecto. Su tabla de modelos **debe** coincidir con
   `config.py`; se desincronizo una vez y no lo detecto ningun gate.
-- Falta `tools/` (T-15, Fase 2 sin abrir).
+- `tools/manifest.py` (T-15): lo que el modelo LEE para decidir que herramienta pedir.
+  Texto que viaja a la API: nada sensible aqui.
+- `tools/system_skills.py` (T-15): **la superficie de riesgo del proyecto.** Hace
+  cuentas con texto de un modelo y abre un proceso. Dos reglas: **nada de `eval`**
+  (analisis con `ast` y lista blanca) y la url se valida por hostname ANTES de
+  construir el comando, que es una lista de argumentos y nunca una cadena.
+- `tests/test_tools.py`: 56 pruebas. La mas importante lee el AST de `tools/` y falla
+  si aparece `eval`, `exec` o `compile`. Verifica una prohibicion, no un comportamiento.
 
 ## Documentacion para personas
 
@@ -74,4 +82,4 @@
 - `docs/evidencia/`: salida del laboratorio, captura de la ventana y la tabla de
   cobertura de los 7 fallos previstos.
 
-Last reindexed: 2026-08-17, al saldar la deuda de la auditoria de la Fase 1.
+Last reindexed: 2026-08-17, al cerrar la Fase 2 completa.
