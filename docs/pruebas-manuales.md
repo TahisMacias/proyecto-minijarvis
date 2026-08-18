@@ -97,3 +97,97 @@ Con estas tres cosas basta:
 1. Que numero de la lista es.
 2. Que hiciste exactamente (que dijiste, que tecla, en que momento).
 3. Que aparecio en pantalla, copiado tal cual.
+
+
+---
+
+# Recorrido de la Fase 2 (17 de agosto)
+
+La ventana cambio entera y hay herramientas nuevas. Esto es lo unico que falta por
+probar antes de ponerse con el informe y el video.
+
+**Abre la aplicacion y ve bajando por la lista.** Marca `[X]` lo que salga bien y
+escribe al lado lo que no. Tarda unos quince minutos.
+
+## A. Lo primero, antes de hablar: mira la ventana
+
+- [ ] **A.1** Abre con doble clic en `Iniciar Mini-JARVIS.bat`. Se abre una ventana
+      oscura, ancha, con tres columnas.
+- [ ] **A.2** ¿Te gusta? Es tu tematica. Si algo te chirria (un color, un tamano, una
+      palabra), anotalo aqui aunque sea una tonteria: es tu proyecto y se cambia.
+- [ ] **A.3** A la derecha del todo pone "LABORATORIO DEL TRANSFORMER" y esta vacio.
+      Es normal: se llena cuando hables.
+
+## B. Habla. Di estas frases, una por una
+
+Manten presionado el boton (o la barra espaciadora), habla, suelta.
+
+- [ ] **B.1** *"Cual es la raiz cuadrada de 3340"*
+      **Esta es la importante.** Es la pregunta que antes no sabia contestar. Ahora
+      debe decir un numero: 57.79 y pico. Si dice "aproximadamente" o "no tengo
+      calculadora", algo va mal y hay que anotarlo.
+- [ ] **B.2** *"Como esta la bateria de la laptop"*
+      Debe decirte el porcentaje REAL de tu bateria. Compruebalo mirando el icono de
+      Windows abajo a la derecha: tienen que coincidir.
+- [ ] **B.3** *"Busca en internet que es un transformer"*
+      Debe darte resultados de verdad, no lo que se sepa de memoria.
+- [ ] **B.4** *"Abre Wikipedia"*
+      Debe abrirse el navegador a pantalla completa. Cierralo con Alt+F4.
+- [ ] **B.5** *"Abre Facebook"*
+      **Debe NEGARSE.** Tiene que decirte con buenas palabras que solo puede abrir
+      YouTube, Wikipedia, Google y GitHub. Si abre Facebook, eso es un fallo grave:
+      anotalo en mayusculas.
+
+## C. Los estados, otra vez (la firma anterior ya no vale)
+
+El tema cambio de claro a oscuro, asi que lo que firmaste el 14 de agosto era sobre
+otra ventana. Hay que volver a mirarlo.
+
+- [ ] **C.1** Habla y **mira la figura grande de la izquierda**, sin leer el texto.
+      Mientras hablas: circulo turquesa que late. Al soltar: tres puntos azules.
+      Cuando responde: barras rosas. ¿Se distinguen?
+- [ ] **C.2** Ahora **entrecierra los ojos** hasta que casi no distingas el color.
+      ¿Sigues sabiendo en cual esta, solo por la forma? Esto es lo que hace que la
+      aplicacion le sirva a una persona daltonica.
+- [ ] **C.3** Alejate un metro de la pantalla. ¿Se sigue entendiendo?
+
+## D. El mapa de atencion
+
+- [ ] **D.1** Despues de hablar, pulsa **"Ver el mapa de atencion"** abajo a la
+      derecha. Se abre grande encima de la ventana.
+- [ ] **D.2** Se ve una linea de cuadros rosas en diagonal. Eso significa que cada
+      palabra esta mirando sobre todo a la palabra anterior. **Es lo que vas a
+      explicar en la sustentacion.** ¿Lo entiendes mirandolo? Si no, dime que parte.
+- [ ] **D.3** Cierrala con el boton rosa "Cerrar". Prueba tambien la tecla Escape.
+
+## E. Los controles de abajo (para la sustentacion)
+
+- [ ] **E.1** Baja **Temperatura** casi a cero. Di *"cuentame algo sobre la musica"*.
+      Fijate en la respuesta.
+- [ ] **E.2** Sube **Temperatura** al maximo. Di **la misma frase**. La respuesta debe
+      ser mas rara o mas creativa. ¿Notas la diferencia? Es lo que te van a preguntar.
+- [ ] **E.3** Cambia el **Modelo** al segundo de la lista y sigue hablando sin cerrar
+      nada. Debe seguir acordandose de lo anterior.
+- [ ] **E.4** Pulsa **"Ver system prompt"**. Es el texto que se le manda al modelo
+      antes de cada frase. Leelo: te lo pueden preguntar.
+- [ ] **E.5** Habla diez veces seguidas y mira el renglon de **Memoria**. Cuando
+      llegue a 10/10 se pone rosa y avisa de que va a olvidar lo mas viejo.
+      **Ese momento es oro para la sustentacion**: es la ventana de contexto
+      llenandose delante del tribunal.
+
+## F. Lo que quedo pendiente de la Fase 1
+
+- [ ] **F.1** Presiona y suelta **sin decir nada**. Antes contestaba a "gracias".
+      Ahora debe avisarte de que no escucho nada.
+- [ ] **F.2** **Apaga el wifi** y habla. Debe avisarte con buenas palabras Y la figura
+      debe ponerse en **triangulo ambar** un par de segundos. Antes no se veia.
+- [ ] **F.3** Enciende el wifi y habla otra vez. Debe funcionar sin reiniciar.
+- [ ] **F.4** En ningun momento debe aparecer texto tecnico raro (`Traceback`, nombres
+      de archivos `.py`). Si aparece, copialo tal cual.
+
+## G. Dos preguntas que solo puedes contestar tu
+
+- [ ] **G.1** ¿Alguien ajeno al proyecto llego a usar la aplicacion sin que le
+      explicaras nada? (Esto es H-10, y esta apuntado como dudoso.)
+- [ ] **G.2** ¿Podrias explicar el mapa de atencion en voz alta a alguien que no ha
+      visto el codigo? (Esto es H-11.)
