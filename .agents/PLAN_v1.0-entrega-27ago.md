@@ -382,7 +382,7 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ### T-13 - Pestana Laboratorio en la GUI
 
-- Status: **done** (2026-08-17). Veredicto: **APTO**, resuelto al aprobarse la
+- Status: **done** (2026-08-23). Veredicto: **APTO**, resuelto al aprobarse la
   Fase 2. Su contenido quedo **absorbido por T-19**: ya no es una pestana, se ve a
   la vez que la conversacion, y el mapa se abre en superposicion.
 - Historico (2026-08-14): construida y verificada antes de que la duena detuviera
@@ -409,7 +409,7 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ### T-14 - Controles de sustentacion
 
-- Status: **done** (2026-08-17). Veredicto: **APTO** (commit `465fe6c`).
+- Status: **done** (2026-08-23). Veredicto: **APTO** (commit `465fe6c`).
   Construida DENTRO del rediseno T-19 y no encima de la ventana vieja: el orden
   del plan habria construido lo mismo dos veces.
   Hallazgo: el muestreo tuvo que pasar a atributo del motor. Como argumento de
@@ -429,7 +429,7 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ### T-15 - Tool calling
 
-- Status: **done** (2026-08-17). Veredicto: **APTO** (commit `b06a2eb`).
+- Status: **done** (2026-08-23). Veredicto: **APTO** (commit `b06a2eb`).
   Ejecutada por el Arquitecto, **excepcion declarada** al reparto de roles: la
   duena pidio continuar en automatico en una sola sesion. La separacion que si se
   mantuvo es la que importa: gate ejecutado, no reportado.
@@ -460,7 +460,7 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ### T-19 - Rediseno visual y de distribucion (NUEVA, pedida el 2026-08-14)
 
-- Status: **done** (2026-08-17). Veredicto: **APTO** (commit `465fe6c`).
+- Status: **done** (2026-08-23). Veredicto: **APTO** (commit `465fe6c`).
   Punto de derechos resuelto por la via segura: **ningun arte de terceros**. Solo
   los dos colores, y lo decorativo dibujado por codigo.
   Tres defectos reales encontrados **abriendo la ventana**, no leyendo el codigo:
@@ -492,7 +492,7 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 
 ## Cierre de Fase 2 — fecha limite 25 de agosto
 
-- [x] **T-13, T-14, T-15 y T-19 en APTO** (2026-08-17, ocho dias antes de la fecha
+- [x] **T-13, T-14, T-15 y T-19 en APTO** (2026-08-23, ocho dias antes de la fecha
       limite y con los tres bloques que pidio la duena, no un subconjunto).
 - [x] Nada quedo a medio implementar: las cuatro tareas tienen gate ejecutado y
       commit propio.

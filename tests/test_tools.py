@@ -22,6 +22,7 @@ from tools.system_skills import (
     abrir_kiosk,
     buscar_web,
     calcular,
+    clima,
     construir_comando,
     ejecutar_herramienta,
     estado_laptop,
@@ -194,7 +195,7 @@ def test_la_url_viaja_en_un_solo_argumento():
 
 
 def test_la_url_va_suelta_y_no_pegada_a_kiosk():
-    """Defecto real que la duena encontro el 2026-08-17: pidio Wikipedia y salio Edge
+    """Defecto real que la duena encontro el 2026-08-23: pidio Wikipedia y salio Edge
     con su pagina de importar datos.
 
     En Chromium `--kiosk` es un INTERRUPTOR, no una opcion con valor. Escribir
@@ -307,9 +308,11 @@ def test_cada_herramienta_declarada_tiene_implementacion():
         )
 
 
-def test_las_cuatro_herramientas_del_plan_estan_declaradas():
+def test_las_cinco_herramientas_estan_declaradas():
+    """La quinta, `clima`, la pidio la duena: es lo primero que se le pregunta a un
+    asistente de voz y no estaba."""
     assert NOMBRES_DECLARADOS == {
-        "calcular", "estado_laptop", "buscar_web", "abrir_kiosk"
+        "calcular", "clima", "estado_laptop", "buscar_web", "abrir_kiosk"
     }
 
 
@@ -345,3 +348,82 @@ def test_argumentos_de_forma_inesperada_no_tumban_el_despachador():
     for argumentos in [None, "texto suelto", 42, []]:
         peticion = type("P", (), {"nombre": "calcular", "argumentos": argumentos})()
         assert isinstance(ejecutar_herramienta(peticion), str)
+
+
+# ===========================================================================
+# clima - con el servicio inyectado, sin salir a internet
+# ===========================================================================
+
+def _servicio_falso(geo=None, tiempo=None, fallar_en=None):
+    """Devuelve una funcion `pedir` que imita a open-meteo sin tocar la red."""
+    def pedir(url, parametros):
+        if fallar_en and fallar_en in url:
+            raise ConnectionError("sin red")
+        if "geocoding" in url:
+            return geo if geo is not None else {
+                "results": [{"name": "Guayaquil", "country": "Ecuador",
+                             "latitude": -2.19, "longitude": -79.89}]
+            }
+        return tiempo if tiempo is not None else {
+            "current": {"temperature_2m": 28.1, "apparent_temperature": 31.4,
+                        "relative_humidity_2m": 64, "weather_code": 1}
+        }
+    return pedir
+
+
+def test_el_clima_se_dice_en_una_frase_hablable():
+    respuesta = clima("Guayaquil", pedir=_servicio_falso())
+    assert "Guayaquil" in respuesta
+    assert "28 grados" in respuesta
+    assert "64 por ciento" in respuesta
+    # Nada de simbolos que no se puedan pronunciar.
+    for simbolo in ("°", "%", "{", "[", "|"):
+        assert simbolo not in respuesta
+
+
+def test_el_codigo_del_cielo_se_traduce_a_palabras():
+    """El servicio devuelve un numero. Un numero no se puede leer en voz alta."""
+    respuesta = clima("X", pedir=_servicio_falso())
+    assert "casi despejado" in respuesta
+    assert "1" not in respuesta.split("grados")[0].replace("28", "")
+
+
+def test_la_sensacion_termica_solo_se_menciona_si_difiere():
+    """Repetir el mismo numero dos veces en voz alta suena a error del asistente."""
+    igual = _servicio_falso(tiempo={"current": {
+        "temperature_2m": 20.0, "apparent_temperature": 20.2,
+        "relative_humidity_2m": 50, "weather_code": 0}})
+    assert "se sienten como" not in clima("X", pedir=igual)
+
+    distinta = _servicio_falso(tiempo={"current": {
+        "temperature_2m": 28.0, "apparent_temperature": 34.0,
+        "relative_humidity_2m": 80, "weather_code": 0}})
+    assert "se sienten como 34" in clima("X", pedir=distinta)
+
+
+def test_una_ciudad_que_no_existe_se_explica_con_palabras():
+    vacio = _servicio_falso(geo={"results": []})
+    respuesta = clima("Ciudadinventada", pedir=vacio)
+    assert "No encontre" in respuesta
+    assert "Ciudadinventada" in respuesta
+
+
+def test_sin_red_el_clima_no_rompe_el_turno():
+    respuesta = clima("Quito", pedir=_servicio_falso(fallar_en="geocoding"))
+    assert "conexion a internet" in respuesta
+
+
+def test_si_falla_solo_la_segunda_llamada_tambien_se_explica():
+    respuesta = clima("Quito", pedir=_servicio_falso(fallar_en="forecast"))
+    assert "no pude leer el clima" in respuesta.lower()
+
+
+def test_sin_ciudad_se_pide_la_ciudad():
+    for entrada in ["", "   ", None, 42]:
+        assert isinstance(clima(entrada), str)
+    assert "que ciudad" in clima("")
+
+
+def test_el_clima_esta_enchufado_al_despachador():
+    peticion = type("P", (), {"nombre": "clima", "argumentos": {"ciudad": "Guayaquil"}})()
+    assert "no existe" not in ejecutar_herramienta(peticion)

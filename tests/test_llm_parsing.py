@@ -212,7 +212,7 @@ def test_el_mensaje_crudo_se_conserva_para_el_historial():
 
 
 # ===========================================================================
-# Un tiempo de espera agotado NO es quedarse sin internet (2026-08-17)
+# Un tiempo de espera agotado NO es quedarse sin internet (2026-08-23)
 # ===========================================================================
 #
 # La duena subio el slider de temperatura al maximo y la aplicacion, tras pensar un

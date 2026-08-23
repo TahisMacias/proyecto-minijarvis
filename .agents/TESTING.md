@@ -54,13 +54,13 @@ directa de codigo desde este archivo.
 ## Fase 2 - Valor agregado (limite 25 de agosto)
 
 - [x] H-13. **[OK 2026-08-14, prueba 7 del recorrido manual]** T-13 quedo en APTO al
-      aprobarse la Fase 2 el 2026-08-17. **Ya no hay pestana**: el laboratorio se ve a
+      aprobarse la Fase 2 el 2026-08-23. **Ya no hay pestana**: el laboratorio se ve a
       la vez que la conversacion (T-19), asi que este check queda cubierto por el H-09
       nuevo y por H-14.
 - [ ] H-14. Poner `temperature` en 0.1, repetir una frase, subirla a 1.5 y repetirla ->
       la diferencia entre ambas respuestas es perceptible y explicable. Aprovechar para
       mirar el indicador de memoria y el selector de modelo en caliente.
-- [x] H-15. **[OK 2026-08-17, firmado por la duena tras usar la aplicacion]** Las
+- [x] H-15. **[OK 2026-08-23, firmado por la duena tras usar la aplicacion]** Las
       cuatro herramientas invocadas por voz, una por una:
       - `calcular` -> **57.79**, la pregunta que origino la herramienta. Resuelta.
       - `estado_laptop` -> porcentaje real de bateria.
@@ -99,7 +99,7 @@ directa de codigo desde este archivo.
   verificado y la version manual pendiente** (H-12), y los de Fase 2 y 3 sin abrir.
 - Failures mapped to tasks: los tres fallos del recorrido manual (pruebas 2.3, 5.1 y
   5.3) se corrigieron en los commits `88ac9b4` y `d688954`.
-  **2.3 y 5.1 REPROBADAS POR LA DUENA el 2026-08-17 y pasan.** El circulo se ve verde
+  **2.3 y 5.1 REPROBADAS POR LA DUENA el 2026-08-23 y pasan.** El circulo se ve verde
   al hablar, y pulsar sin decir nada ya no hace que el asistente conteste a "gracias":
   las dos correcciones funcionan en uso real, no solo en las pruebas.
   **5.3 sigue sin reprobar.** Es la unica que queda de la Fase 1, y es la que exige

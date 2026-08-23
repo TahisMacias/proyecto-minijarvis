@@ -1,7 +1,7 @@
 # CURRENT - Mini-JARVIS
 
 ```yaml
-updated_at: 2026-08-17 (sesion 4)
+updated_at: 2026-08-23 (sesion 4)
 source_commit: (ver ultimo [STATE]; limpio)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
@@ -21,7 +21,7 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 
 ## Next action
 
-**FASE 2 COMPLETA.** Las cuatro tareas en APTO el 2026-08-17, ocho dias antes de su
+**FASE 2 COMPLETA.** Las cuatro tareas en APTO el 2026-08-23, ocho dias antes de su
 fecha limite, y con los tres bloques que pidio la duena, no un subconjunto.
 
 Lo que queda antes de la Fase 3 **es todo suyo**. Ningun agente puede firmarlo:
@@ -96,7 +96,7 @@ critico ya no es el codigo, es el informe y el video.
   prueba automatica los habria visto. Conviene seguir alternando pruebas y uso real.
 - El nivel Ingeniero de la jerarquia de tres niveles quedo sin segunda observacion: las
   ultimas sesiones no lo usaron. El criterio escrito sigue vigente por si se retoma.
-- **El entregable de mayor peso de la rubrica no se explicaba solo.** El 2026-08-17 la
+- **El entregable de mayor peso de la rubrica no se explicaba solo.** El 2026-08-23 la
   duena miro el mapa de atencion y dijo que no entendia que mostraba ni que significaba
   "capa 6 de 12, cabeza 4 de 12". El grafico es correcto y esta bien etiquetado; el
   problema es que **estaba escrito para alguien que ya sabe lo que esta mirando**. Vale
@@ -106,7 +106,7 @@ critico ya no es el codigo, es el informe y el video.
   (T-16) y al video (T-17): el criterio no es que sean correctos, es que ella pueda
   defenderlos sola.
 - ~~`Sintesis del proyecto.md` contradice decisiones vigentes.~~ **CERRADO**
-  (2026-08-17, commit `b215812`). Lleva un aviso de documento superado con la tabla de
+  (2026-08-23, commit `b215812`). Lleva un aviso de documento superado con la tabla de
   las cinco contradicciones: los dos modelos inservibles, `asyncio`, las 7 herramientas
   que son 3, el color de PENSANDO y la carpeta raiz `mini_jarvis/` que nunca existio.
   No se borro: la distancia entre lo planeado y lo posible es material de sustentacion.
@@ -117,7 +117,7 @@ critico ya no es el codigo, es el informe y el video.
   `config.py` y dejo el README como estaba. **Regla que sale de aqui:** todo cambio de
   un identificador de modelo, de una version fijada o de un precio obliga a revisar
   `README.md` y `docs/specs/` en el mismo commit.
-- ~~**Lo que se importa se declara.**~~ **CERRADO CON EVIDENCIA** (2026-08-17, commit
+- ~~**Lo que se importa se declara.**~~ **CERRADO CON EVIDENCIA** (2026-08-23, commit
   `b215812`). Se recorrio el AST de los 19 archivos `.py` y se mapeo cada import a su
   distribucion: **los 11 de terceros estan declarados**. Pillow era el unico hueco.
   El barrido inverso encontro tres pines que nadie importa —`psutil`,

@@ -18,7 +18,7 @@ aplicacion: si la unica pista fuera el color, para ella la interfaz no comunicar
 nada. Por eso cada estado tiene ademas su propia figura: circulo lleno, tres puntos,
 onda y triangulo. La forma no es decoracion.
 
-REDISENO T-19 (2026-08-17), pedido por la duena
+REDISENO T-19 (2026-08-23), pedido por la duena
 ===============================================
 
 Tres cambios de fondo respecto a la ventana anterior:

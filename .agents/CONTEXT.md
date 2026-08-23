@@ -244,7 +244,7 @@ Seis entradas compactadas el 2026-08-14. Lo que hay que recordar:
   solo con su OK, abrir la Fase 2 (ver CURRENT > Fase 2 propuesta). **La Fase 2 sigue
   bloqueada: la auditoria no la desbloquea.**
 
-## 2026-08-17 - Sesion automatica: saldar la deuda de la auditoria
+## 2026-08-23 - Sesion automatica: saldar la deuda de la auditoria
 
 - Changed: `requirements.txt`, `Sintesis del proyecto.md` (commit `b215812`);
   `.agents/` (este `[STATE]`).
@@ -286,7 +286,7 @@ Seis entradas compactadas el 2026-08-14. Lo que hay que recordar:
 - Next: **nada de agente.** Los tres pendientes son suyos: reprobar 2.3, 5.1 y 5.3;
   decir si H-10 y H-11 estan hechos; decidir la Fase 2.
 
-## 2026-08-17 - Fase 2 completa en una sesion: herramientas y ventana nueva
+## 2026-08-23 - Fase 2 completa en una sesion: herramientas y ventana nueva
 
 - Changed: `tools/manifest.py`, `tools/system_skills.py`, `tests/test_tools.py`,
   `gui/desktop_app.py` (reescrito), `config.py`, `core/llm_engine.py`, `main.py`,

@@ -24,6 +24,7 @@ NOMBRE_ESTADO_LAPTOP = "estado_laptop"
 NOMBRE_BUSCAR_WEB = "buscar_web"
 NOMBRE_ABRIR_KIOSK = "abrir_kiosk"
 NOMBRE_CALCULAR = "calcular"
+NOMBRE_CLIMA = "clima"
 
 
 MANIFIESTO: list[dict] = [
@@ -55,6 +56,32 @@ MANIFIESTO: list[dict] = [
                     }
                 },
                 "required": ["expresion"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": NOMBRE_CLIMA,
+            "description": (
+                "Consulta el tiempo que hace AHORA MISMO en una ciudad: temperatura, "
+                "sensacion termica, humedad y estado del cielo. USA SIEMPRE esta "
+                "herramienta cuando pregunten por el clima, el tiempo, si llueve, si "
+                "hace frio o calor, o que temperatura hay. No lo respondas de memoria: "
+                "el clima cambia cada hora y tu no puedes saberlo."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "ciudad": {
+                        "type": "string",
+                        "description": (
+                            "Nombre de la ciudad. Si la persona no dice ninguna, usa "
+                            "Guayaquil, que es donde esta la usuaria."
+                        ),
+                    }
+                },
+                "required": ["ciudad"],
             },
         },
     },

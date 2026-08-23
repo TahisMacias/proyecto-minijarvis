@@ -35,7 +35,7 @@ def test_todos_los_estados_del_diseno_tienen_color():
 def test_los_colores_de_estado_son_hexadecimales_validos():
     """Ningun color suelto ni mal escrito.
 
-    NOTA DEL REDISENO T-19 (2026-08-17): antes esta prueba exigia que cada color de
+    NOTA DEL REDISENO T-19 (2026-08-23): antes esta prueba exigia que cada color de
     estado estuviera literalmente dentro de `PALETA`. Con el tema claro tenia sentido,
     porque los rellenos eran los mismos tintes pastel que el resto de la ventana. En el
     tema oscuro los estados forman su propia familia (relleno apagado + borde luminoso)

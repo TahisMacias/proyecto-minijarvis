@@ -27,7 +27,7 @@
   **No esta versionado**: es documento del docente y el repositorio es publico.
   Vive solo en la carpeta local, excluido por `.gitignore`. Su contenido esta
   reflejado en `APPCORE.md` y en `docs/specs/2026-08-13-mini-jarvis-design.md`.
-- `Sintesis del proyecto.md`: **DOCUMENTO SUPERADO**, marcado como tal el 2026-08-17.
+- `Sintesis del proyecto.md`: **DOCUMENTO SUPERADO**, marcado como tal el 2026-08-23.
   Es la sintesis previa a construir nada. Contradice cinco decisiones vigentes y lleva
   la tabla de contradicciones al principio. No citarlo en el informe.
 - `.gitignore`: primera linea de defensa contra publicar credenciales.
@@ -57,12 +57,12 @@
   importa nada de la GUI**; una prueba lee su AST para que siga siendo cierto.
 - `gui/desktop_app.py` (T-10, T-13, T-14, T-19): la ventana, el puente `after(0, ...)`
   entre hilos, los controles de sustentacion y la superposicion del mapa. Tema oscuro,
-  tres columnas, **sin pestanas** desde el rediseno del 2026-08-17.
+  tres columnas, **sin pestanas** desde el rediseno del 2026-08-23.
 - `main.py`: punto de entrada. `Iniciar Mini-JARVIS.bat`: lanzador con doble clic.
 - `tests/`: memoria, parseo del LLM, orquestador, paleta de estados, barra
   espaciadora y herramientas. **128 pruebas**, sin red, sin microfono y sin saldo.
 - `pytest.ini`: `pythonpath = .` para que el comando del gate encuentre `core`.
-- `requirements.txt`: 14 dependencias fijadas. Auditado con AST el 2026-08-17: los 11
+- `requirements.txt`: 14 dependencias fijadas. Auditado con AST el 2026-08-23: los 11
   imports de terceros estan declarados. Tres pines (`psutil`, `duckduckgo-search`,
   `tiktoken`) estan reservados para tareas sin construir y marcados como tales.
 - `README.md`: cara publica del proyecto. Su tabla de modelos **debe** coincidir con
@@ -82,4 +82,4 @@
 - `docs/evidencia/`: salida del laboratorio, captura de la ventana y la tabla de
   cobertura de los 7 fallos previstos.
 
-Last reindexed: 2026-08-17, al cerrar la Fase 2 completa.
+Last reindexed: 2026-08-23, al cerrar la Fase 2 completa.

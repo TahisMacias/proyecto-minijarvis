@@ -52,7 +52,7 @@ def _leer_api_key() -> str:
 TOGETHER_API_KEY = _leer_api_key()
 
 
-# --- Paleta (rediseno T-19, 2026-08-17) -------------------------------------
+# --- Paleta (rediseno T-19, 2026-08-23) -------------------------------------
 #
 # CAMBIO DE TEMA, pedido por la duena: la interfaz pastel clara le parecia "limpia y
 # profesional" pero sin personalidad. Se pasa a un tema OSCURO con la paleta del
@@ -116,7 +116,7 @@ TOGETHER_BASE_URL = "https://api.together.xyz/v1"
 # ~2.5 s, que es aceptable para voz. No existe ninguna variante de 27B en Together.
 MODELO_LLM_PREDETERMINADO = "Qwen/Qwen3.8-2.4T-A95B"
 
-# ALTERNO CAMBIADO EL 2026-08-17. El anterior, Qwen2.5-7B-Instruct-Turbo, funcionaba
+# ALTERNO CAMBIADO EL 2026-08-23. El anterior, Qwen2.5-7B-Instruct-Turbo, funcionaba
 # el 14 de agosto y para el 17 devolvia HTTP 503 en todos los intentos: Together lo
 # retiro en esos tres dias. Lo encontro la duena usando el selector.
 #
@@ -140,7 +140,7 @@ MODELO_LLM_ALTERNO = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
 #   Qwen3.8-2.4T-A95B              entrada $2.50   salida $6.25
 #   Llama-3.3-70B-Instruct-Turbo   entrada $1.04   salida $1.04
 #   whisper-large-v3               $0.0015 por minuto de audio
-# Precios releidos del catalogo el 2026-08-17, no copiados de la web.
+# Precios releidos del catalogo el 2026-08-23, no copiados de la web.
 
 MODELO_STT = "openai/whisper-large-v3"
 IDIOMA_STT = "es"
@@ -174,7 +174,7 @@ UMBRAL_DE_SILENCIO = 180
 #
 # Historia de este numero, que ya va por su tercera version:
 #   instantaneo -> el estado ocurria durante microsegundos y nadie lo veia jamas.
-#   2.5 s       -> medido y correcto, y la duena SIGUIO sin verlo (2026-08-17).
+#   2.5 s       -> medido y correcto, y la duena SIGUIO sin verlo (2026-08-23).
 #   5.0 s       -> el actual.
 #
 # La segunda vez se comprobo con el mainloop real que la ventana SI pintaba el

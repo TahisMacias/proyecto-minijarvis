@@ -115,7 +115,7 @@ escribe al lado lo que no. Tarda unos quince minutos.
       oscura, ancha, con tres columnas.
 - [no me gusta ni el color ni el diseño se ve anticuado y muy cargado. si se puede mejorar y modernizar visualmente mejor. ] **A.2** ¿Te gusta? Es tu tematica. Si algo te chirria (un color, un tamano, una
       palabra), anotalo aqui aunque sea una tonteria: es tu proyecto y se cambia.
-- [ ] **A.3** A la derecha del todo pone "LABORATORIO DEL TRANSFORMER" y esta vacio.
+- [X] **A.3** A la derecha del todo pone "LABORATORIO DEL TRANSFORMER" y esta vacio.
       Es normal: se llena cuando hables.
 
 ## B. Habla. Di estas frases, una por una

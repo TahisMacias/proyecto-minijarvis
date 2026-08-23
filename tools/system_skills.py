@@ -298,6 +298,112 @@ def buscar_web(consulta: str, buscador=None) -> str:
 
 
 # ===========================================================================
+# clima - el dato que cualquiera le pide a un asistente de voz
+# ===========================================================================
+#
+# Lo pidio la duena: "debe funcionar cuando le pregunto el clima, tal y como funciona
+# Alexa". Es la peticion mas natural que recibe un asistente y no estaba cubierta.
+#
+# Se usa open-meteo porque NO EXIGE CLAVE DE API ni registro. Anadir otro proveedor con
+# credenciales habria significado otra clave que guardar, otra que puede caducar la
+# vispera de la sustentacion y otra linea de `.env` que explicar en el README.
+
+URL_CLIMA = "https://api.open-meteo.com/v1/forecast"
+URL_GEOCODIFICACION = "https://geocoding-api.open-meteo.com/v1/search"
+
+# El servicio devuelve el estado del cielo como un numero (codigo WMO). Se traduce a
+# palabras que se puedan LEER EN VOZ ALTA, que es el unico formato util aqui.
+_CIELO_POR_CODIGO = {
+    0: "despejado",
+    1: "casi despejado", 2: "parcialmente nublado", 3: "nublado",
+    45: "con niebla", 48: "con niebla helada",
+    51: "con llovizna ligera", 53: "con llovizna", 55: "con llovizna intensa",
+    56: "con llovizna helada", 57: "con llovizna helada intensa",
+    61: "con lluvia ligera", 63: "con lluvia", 65: "con lluvia fuerte",
+    66: "con lluvia helada", 67: "con lluvia helada fuerte",
+    71: "con nieve ligera", 73: "con nieve", 75: "con nieve intensa",
+    77: "con granizo",
+    80: "con chubascos ligeros", 81: "con chubascos", 82: "con chubascos fuertes",
+    85: "con chubascos de nieve", 86: "con chubascos de nieve intensos",
+    95: "con tormenta", 96: "con tormenta y granizo", 99: "con tormenta y granizo fuerte",
+}
+
+
+def _buscar_ciudad(nombre: str, pedir):
+    """Traduce un nombre de ciudad a coordenadas. Devuelve (etiqueta, lat, lon)."""
+    r = pedir(URL_GEOCODIFICACION,
+              {"name": nombre, "count": 1, "language": "es", "format": "json"})
+    resultados = (r or {}).get("results") or []
+    if not resultados:
+        raise LookupError(nombre)
+    sitio = resultados[0]
+    etiqueta = sitio.get("name", nombre)
+    pais = sitio.get("country")
+    if pais and pais != etiqueta:
+        etiqueta = f"{etiqueta}, {pais}"
+    return etiqueta, sitio["latitude"], sitio["longitude"]
+
+
+def clima(ciudad: str, pedir=None) -> str:
+    """Devuelve el tiempo actual de una ciudad, en una frase para decir en voz alta.
+
+    `pedir` se inyecta en las pruebas: recibe (url, parametros) y devuelve el JSON ya
+    convertido a diccionario. Asi la suite no sale a internet.
+    """
+    if not isinstance(ciudad, str) or not ciudad.strip():
+        return "No me dijiste de que ciudad quieres el clima."
+    ciudad = ciudad.strip()
+
+    if pedir is None:
+        import httpx
+
+        def pedir(url, parametros):
+            respuesta = httpx.get(url, params=parametros, timeout=20)
+            respuesta.raise_for_status()
+            return respuesta.json()
+
+    try:
+        etiqueta, lat, lon = _buscar_ciudad(ciudad, pedir)
+    except LookupError:
+        return (
+            f"No encontre ninguna ciudad que se llame {ciudad}. Prueba con el nombre "
+            "completo, por ejemplo Guayaquil o Quito."
+        )
+    except Exception:  # noqa: BLE001 - sin red, servicio caido, respuesta rara
+        return (
+            "No pude consultar el clima ahora mismo. Puede que no haya conexion a "
+            "internet."
+        )
+
+    try:
+        datos = pedir(URL_CLIMA, {
+            "latitude": lat, "longitude": lon,
+            "current": "temperature_2m,relative_humidity_2m,apparent_temperature,weather_code",
+            "timezone": "auto",
+        })
+        ahora = datos["current"]
+    except Exception:  # noqa: BLE001
+        return (
+            f"Encontre {etiqueta}, pero no pude leer el clima ahora mismo. Intentalo "
+            "de nuevo en un momento."
+        )
+
+    grados = round(ahora.get("temperature_2m", 0))
+    sensacion = round(ahora.get("apparent_temperature", grados))
+    humedad = ahora.get("relative_humidity_2m")
+    cielo = _CIELO_POR_CODIGO.get(ahora.get("weather_code"), "sin datos del cielo")
+
+    frase = f"En {etiqueta} hay {grados} grados y el cielo esta {cielo}"
+    # La sensacion termica solo se menciona cuando difiere de verdad: repetir el mismo
+    # numero dos veces en voz alta suena a error del asistente.
+    if abs(sensacion - grados) >= 2:
+        frase += f", aunque se sienten como {sensacion}"
+    if humedad is not None:
+        frase += f". La humedad es del {humedad} por ciento"
+    return frase + "."
+
+
+# ===========================================================================
 # abrir_kiosk - el unico sitio donde este proyecto lanza un proceso
 # ===========================================================================
 
@@ -351,7 +457,7 @@ def construir_comando(url_validada: str, ruta_navegador: str = RUTA_EDGE) -> lis
     lugar de la pedida: en Chromium `--kiosk` es un INTERRUPTOR, no una opcion con
     valor, asi que al pegarle un `=algo` la direccion se pierde y el navegador arranca
     con lo que tenga configurado. Lo encontro la duena probando la aplicacion el
-    2026-08-17: pidio Wikipedia y le salio la pagina de importar datos de Edge.
+    2026-08-23: pidio Wikipedia y le salio la pagina de importar datos de Edge.
     Ninguna prueba lo habria visto, porque el comando estaba bien FORMADO; lo que
     estaba mal era su significado para el programa que lo recibe.
 
@@ -405,6 +511,7 @@ def abrir_kiosk(url: str, lanzar=None, ruta_navegador: str = RUTA_EDGE) -> str:
 
 _IMPLEMENTACIONES = {
     "calcular": lambda a: calcular(a.get("expresion", "")),
+    "clima": lambda a: clima(a.get("ciudad", "")),
     "estado_laptop": lambda a: estado_laptop(),
     "buscar_web": lambda a: buscar_web(a.get("consulta", "")),
     "abrir_kiosk": lambda a: abrir_kiosk(a.get("url", "")),
