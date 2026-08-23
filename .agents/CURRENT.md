@@ -96,6 +96,15 @@ critico ya no es el codigo, es el informe y el video.
   prueba automatica los habria visto. Conviene seguir alternando pruebas y uso real.
 - El nivel Ingeniero de la jerarquia de tres niveles quedo sin segunda observacion: las
   ultimas sesiones no lo usaron. El criterio escrito sigue vigente por si se retoma.
+- **El entregable de mayor peso de la rubrica no se explicaba solo.** El 2026-08-17 la
+  duena miro el mapa de atencion y dijo que no entendia que mostraba ni que significaba
+  "capa 6 de 12, cabeza 4 de 12". El grafico es correcto y esta bien etiquetado; el
+  problema es que **estaba escrito para alguien que ya sabe lo que esta mirando**. Vale
+  el 25 % de la nota y quien lo tiene que defender en voz alta no es programadora.
+  Se escribio `docs/guion-mapa-atencion.md`. **Leccion general: un entregable que solo
+  se entiende con quien lo hizo al lado no esta terminado.** Aplica igual al informe
+  (T-16) y al video (T-17): el criterio no es que sean correctos, es que ella pueda
+  defenderlos sola.
 - ~~`Sintesis del proyecto.md` contradice decisiones vigentes.~~ **CERRADO**
   (2026-08-17, commit `b215812`). Lleva un aviso de documento superado con la tabla de
   las cinco contradicciones: los dos modelos inservibles, `asyncio`, las 7 herramientas
