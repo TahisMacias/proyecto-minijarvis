@@ -92,6 +92,9 @@ directa de codigo desde este archivo.
   **2 en contradiccion** por resolver (H-10, H-11), **1 con equivalente automatico
   verificado y la version manual pendiente** (H-12), y los de Fase 2 y 3 sin abrir.
 - Failures mapped to tasks: los tres fallos del recorrido manual (pruebas 2.3, 5.1 y
-  5.3) se corrigieron en los commits `88ac9b4` y `d688954`. **Falta reprobarlos**:
-  es la primera accion pendiente de la duena, y hasta hacerla no hay evidencia de
-  que las correcciones funcionen en uso real.
+  5.3) se corrigieron en los commits `88ac9b4` y `d688954`.
+  **2.3 y 5.1 REPROBADAS POR LA DUENA el 2026-08-17 y pasan.** El circulo se ve verde
+  al hablar, y pulsar sin decir nada ya no hace que el asistente conteste a "gracias":
+  las dos correcciones funcionan en uso real, no solo en las pruebas.
+  **5.3 sigue sin reprobar.** Es la unica que queda de la Fase 1, y es la que exige
+  apagar el wifi de verdad.

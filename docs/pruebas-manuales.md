@@ -23,7 +23,7 @@ Marca con `[x]` lo que pase y anota al lado lo que no.
 
 - [X] **2.1** Manten el **boton** con el raton, habla, suelta -> responde.
 - [X] **2.2** Manten la **barra espaciadora**, habla, suelta -> responde igual.
-- [X: no es verde es azul] **2.3** Mientras hablas, el circulo esta **verde y latiendo**. Es la senal de
+- [X] **2.3** Mientras hablas, el circulo esta **verde y latiendo**. Es la senal de
       que si esta grabando.
 - [X] **2.4** Al soltar, pasa a **azul con tres puntos** (pensando) y luego a **rosa
       con ondas** (respondiendo).
@@ -45,7 +45,7 @@ Marca con `[x]` lo que pase y anota al lado lo que no.
 
 ## 5. Los errores, que es lo que mas importa
 
-- [FALLO: por defecto ubica el texto "gracias"] **5.1** Presiona y **suelta de inmediato**, sin decir nada -> debe aparecer un
+- [x] **5.1** Presiona y **suelta de inmediato**, sin decir nada -> debe aparecer un
       aviso amable tipo "No te escuche bien" y volver a reposo. **No** debe quedarse
       pensando para siempre.
 - [X] **5.2** Mientras esta respondiendo, presiona la barra otra vez -> te avisa que
