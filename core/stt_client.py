@@ -72,6 +72,9 @@ def _crear_cliente() -> openai.OpenAI:
         api_key=TOGETHER_API_KEY,
         base_url=TOGETHER_BASE_URL,
         timeout=TIMEOUT_SEGUNDOS,
+        # Ver el comentario de core/llm_engine.py: reintentar sin red solo
+        # retrasa el cambio al respaldo local.
+        max_retries=0,
     )
 
 

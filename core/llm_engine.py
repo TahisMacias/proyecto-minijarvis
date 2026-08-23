@@ -149,6 +149,11 @@ class MotorLLM:
             api_key=TOGETHER_API_KEY,
             base_url=TOGETHER_BASE_URL,
             timeout=TIMEOUT_SEGUNDOS,
+            # Sin reintentos automaticos. El SDK reintenta dos veces por
+            # defecto, y con la red caida eso son tres segundos regalados por
+            # llamada antes de poder cambiar al respaldo local. Reintentar
+            # cuando no hay red no arregla nada: solo alarga la espera.
+            max_retries=0,
         )
 
     def cambiar_modelo(self, modelo: str) -> None:

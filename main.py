@@ -40,6 +40,7 @@ def main() -> int:
             TranscriptorConRespaldo,
             VozConRespaldo,
             hablar_local,
+            precalentar_en_segundo_plano,
             transcribir_local,
         )
         from tools.manifest import MANIFIESTO
@@ -82,6 +83,15 @@ def main() -> int:
         transcribir, transcribir_local, avisar=avisos_de_modo.append)
     voz = VozConRespaldo(
         hablar, hablar_local, avisar=avisos_de_modo.append)
+
+    # Los modelos locales se cargan YA, en segundo plano. Sin esto, el primer turno
+    # sin internet tardaba mas de un minuto -18 s de Whisper, 37 s del modelo de
+    # lenguaje- y durante todo ese rato la ventana solo decia "Pensando...". Un minuto
+    # sin ninguna senal es indistinguible de estar colgado.
+    print("Preparando el modo sin internet en segundo plano...")
+    precalentar_en_segundo_plano(
+        avisar=lambda _: avisos_de_modo.append(
+            "Modo sin internet listo: si se cae la red, sigo funcionando."))
 
     # La ventana recibe una fabrica, no un orquestador ya hecho: solo ella sabe como
     # construir el puente `after(0, ...)` hacia su propio hilo, y ese puente es un

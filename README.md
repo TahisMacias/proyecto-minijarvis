@@ -158,6 +158,15 @@ Que cambia cuando entra el respaldo, medido en una laptop sin tarjeta grafica:
 **La diferencia se nota y la aplicacion no la disimula**: cuando el respaldo entra, lo
 dice en la conversacion y aparece un aviso ambar arriba a la derecha.
 
+**Cuenta con que se equivoque.** Preguntandole dos veces seguidas la capital de Ecuador,
+el modelo local contesto "Quito" una vez y "Santo Domingo" la otra. No es un fallo del
+programa: es lo que da un modelo de 494 millones de parametros. Sirve para que la
+aplicacion siga viva sin conexion, no para confiar en lo que dice.
+
+Los modelos locales se cargan **en segundo plano nada mas abrir la aplicacion**, para
+que el cambio sea instantaneo si se cae la red. Tarda unos 18 segundos y no bloquea
+nada. Sin ese precalentado, el primer turno sin internet tardaba mas de un minuto.
+
 Dos cosas que el respaldo NO hace, a proposito:
 
 - **No se activa si la clave de API es invalida o la cuenta se quedo sin saldo.** Solo

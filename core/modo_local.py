@@ -362,6 +362,46 @@ class VozConRespaldo(ConRespaldo):
         self._local(texto)
 
 
+def precalentar_en_segundo_plano(avisar=None) -> threading.Thread:
+    """Carga los modelos locales en un hilo aparte, nada mas arrancar la aplicacion.
+
+    POR QUE ESTO EXISTE. Sin precalentar, el primer turno sin internet tardaba mas de
+    un minuto: 18 s en cargar Whisper, 37 s en cargar el modelo de lenguaje y otros
+    veinte en generar. La duena apago el wifi, vio "Pensando..." durante todo ese rato
+    y dio por hecho que no funcionaba. Tenia razon en darlo por hecho: **un minuto sin
+    ninguna senal es indistinguible de estar colgado.**
+
+    Cargarlos por adelantado mueve esa espera al arranque, donde nadie la nota porque
+    la aplicacion ya esta usable mientras tanto. Cuesta memoria -unos 2 GB- y ese es el
+    precio de que el cambio a local sea instantaneo cuando de verdad hace falta.
+
+    Es un hilo `daemon`: si se cierra la ventana a mitad de la carga, no deja el
+    proceso colgado esperandolo.
+
+    Si los modelos no estan descargados todavia, esto falla en silencio y no pasa nada:
+    el respaldo seguira funcionando, solo que cargando en el momento. El aviso de que
+    hay que descargarlos vive en el README y en `descargar_modelos_locales`.
+    """
+    def preparar():
+        try:
+            _modelo_stt()
+            _modelo_llm()
+        except Exception:  # noqa: BLE001 - precalentar nunca debe romper el arranque
+            return
+        if avisar:
+            avisar("listo")
+
+    hilo = threading.Thread(target=preparar, name="minijarvis-precalentar",
+                            daemon=True)
+    hilo.start()
+    return hilo
+
+
+def modelos_locales_listos() -> bool:
+    """True si los dos modelos ya estan en memoria y el cambio seria instantaneo."""
+    return "stt" in _cargados and "llm" in _cargados
+
+
 def descargar_modelos_locales(informar=print) -> None:
     """Baja y calienta los tres modelos locales. Se ejecuta a mano, no al arrancar.
 
