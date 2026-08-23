@@ -111,7 +111,7 @@ escribe al lado lo que no. Tarda unos quince minutos.
 
 ## A. Lo primero, antes de hablar: mira la ventana
 
-- [ ] **A.1** Abre con doble clic en `Iniciar Mini-JARVIS.bat`. Se abre una ventana
+- [X] **A.1** Abre con doble clic en `Iniciar Mini-JARVIS.bat`. Se abre una ventana
       oscura, ancha, con tres columnas.
 - [ ] **A.2** ¿Te gusta? Es tu tematica. Si algo te chirria (un color, un tamano, una
       palabra), anotalo aqui aunque sea una tonteria: es tu proyecto y se cambia.
@@ -122,18 +122,18 @@ escribe al lado lo que no. Tarda unos quince minutos.
 
 Manten presionado el boton (o la barra espaciadora), habla, suelta.
 
-- [ ] **B.1** *"Cual es la raiz cuadrada de 3340"*
+- [X: dio 57.79] **B.1** *"Cual es la raiz cuadrada de 3340"*
       **Esta es la importante.** Es la pregunta que antes no sabia contestar. Ahora
       debe decir un numero: 57.79 y pico. Si dice "aproximadamente" o "no tengo
       calculadora", algo va mal y hay que anotarlo.
-- [ ] **B.2** *"Como esta la bateria de la laptop"*
+- [X] **B.2** *"Como esta la bateria de la laptop"*
       Debe decirte el porcentaje REAL de tu bateria. Compruebalo mirando el icono de
       Windows abajo a la derecha: tienen que coincidir.
-- [ ] **B.3** *"Busca en internet que es un transformer"*
+- [X] **B.3** *"Busca en internet que es un transformer"*
       Debe darte resultados de verdad, no lo que se sepa de memoria.
-- [ ] **B.4** *"Abre Wikipedia"*
+- [X: arreglado el 17 ago, commit d2b212a] **B.4** *"Abre Wikipedia"*
       Debe abrirse el navegador a pantalla completa. Cierralo con Alt+F4.
-- [ ] **B.5** *"Abre Facebook"*
+- [X: se nego, correcto] **B.5** *"Abre Facebook"*
       **Debe NEGARSE.** Tiene que decirte con buenas palabras que solo puede abrir
       YouTube, Wikipedia, Google y GitHub. Si abre Facebook, eso es un fallo grave:
       anotalo en mayusculas.

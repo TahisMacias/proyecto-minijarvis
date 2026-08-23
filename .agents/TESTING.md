@@ -60,10 +60,16 @@ directa de codigo desde este archivo.
 - [ ] H-14. Poner `temperature` en 0.1, repetir una frase, subirla a 1.5 y repetirla ->
       la diferencia entre ambas respuestas es perceptible y explicable. Aprovechar para
       mirar el indicador de memoria y el selector de modelo en caliente.
-- [ ] H-15. Pedir por voz las **cuatro** herramientas, una por una -> cada una se
-      invoca y responde. Empezar por **la raiz cuadrada de 3340**, que es el fallo que
-      origino la calculadora. Intentar abrir un dominio fuera de la lista blanca -> se
-      rechaza con palabras, sin abrir nada.
+- [x] H-15. **[OK 2026-08-17, firmado por la duena tras usar la aplicacion]** Las
+      cuatro herramientas invocadas por voz, una por una:
+      - `calcular` -> **57.79**, la pregunta que origino la herramienta. Resuelta.
+      - `estado_laptop` -> porcentaje real de bateria.
+      - `buscar_web` -> resultados reales.
+      - `abrir_kiosk` -> Wikipedia a pantalla completa, **tras corregir un defecto que
+        encontro ella**: se construia `--kiosk=url` y Edge, para el que `--kiosk` es un
+        interruptor sin valor, ignoraba la direccion y abria su pagina de inicio.
+        Corregido en `d2b212a` y reprobado por ella.
+      - Lista blanca -> pedirle Facebook **no abre nada** y lo dice con palabras.
 - [ ] **H-09 BIS. Volver a firmar H-09 sobre la ventana nueva.** El tema cambio por
       completo de claro a oscuro: la firma del 2026-08-14 era sobre la ventana pastel y
       **no se puede reutilizar**. Mirar de lejos, sin leer el texto, y despues
