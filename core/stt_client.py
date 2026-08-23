@@ -93,7 +93,15 @@ def transcribir(audio_wav: io.BytesIO, cliente: openai.OpenAI | None = None) -> 
             file=audio_wav,
             language=IDIOMA_STT,
         )
-    except (openai.APITimeoutError, openai.APIConnectionError) as excepcion:
+    except openai.APITimeoutError as excepcion:
+        # Mismo criterio que en llm_engine: un tiempo de espera agotado no es lo mismo
+        # que no tener red, y decirle a la usuaria que revise el wifi cuando el wifi
+        # funciona la manda a arreglar algo que no esta roto.
+        raise SinConexionSTT(
+            "La transcripcion esta tardando demasiado. Puede que la conexion este "
+            "lenta; intentalo otra vez con una frase mas corta."
+        ) from excepcion
+    except openai.APIConnectionError as excepcion:
         raise SinConexionSTT(
             "No se pudo enviar el audio para transcribir. Revisa tu conexion a "
             "internet e intenta de nuevo."

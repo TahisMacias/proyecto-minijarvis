@@ -56,6 +56,7 @@ from config import (
     MODELO_LLM_ALTERNO,
     MODELO_LLM_PREDETERMINADO,
     PALETA,
+    TEMPERATURA_MAXIMA,
     TEMPERATURA_PREDETERMINADA,
     TOP_P_PREDETERMINADO,
 )
@@ -274,7 +275,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
 
         # --- Sliders de muestreo ---
         self._slider_temperatura, self._valor_temperatura = self._construir_slider(
-            marco, fila=1, etiqueta="Temperatura", minimo=0.0, maximo=1.5,
+            marco, fila=1, etiqueta="Temperatura", minimo=0.0, maximo=TEMPERATURA_MAXIMA,
             inicial=TEMPERATURA_PREDETERMINADA, al_mover=self._cambiar_temperatura)
 
         self._slider_top_p, self._valor_top_p = self._construir_slider(

@@ -67,7 +67,18 @@ class ErrorDeLLM(RuntimeError):
 
 
 class SinConexionLLM(ErrorDeLLM):
-    """No se pudo llegar al servidor: sin internet o timeout."""
+    """No se pudo llegar al servidor: no hay red."""
+
+
+class ModeloDemasiadoLento(ErrorDeLLM):
+    """El servidor acepto la peticion pero no contesto a tiempo.
+
+    Se separa de SinConexionLLM a proposito. Antes las dos cosas compartian mensaje y
+    la aplicacion decia "revisa tu conexion a internet" cuando la conexion estaba
+    perfecta: lo que pasaba era que el modelo tardaba mas que el tiempo de espera. Un
+    mensaje de error que senala la causa equivocada es peor que no dar ninguno, porque
+    manda a la usuaria a arreglar algo que no esta roto.
+    """
 
 
 class CredencialRechazadaLLM(ErrorDeLLM):
@@ -174,7 +185,12 @@ class MotorLLM:
 
         try:
             respuesta = self._cliente.chat.completions.create(**peticion)
-        except (openai.APITimeoutError, openai.APIConnectionError) as excepcion:
+        except openai.APITimeoutError as excepcion:
+            raise ModeloDemasiadoLento(
+                "El modelo esta tardando demasiado en contestar. Si moviste la "
+                "temperatura muy arriba, bajala un poco y vuelve a intentarlo."
+            ) from excepcion
+        except openai.APIConnectionError as excepcion:
             raise SinConexionLLM(
                 "No se pudo contactar al modelo. Revisa tu conexion a internet e "
                 "intenta de nuevo."

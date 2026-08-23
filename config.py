@@ -197,3 +197,23 @@ DOMINIOS_PERMITIDOS_KIOSK = frozenset(
 # puede mover en vivo para demostrar su efecto.
 TEMPERATURA_PREDETERMINADA = 0.7
 TOP_P_PREDETERMINADO = 0.9
+
+# Tope del slider de temperatura. NO es un numero elegido a ojo: sale de medir.
+#
+# La duena movio el slider al maximo (1.5) y la aplicacion se quedo pensando y acabo
+# diciendo que no habia internet. Su conexion estaba perfecta. Midiendo la misma frase
+# contra la API real, con el modelo de razonamiento predeterminado:
+#
+#     temp 0.0   ->    2.4 s        temp 1.35  ->    1.7 s
+#     temp 0.7   ->    1.1 s        temp 1.40  ->    0.7 s
+#     temp 1.2   ->    1.1 s        temp 1.45  ->    3.0 s
+#     temp 1.3   ->    0.9 s        temp 1.50  ->  152 s / 102 s / 102 s / 1.3 s
+#
+# A partir de 1.5 el servidor se atasca unos 100 segundos en dos de cada tres
+# intentos. No devuelve mas texto -de hecho devolvio menos-, simplemente tarda. Por
+# debajo de 1.45 no ocurre nunca.
+#
+# Un control que la usuaria puede mover hasta un valor que rompe la aplicacion no es un
+# control, es una trampa. El slider llega hasta 1.4, que sigue siendo territorio de
+# sobra para demostrar el efecto en vivo.
+TEMPERATURA_MAXIMA = 1.4

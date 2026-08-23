@@ -209,3 +209,96 @@ def test_el_mensaje_crudo_se_conserva_para_el_historial():
     assert resultado.mensaje_crudo is not None
     assert resultado.mensaje_crudo["role"] == "assistant"
     assert "tool_calls" in resultado.mensaje_crudo
+
+
+# ===========================================================================
+# Un tiempo de espera agotado NO es quedarse sin internet (2026-08-17)
+# ===========================================================================
+#
+# La duena subio el slider de temperatura al maximo y la aplicacion, tras pensar un
+# buen rato, le dijo que revisara su conexion a internet. Su conexion estaba perfecta:
+# lo que pasaba es que el modelo tardaba mas que el tiempo de espera. Midiendo contra
+# la API real, a temperatura 1.5 el servidor se atasca unos 100 segundos en dos de cada
+# tres intentos; por debajo de 1.45 nunca.
+#
+# Un mensaje que senala la causa equivocada es peor que no dar ninguno, porque manda a
+# la persona a arreglar algo que no esta roto. Estas pruebas fijan que las dos causas
+# se distingan.
+
+class _ClienteQueFalla:
+    """Cliente falso que siempre levanta la excepcion que se le indique."""
+
+    def __init__(self, excepcion):
+        self._excepcion = excepcion
+        self.chat = self
+        self.completions = self
+
+    def create(self, **_kwargs):
+        raise self._excepcion
+
+
+def _motor_que_falla(excepcion):
+    from core.llm_engine import MotorLLM
+    return MotorLLM(cliente=_ClienteQueFalla(excepcion))
+
+
+def test_un_timeout_no_culpa_a_la_conexion():
+    import httpx
+    import openai
+    import pytest as _pytest
+
+    from core.llm_engine import ModeloDemasiadoLento
+
+    motor = _motor_que_falla(
+        openai.APITimeoutError(request=httpx.Request("POST", "http://x"))
+    )
+    with _pytest.raises(ModeloDemasiadoLento) as fallo:
+        motor.responder([{"role": "user", "content": "hola"}])
+
+    mensaje = str(fallo.value).lower()
+    assert "internet" not in mensaje, (
+        "un tiempo de espera agotado no debe mandar a revisar la conexion"
+    )
+    assert "temperatura" in mensaje, (
+        "el mensaje debe apuntar a la causa probable, que es la temperatura alta"
+    )
+
+
+def test_un_fallo_de_red_si_culpa_a_la_conexion():
+    import httpx
+    import openai
+    import pytest as _pytest
+
+    from core.llm_engine import SinConexionLLM
+
+    motor = _motor_que_falla(
+        openai.APIConnectionError(request=httpx.Request("POST", "http://x"))
+    )
+    with _pytest.raises(SinConexionLLM) as fallo:
+        motor.responder([{"role": "user", "content": "hola"}])
+    assert "internet" in str(fallo.value).lower()
+
+
+def test_las_dos_causas_son_excepciones_distintas():
+    """Si compartieran tipo, la GUI no podria darles trato distinto manana."""
+    from core.llm_engine import ModeloDemasiadoLento, SinConexionLLM
+
+    assert ModeloDemasiadoLento is not SinConexionLLM
+    assert not issubclass(ModeloDemasiadoLento, SinConexionLLM)
+    assert not issubclass(SinConexionLLM, ModeloDemasiadoLento)
+
+
+def test_el_slider_no_llega_a_la_temperatura_que_atasca_al_modelo():
+    """El tope del slider sale de una medicion, no de una intuicion.
+
+    1.45 y por debajo respondieron siempre en segundos; 1.5 se atasco unos 100 s en dos
+    de cada tres intentos, mas que el tiempo de espera de la aplicacion. Un control que
+    la usuaria puede mover hasta un valor que rompe la aplicacion no es un control.
+    """
+    from config import TEMPERATURA_MAXIMA, TEMPERATURA_PREDETERMINADA
+
+    assert TEMPERATURA_MAXIMA < 1.5, "1.5 atasca al modelo de razonamiento"
+    assert TEMPERATURA_MAXIMA > TEMPERATURA_PREDETERMINADA, (
+        "el tope debe dejar margen por encima del valor por defecto, o el slider no "
+        "sirve para demostrar nada"
+    )
