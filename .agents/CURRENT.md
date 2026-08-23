@@ -1,16 +1,15 @@
 # CURRENT - Mini-JARVIS
 
 ```yaml
-updated_at: 2026-08-23 (sesion 4)
-source_commit: (ver ultimo [STATE]; limpio)
+updated_at: 2026-08-23 (sesion 5, cierre)
+source_commit: (ver ultimo [STATE]; limpio y sincronizado con origin/main)
 assurance: Lean
 active_plan: PLAN_v1.0-entrega-27ago.md
-active_task: ninguna — sesion cerrada, Fase 2 bloqueada esperando el OK de la duena
-last_verdict: auditoria de cierre de Fase 1 = NO APTO; los 3 defectos corregidos en
-  72f1134 y publicados. Los 2 hallazgos que quedaban abiertos, cerrados en b215812.
-  Fase 1 tecnicamente completa y sin deuda de auditoria pendiente.
+active_task: ninguna — no queda trabajo de codigo pendiente
+last_verdict: enunciado repasado ENTERO y cerrado. Los 7 requisitos obligatorios, los
+  5 tecnicos, los 5 eticos y las 6 preguntas guia, cubiertos.
 backup: remote origin -> https://github.com/TahisMacias/proyecto-minijarvis (publico)
-deadline: 2026-08-27
+deadline: 2026-08-27  (QUEDAN 4 DIAS)
 ```
 
 ## COMO RETOMAR EN UNA SESION NUEVA
@@ -21,33 +20,35 @@ El diseno completo esta en `docs/specs/2026-08-13-mini-jarvis-design.md`.
 
 ## Next action
 
-**FASE 2 COMPLETA.** Las cuatro tareas en APTO el 2026-08-23, ocho dias antes de su
-fecha limite, y con los tres bloques que pidio la duena, no un subconjunto.
+**NO QUEDA TRABAJO DE CODIGO.** El repaso completo del enunciado esta cerrado. Todo lo
+que falta es de la duena y ninguna parte se puede automatizar.
 
-Lo que queda antes de la Fase 3 **es todo suyo**. Ningun agente puede firmarlo:
+### Lo unico que de verdad importa ahora
 
-1. **H-15 — probar las herramientas por voz.** Empezar por *"cual es la raiz cuadrada
-   de 3340"*, que es el fallo que origino la calculadora. Despues la bateria, una
-   busqueda, y abrir Wikipedia. Por ultimo pedirle un sitio prohibido: debe negarse
-   con palabras, sin abrir nada.
-2. **H-09 BIS — volver a firmar los estados sobre la ventana nueva.** El tema cambio
-   de claro a oscuro por completo; la firma del 14 de agosto era sobre la ventana
-   pastel y no vale. Es el unico criterio del proyecto marcado como NO APTO
-   automatico, asi que conviene mirarlo en serio.
-3. **H-14 — mover los sliders** y comprobar que la diferencia se nota y se explica.
-4. **Reprobar 2.3, 5.1 y 5.3** de `docs/pruebas-manuales.md`, que sigue pendiente
-   desde la Fase 1.
-5. **R-01 — regresion**: repetir H-06 y H-12 para comprobar que las herramientas y los
-   controles nuevos no rompieron la conversacion basica ni el manejo de errores.
+1. **GRABAR EL VIDEO.** Es el mayor riesgo abierto del proyecto. El guion esta escrito
+   y probado en `docs/guion-video.md`: bloques por minuto, lo que dice entre comillas
+   para leerlo tal cual, y las frases a Elena ya verificadas. Ella dijo el 2026-08-23
+   que lo grabaria al dia siguiente.
+2. **Ensayar la sustentacion** con `docs/guion-mapa-atencion.md`, que ya trae
+   preparadas las respuestas a las seis preguntas guia de la seccion 12.
 
-Despues, **Fase 3**: informe (T-16), video (T-17) y ensayo (T-18). Los dias 26 y 27
-son intocables y no se escribe codigo de producto.
+### Checks humanos que siguen pendientes
 
-### Aviso sobre el calendario
+- **H-07 (la voz).** Firmado el 14 con Dalia. Desde entonces la voz cambio dos veces y
+  hoy es `es-AR-ElenaNeural`. La firma no se hereda: hay que volver a oirla en la app.
+- **H-09 (los estados).** Firmado el 14 sobre la ventana pastel. Ha habido TRES disenos
+  desde entonces. Hay que volver a mirarlo sobre el diseno actual. Es el unico criterio
+  del proyecto marcado como NO APTO automatico.
+- **H-10 y H-11**: siguen en contradiccion desde la auditoria del 14. Solo ella puede
+  decir si se hicieron. Ver `TESTING.md`.
+- **Prueba 5.3** de `docs/pruebas-manuales.md`: apagar el wifi y ver el triangulo
+  ambar. Ya lo hizo de facto probando el modo sin internet, pero sin marcarlo.
 
-Quedan 10 dias. La Fase 2 se hizo en uno, asi que el margen sigue intacto: el riesgo
-que se advirtio al abrirla con alcance completo **no se materializo**. Ahora el camino
-critico ya no es el codigo, es el informe y el video.
+### Antes de la entrega
+
+- Verificar saldo en Together AI la vispera (26 ago).
+- Correr `python -m core.modo_local` si alguna vez se limpia la cache: sin esos modelos
+  descargados, el modo sin internet tarda un minuto en vez de cuatro segundos.
 
 ## Blockers
 
@@ -72,24 +73,47 @@ critico ya no es el codigo, es el informe y el video.
   instalaba de rebote porque matplotlib depende de ella.
   Instalacion desde cero verificada en un entorno limpio **antes** de ese cambio; la
   verificacion con el `requirements.txt` nuevo queda para T-18.
-- **128 pruebas verdes en ~4 s**, sin red, sin microfono y sin gastar saldo.
+- **171 pruebas verdes en ~12 s**, sin red, sin microfono y sin gastar saldo.
 - Codigo entregado: `config.py`, los seis modulos de `core/`, `gui/desktop_app.py`,
   `main.py`, `exploration/transformer_lab.py`, `Iniciar Mini-JARVIS.bat`.
-- **`tools/` entregado (T-15)**: `calcular`, `estado_laptop`, `buscar_web` y
-  `abrir_pagina`. La calculadora **no usa `eval`**: analiza con `ast` contra lista
+- **`tools/` entregado (T-15)**: SEIS herramientas — `calcular`, `clima`, `hora`,
+  `estado_laptop`, `buscar_web` y `abrir_pagina`. La calculadora **no usa `eval`**: analiza con `ast` contra lista
   blanca y evalua el arbol a mano. Verificado contra la API real: el modelo las pide
   por su cuenta.
-- **Ventana rediseñada (T-19 + T-14)**: tema oscuro turquesa y rosa, tres columnas sin
-  pestanas, mapa de atencion en superposicion, sliders, indicador de memoria, visor de
-  system prompt y selector de modelo en caliente.
+- **Ventana en su TERCER diseno (T-20 "neon minimo")**, elegido por la duena entre
+  tres bocetos dibujados. Sin cajas, dos columnas, el reactor a la izquierda.
+- **La asistente se llama Elena** y responde a su nombre. El proyecto sigue siendo
+  Mini-JARVIS. El nombre vive en `config.NOMBRE_ASISTENTE`, un solo sitio.
+- **Modo sin internet (T-21)**: oye con faster-whisper, piensa con Qwen2.5-0.5B y habla
+  con la voz de Windows, todo en local. Cambia solo al caerse la red y lo avisa. Los
+  modelos se precalientan al arrancar; sin eso el primer turno tardaba mas de un minuto
+  y ahora tarda cuatro segundos.
 - **T-13 cerrada en APTO**: su contenido quedo absorbido por T-19. Ya no es una
   pestana; el laboratorio se ve a la vez que la conversacion.
 - La extraccion de atencion sobre BETO exige `attn_implementation="eager"`; el
   laboratorio lo verifica en tiempo de ejecucion y falla con mensaje explicito si no.
 - El enunciado en PDF **no esta versionado** a proposito: es material del docente y el
-  repositorio es publico.
+  repositorio es publico. **Vive en la raiz local y en Descargas.** SE LEYO ENTERO el
+  2026-08-23; hasta entonces el proyecto trabajaba contra el resumen de APPCORE.md.
 
 ## Open findings
+
+- **EL HALLAZGO DE LA SEMANA: nadie habia leido el enunciado entero.** El proyecto
+  trabajaba contra `APPCORE.md`, un resumen escrito en la primera sesion. El PDF estaba
+  en la carpeta local todo el tiempo, y el propio `INDEX.md` lo declaraba "maxima
+  autoridad academica". Leerlo el 2026-08-23 encontro, en una sola pasada: que faltaba
+  **positional encoding**, que lo pide dos veces y cae en el criterio del 25 %; que la
+  rubrica premia una **interfaz tipo HUD** que refuerce la identidad Jarvis, cuando el
+  diseno se estaba haciendo contra descripciones sueltas de la duena; que **el clima y
+  la hora** estaban en la lista de funciones reales; y dos huecos teoricos.
+  **Regla que sale de aqui: leer la fuente antes de trabajar contra un resumen de la
+  fuente.** Es la misma leccion que el proyecto ya tenia escrita para los modelos de la
+  API -"que algo aparezca en un listado no prueba nada"- aplicada al sitio donde mas
+  dolia.
+- **Describir un diseno con palabras no funciona.** Dos intentos fallidos -tematica
+  Miku, luego HUD- disenados a partir de descripciones. El tercero se acerto dibujando
+  tres bocetos y dejando que eligiera mirando. Lo mismo con la voz: ocho muestras y
+  eligio de oido. **Cuando el criterio es perceptual, hay que ensenar, no describir.**
 
 - **Un color que el usuario no puede nombrar no comunica nada.** Los tres defectos que
   encontro la duena viven en la frontera entre el codigo y la percepcion: ninguna

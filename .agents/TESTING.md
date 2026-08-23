@@ -78,11 +78,18 @@ directa de codigo desde este archivo.
       **no se puede reutilizar**. Mirar de lejos, sin leer el texto, y despues
       entrecerrando los ojos: ¿se distinguen los cuatro estados por color y por forma?
 
+- [ ] H-19. **Modo sin internet (T-21).** Apagar el wifi y hablarle: debe avisar en
+      ambar, responder con el modelo local y no caerse. **Hecho de facto por la duena el
+      2026-08-23** -confirmo que funciona- pero sin marcarlo formalmente.
+      Aviso para el video: NO preguntarle datos en este modo. A la misma pregunta sobre
+      la capital de Ecuador contesto "Quito" una vez y "Santo Domingo" la otra. Con
+      "quien eres" responde bien y demuestra lo mismo.
+
 ## Fase 3 - Cierre (26 y 27 de agosto)
 
-- [ ] H-16. Leer el informe completo -> se entiende sin haber visto el codigo, y ninguna
+- [ ] H-16. Leer el informe completo (borrador ya escrito en `docs/informe-tecnico.md`) -> se entiende sin haber visto el codigo, y ninguna
       afirmacion contradice lo que la aplicacion hace de verdad.
-- [ ] H-17. Ver el video -> muestra el pipeline, los estados y la exploracion en 2-4 min,
+- [ ] H-17. Grabar y ver el video (guion listo en `docs/guion-video.md`) -> muestra el pipeline, los estados y la exploracion en 2-4 min,
       y sirve como respaldo si la demo en vivo falla.
 - [ ] H-18. Instalar el proyecto desde el repositorio publico en **otra maquina** ->
       arranca siguiendo solo el README. Lo exige la seccion 6 del enunciado.

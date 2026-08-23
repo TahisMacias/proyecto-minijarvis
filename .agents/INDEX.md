@@ -51,6 +51,9 @@
 - `core/stt_client.py` (T-06): WAV -> texto con Whisper en Together AI.
 - `core/llm_engine.py` (T-07): mensajes -> texto o peticion de tool. **No ejecuta
   herramientas.** Contiene el `SYSTEM_PROMPT` con la declaracion de ser una IA.
+- `core/modo_local.py` (T-21): respaldo sin internet. Oye, piensa y habla en local
+  cuando se cae la red. Los envoltorios imitan la forma de las piezas de nube, por
+  eso el orquestador no se entera. `python -m core.modo_local` descarga los modelos.
 - `core/tts_engine.py` (T-08): texto -> voz reproducida. `python -m core.tts_engine`
   como comprobacion manual (H-07).
 - `core/orchestrator.py` (T-09): maquina de estados y el hilo de cada turno. **No
@@ -60,7 +63,7 @@
   tres columnas, **sin pestanas** desde el rediseno del 2026-08-23.
 - `main.py`: punto de entrada. `Iniciar Mini-JARVIS.bat`: lanzador con doble clic.
 - `tests/`: memoria, parseo del LLM, orquestador, paleta de estados, barra
-  espaciadora y herramientas. **128 pruebas**, sin red, sin microfono y sin saldo.
+  espaciadora y herramientas. **171 pruebas**, sin red, sin microfono y sin saldo.
 - `pytest.ini`: `pythonpath = .` para que el comando del gate encuentre `core`.
 - `requirements.txt`: 14 dependencias fijadas. Auditado con AST el 2026-08-23: los 11
   imports de terceros estan declarados. Tres pines (`psutil`, `duckduckgo-search`,
@@ -73,13 +76,21 @@
   cuentas con texto de un modelo y abre un proceso. Dos reglas: **nada de `eval`**
   (analisis con `ast` y lista blanca) y la url se valida por hostname ANTES de
   construir el comando, que es una lista de argumentos y nunca una cadena.
-- `tests/test_tools.py`: 56 pruebas. La mas importante lee el AST de `tools/` y falla
+- `tests/test_tools.py`: 78 pruebas. La mas importante lee el AST de `tools/` y falla
   si aparece `eval`, `exec` o `compile`. Verifica una prohibicion, no un comportamiento.
 
 ## Documentacion para personas
 
+- `docs/informe-tecnico.md` (T-16): borrador del informe. Cifras verificadas contra el
+  repositorio, no recordadas. Pendiente de que la duena lo lea (H-16).
+- `docs/guion-video.md` (T-17): guion del video por bloques de tiempo, escrito para
+  leerse mientras se graba. Incluye que recortar si sobra metraje y las tres frases
+  minimas con las que el video ya cumple.
+- `docs/guion-mapa-atencion.md`: como explicar el mapa de atencion, que es el 25 % de
+  la rubrica. Escrito porque la duena miro el grafico y no lo entendia: correcto y sin
+  explicar no vale como entregable.
 - `docs/pruebas-manuales.md`: recorrido de pruebas de la Fase 1, escrito para usarse.
 - `docs/evidencia/`: salida del laboratorio, captura de la ventana y la tabla de
   cobertura de los 7 fallos previstos.
 
-Last reindexed: 2026-08-23, al cerrar la Fase 2 completa.
+Last reindexed: 2026-08-23, al cerrar la sesion del repaso al enunciado.

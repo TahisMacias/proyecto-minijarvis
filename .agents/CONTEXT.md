@@ -352,3 +352,80 @@ Seis entradas compactadas el 2026-08-14. Lo que hay que recordar:
   sobre la ventana clara y no vale) y la regresion R-01.
 - Next: **nada de agente en el codigo de producto.** Todo lo que queda antes de la
   Fase 3 son checks humanos. Despues, informe (T-16), video (T-17) y ensayo (T-18).
+
+## 2026-08-23 - Se leyo el enunciado entero, y cambio medio proyecto
+
+- Changed: casi todo. 14 commits. `tools/` (dos herramientas nuevas),
+  `gui/desktop_app.py` (dos redisenos), `core/modo_local.py` (nuevo), `config.py`,
+  `core/llm_engine.py`, `core/stt_client.py`, `core/tts_engine.py`,
+  `exploration/transformer_lab.py`, README, informe, tres guiones nuevos en `docs/`.
+
+- **EL HALLAZGO QUE ORDENA TODO LO DEMAS: nadie habia leido el enunciado.** El proyecto
+  llevaba diez dias trabajando contra `APPCORE.md`, que es un resumen escrito en la
+  primera sesion. El PDF estaba en la carpeta local desde el principio y el propio
+  `INDEX.md` lo declaraba "maxima autoridad academica; ante cualquier conflicto, manda
+  este documento". Se abrio por primera vez hoy, y solo porque la duena insistio tres
+  veces en que el proyecto pedia cosas que no estabamos haciendo.
+  Ella tenia razon en dos de las tres, y en la tercera se equivocaba: pero **el que
+  estaba operando mal era yo**, por discutir de memoria en vez de abrir la fuente.
+
+- Lo que encontro esa lectura, en una sola pasada:
+  - **Positional encoding**, pedido dos veces (secciones 2.2 y 3.1) y ausente del
+    laboratorio. Cae dentro del criterio del 25 %, el de mayor peso.
+  - La rubrica premia una **interfaz tipo HUD que refuerce la identidad Jarvis**
+    (15 %). Se llevaba dos disenos hechos contra descripciones de la duena sin
+    contrastarlos nunca con lo que califica.
+  - **Clima y hora** figuran en la lista de funciones reales de la 5.2. Faltaban las
+    dos.
+  - Dos huecos teoricos: encoder-only vs decoder-only, y la pregunta guia numero 5.
+  - Y lo que NO pedia: funcionar sin internet. La seccion 6 dice "por API en la nube
+    **o** ejecutado localmente", y "sin conexion" aparece solo como error a atender.
+
+- **Error mio de calendario, con consecuencias.** Toda la sesion anterior se fecho como
+  2026-08-17 copiando los archivos del proyecto, cuando la fecha real era el 23. Le dije
+  varias veces que quedaban diez dias cuando quedaban cuatro, y con esa cifra tomo
+  decisiones de alcance. Corregido en 11 archivos.
+
+- **MODO SIN INTERNET (T-21), construido aunque el enunciado no lo exija.** Lo pidio
+  cuatro veces. Las tres primeras se le respondio con el enunciado en la mano y
+  midiendo que partes ya funcionaban offline; era correcto y no era lo que pedia. Es su
+  proyecto. Se comprobo antes de empezar que las piezas existieran: faster-whisper y
+  pyttsx3 tienen rueda para Python 3.14, llama-cpp-python NO, asi que el modelo local va
+  sobre torch y transformers, que ya estaban.
+  Los tres envoltorios tienen la forma de la pieza que sustituyen, asi que **no se toco
+  ni una linea del orquestador**: es el rendimiento de haber inyectado sus dependencias
+  en T-09.
+  La primera version tardaba mas de un minuto en el primer turno y la duena la dio por
+  rota. Tenia razon: **un minuto sin ninguna senal es indistinguible de estar colgado.**
+  Se precalientan los modelos al arrancar y paso a 6.2 s el primero y 3.8 s los
+  siguientes.
+
+- **Tres disenos en un dia, y el metodo importo mas que el diseno.** Miku oscuro y HUD
+  se hicieron adivinando a partir de descripciones, y los dos fallaron. El tercero se
+  acerto dibujando tres bocetos completos y dejando que eligiera mirando. Igual con la
+  voz: ocho muestras y eligio de oido. **Cuando el criterio es perceptual, hay que
+  ensenar, no describir.** Costo dos intentos aprenderlo.
+
+- **La asistente se llama Elena.** El proyecto sigue siendo Mini-JARVIS: la seccion 4
+  del enunciado separa las dos cosas y permite identidad propia si esta documentada en
+  un system prompt. El nombre vive en una sola constante.
+
+- Defectos reales encontrados por la duena usando la aplicacion, todos corregidos:
+  `--kiosk=url` abria Edge en su pagina de inicio; el navegador se abria a pantalla
+  completa sin forma obvia de salir; el modelo alterno devolvia 503 porque Together lo
+  retiro en tres dias; temperatura 1.5 atascaba al modelo 100 s y el mensaje culpaba a
+  la conexion; `duckduckgo_search` devolvia cero resultados de forma intermitente y el
+  modelo concluia que no habia internet; el indicador de memoria se cortaba a media
+  palabra. **Ninguno lo habria visto una prueba automatica.**
+
+- Tres documentos nuevos para personas, no para agentes: `docs/guion-mapa-atencion.md`
+  (como explicar el 25 % de la nota), `docs/guion-video.md` (bloques por minuto, para
+  leer mientras se graba) y el borrador del informe tecnico.
+
+- Gates: 171 pruebas verdes; compileall exit 0; el laboratorio corre entero con la red
+  bloqueada por variable de entorno.
+
+- Unresolved: **H-07 y H-09 hay que volver a firmarlos.** La voz cambio dos veces y la
+  ventana tres desde que se firmaron. H-10 y H-11 siguen en contradiccion desde el 14.
+
+- Next: **nada de agente.** Video y sustentacion, las dos de la duena. Quedan 4 dias.

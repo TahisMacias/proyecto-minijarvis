@@ -492,6 +492,18 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 - Risk triggers: ninguno tecnico. El riesgo es de alcance: es la clase de tarea que
   se come los dias que hacen falta para el informe y el video.
 
+### Repaso completo del enunciado (2026-08-23)
+
+Se leyo el PDF entero por primera vez. Hasta entonces el proyecto trabajaba contra el
+resumen de `APPCORE.md`. Lo que encontro y ya esta cerrado:
+
+- **Positional encoding** (secciones 2.2 y 3.1), ausente del laboratorio pese a estar
+  pedido dos veces y caer en el criterio del 25 %. Anadido como nivel 3 en `T-11`.
+- **Interfaz tipo HUD** premiada por el criterio del 15 %. Origen de T-19 y T-20.
+- **Clima y hora** en la lista de funciones reales de la 5.2. Anadidas a T-15.
+- **Encoder-only vs decoder-only** y la pregunta guia numero 5, ausentes del informe.
+- Y lo que NO pide: funcionar sin internet.
+
 ## Cierre de Fase 2 — fecha limite 25 de agosto
 
 - [x] **T-13, T-14, T-15 y T-19 en APTO** (2026-08-23, ocho dias antes de la fecha
@@ -504,6 +516,37 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
 - [ ] **R-01**: repetir H-06 y H-12 para comprobar que las herramientas y los
       controles nuevos no rompieron la conversacion basica ni el manejo de errores.
 - [x] Auditoria de tarea con gate ejecutado en cada una; commit y push.
+
+### T-20 - Tercer diseno: neon minimo
+
+- Status: **done** (2026-08-23). Veredicto: **APTO** (commit `87a21dc`).
+- Los dos disenos anteriores se hicieron adivinando a partir de descripciones y los dos
+  fallaron. Este se eligio dibujando tres bocetos completos y dejando que la duena
+  eligiera mirando. **El cambio de metodo fue el arreglo, no el diseno.**
+- H-09 recomprobado antes de escribir interfaz: los cuatro bordes contra su relleno dan
+  150, 120, 98 y 145 de diferencia de luminosidad; contra el fondo, 194, 155, 123 y 188.
+  El minimo exigido es 80.
+- Human checks: **H-09 BIS pendiente.** Van tres disenos desde que se firmo.
+
+### T-21 - Modo sin internet
+
+- Status: **done** (2026-08-23). Veredicto: **APTO** (commits `12801b1`, `cb17970`).
+- **No lo exige el enunciado.** La seccion 6 permite API o local, y "sin conexion"
+  aparece solo como error a atender, que ya se atendia. La duena lo pidio cuatro veces:
+  es su proyecto.
+- Comprobado ANTES de empezar que las piezas existieran para Python 3.14:
+  faster-whisper y pyttsx3 tienen rueda, llama-cpp-python **no**. El modelo local va
+  sobre torch y transformers, que ya estaban instalados para el laboratorio.
+- No se toco el orquestador: los envoltorios tienen la forma de las piezas de nube.
+- Acceptance:
+  - [x] Oir, pensar y hablar sin conexion, con cambio automatico.
+  - [x] El respaldo NO se activa ante credenciales invalidas, solo ante falta de red.
+        Cuatro pruebas dedicadas: es la regla mas importante del modulo.
+  - [x] La aplicacion dice cuando esta en modo local, en la conversacion y con un aviso
+        ambar. No disimula que responde peor.
+  - [x] Primer turno sin internet en 6.2 s (era mas de 60 s antes de precalentar).
+- Human checks: H-19 — usarlo con el wifi apagado de verdad. **Hecho de facto por la
+  duena el 2026-08-23**, sin marcar formalmente.
 
 ---
 
