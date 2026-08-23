@@ -67,13 +67,20 @@ from core.orchestrator import Estado, TipoEvento
 
 TITULO = "Mini-JARVIS"
 
-ANCHO_VENTANA = 1120          # tres columnas: reactor, conversacion y laboratorio
-ALTO_VENTANA = 720
+ANCHO_VENTANA = 1000          # dos columnas: el reactor y todo lo demas
+# El diseno C apila conversacion, controles y laboratorio en una sola columna, asi
+# que necesita mas alto que las versiones de tres columnas. Se subio de 720 a 790
+# porque los botones del laboratorio quedaban cortados por el borde inferior: antes
+# de eso se probo apretando margenes y alturas, y solo se gano ruido visual. Cuando
+# el contenido no cabe, lo honesto es agrandar la ventana, no encoger el contenido.
+# Sigue limitado por FRACCION_MAXIMA_DE_PANTALLA, asi que en una pantalla pequena se
+# recorta solo.
+ALTO_VENTANA = 790
 FRACCION_MAXIMA_DE_PANTALLA = 0.88
 
 MILIS_ANTIRREBOTE_ESPACIO = 60
 
-LADO_LIENZO = 264             # el reactor HUD: tres anillos, marcas y barrido
+LADO_LIENZO = 300             # la pieza protagonista del diseno C
 MILIS_ANIMACION = 90
 
 LEYENDA_POR_ESTADO = {
@@ -100,7 +107,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         customtkinter.set_appearance_mode("dark")
         self.title(TITULO)
         self.geometry(f"{self._ancho_que_cabe()}x{self._alto_que_cabe()}")
-        self.minsize(880, 560)
+        self.minsize(860, 620)
         self.configure(fg_color=PALETA["fondo_profundo"])
 
         # `motor` y `memoria` llegan para los controles de sustentacion (T-14): los
@@ -117,6 +124,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         self._imagen_mapa = None
         self._imagen_superpuesta = None
         self._ruta_mapa_actual = None
+        self._tokens_texto = ""
         self._superposicion = None
         self._cierre_de_espacio_pendiente = None
 
@@ -154,19 +162,26 @@ class AplicacionMiniJarvis(customtkinter.CTk):
     # --- Construccion de la ventana ------------------------------------------
 
     def _construir(self) -> None:
-        # Los minsize NO son decorativos. Sin ellos, un texto largo dentro de una
-        # columna la ensancha y aplasta a las vecinas: al llenarse la memoria, el aviso
-        # de descarte hacia crecer la columna central y la del laboratorio se quedaba
-        # con el titulo y el boton cortados. Se vio abriendo la ventana con la memoria
-        # llena, no leyendo el codigo.
-        self.grid_columnconfigure(0, weight=0, minsize=336)  # izquierda: el reactor HUD
-        self.grid_columnconfigure(1, weight=3, minsize=380)  # centro: conversacion
-        self.grid_columnconfigure(2, weight=2, minsize=330)  # derecha: laboratorio
-        self.grid_rowconfigure(0, weight=1)
+        """Maqueta la ventana: cabecera arriba, reactor a la izquierda, todo lo demas
+        apilado a la derecha.
 
+        DISENO C, "NEON MINIMO", elegido por la duena el 2026-08-23 entre tres bocetos
+        dibujados. Las dos versiones anteriores se disenaron adivinando a partir de
+        descripciones y las dos fallaron; esta se eligio mirando.
+
+        LO QUE DEFINE ESTE DISENO ES LO QUE NO TIENE. No hay paneles con borde, ni
+        cajas, ni recuadros dentro de recuadros: eso era lo que hacia que la ventana
+        pareciera un formulario. Aqui solo hay fondo, lineas finas de separacion y
+        texto, con una unica pieza protagonista a la izquierda.
+        """
+        self.configure(fg_color=PALETA["fondo_profundo"])
+        self.grid_columnconfigure(0, weight=0, minsize=380)  # el reactor
+        self.grid_columnconfigure(1, weight=1, minsize=430)  # todo lo demas
+        self.grid_rowconfigure(1, weight=1)
+
+        self._construir_cabecera()
         self._construir_columna_estado()
-        self._construir_columna_conversacion()
-        self._construir_columna_laboratorio()
+        self._construir_columna_derecha()
 
         self.bind_all("<KeyPress-space>", self._al_presionar_espacio)
         self.bind_all("<KeyRelease-space>", self._al_soltar_espacio)
@@ -174,167 +189,168 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         self.protocol("WM_DELETE_WINDOW", self._al_cerrar)
 
         self._escribir(
-            "Mini-JARVIS",
+            "mini-jarvis",
             "Hola. Soy una inteligencia artificial, asi que mis respuestas pueden "
             "contener errores. Manten presionado el boton y hablame.",
         )
 
-    # --- Columna izquierda: el modulo de estado, ahora grande (T-19) ---------
+    def _construir_cabecera(self) -> None:
+        """Nombre arriba a la izquierda y una linea fina que cruza la ventana."""
+        marco = customtkinter.CTkFrame(self, fg_color="transparent")
+        marco.grid(row=0, column=0, columnspan=2, sticky="ew", padx=44, pady=(30, 0))
+        marco.grid_columnconfigure(0, weight=1)
+
+        customtkinter.CTkLabel(
+            marco, text="mini-jarvis", text_color=PALETA["texto_claro"],
+            font=("Segoe UI", 26, "bold"), anchor="w",
+        ).grid(row=0, column=0, sticky="w")
+
+        customtkinter.CTkLabel(
+            marco, text="asistente de voz", text_color=PALETA["texto_tenue"],
+            font=("Segoe UI", 12), anchor="w",
+        ).grid(row=1, column=0, sticky="w", pady=(0, 12))
+
+        # La linea separadora es un frame de 1 px de alto. En un diseno sin cajas es lo
+        # unico que organiza la pantalla, asi que hace bastante trabajo para lo que es.
+        linea = customtkinter.CTkFrame(marco, height=1, fg_color="#242430")
+        linea.grid(row=2, column=0, sticky="ew")
+
+    # --- Izquierda: la pieza protagonista --------------------------------------
 
     def _construir_columna_estado(self) -> None:
-        marco = customtkinter.CTkFrame(self, fg_color=PALETA["superficie"], corner_radius=14,
-                                       border_width=1, border_color=PALETA["superficie_alta"])
-        marco.grid(row=0, column=0, sticky="nsew", padx=(14, 7), pady=14)
+        marco = customtkinter.CTkFrame(self, fg_color="transparent")
+        marco.grid(row=1, column=0, sticky="nsew", padx=(44, 24), pady=(14, 22))
         marco.grid_columnconfigure(0, weight=1)
-        marco.grid_rowconfigure(2, weight=1)
-
-        customtkinter.CTkLabel(
-            marco, text=TITULO, text_color=PALETA["turquesa"],
-            font=("Segoe UI", 30, "bold"),
-        ).grid(row=0, column=0, pady=(22, 2))
-
-        customtkinter.CTkLabel(
-            marco, text="· S I S T E M A   D E   V O Z ·", text_color=PALETA["rosa"],
-            font=("Consolas", 10),
-        ).grid(row=1, column=0, pady=(0, 6))
+        marco.grid_rowconfigure(0, weight=1)
+        marco.grid_rowconfigure(3, weight=1)
 
         self._lienzo = tkinter.Canvas(
             marco, width=LADO_LIENZO, height=LADO_LIENZO,
-            highlightthickness=0, bg=PALETA["superficie"],
+            highlightthickness=0, bg=PALETA["fondo_profundo"],
         )
-        self._lienzo.grid(row=2, column=0, pady=4)
+        self._lienzo.grid(row=1, column=0, pady=(0, 22))
 
         self._leyenda = customtkinter.CTkLabel(
             marco, text=LEYENDA_POR_ESTADO[Estado.REPOSO],
-            text_color=PALETA["texto_claro"], font=("Segoe UI", 15), wraplength=250,
+            text_color=PALETA["texto_claro"], font=("Segoe UI", 17), wraplength=300,
         )
-        self._leyenda.grid(row=3, column=0, pady=(6, 12))
+        self._leyenda.grid(row=2, column=0, pady=(0, 20))
 
+        # Boton de contorno, no relleno: en este diseno lo lleno pesa demasiado.
         self._boton = customtkinter.CTkButton(
-            marco, text="Manten presionado para hablar", height=58, corner_radius=29,
-            fg_color=PALETA["superficie_alta"], hover_color=PALETA["turquesa"],
-            text_color=PALETA["texto_claro"], font=("Segoe UI", 14, "bold"),
-            border_width=3, border_color=BORDE_REPOSO,
+            marco, text="manten presionado para hablar", height=58, corner_radius=29,
+            fg_color="transparent", hover_color=PALETA["superficie"],
+            text_color=PALETA["texto_claro"], font=("Segoe UI", 14),
+            border_width=2, border_color=BORDE_REPOSO,
         )
-        self._boton.grid(row=4, column=0, padx=18, pady=(0, 6), sticky="ew")
+        self._boton.grid(row=3, column=0, sticky="new", padx=26)
         self._boton.bind("<ButtonPress-1>", self._al_presionar)
         self._boton.bind("<ButtonRelease-1>", self._al_soltar)
 
         customtkinter.CTkLabel(
-            marco, text="la barra espaciadora hace lo mismo",
+            marco, text="o la barra espaciadora",
             text_color=PALETA["texto_tenue"], font=("Segoe UI", 10),
-        ).grid(row=5, column=0, pady=(0, 16))
+        ).grid(row=4, column=0, pady=(10, 0))
 
-    # --- Columna central: conversacion + controles de sustentacion (T-14) ----
+    # --- Derecha: conversacion, controles y laboratorio, apilados ---------------
 
-    def _construir_columna_conversacion(self) -> None:
-        marco = customtkinter.CTkFrame(self, fg_color=PALETA["superficie"], corner_radius=14,
-                                       border_width=1, border_color=PALETA["superficie_alta"])
-        marco.grid(row=0, column=1, sticky="nsew", padx=7, pady=14)
+    def _construir_columna_derecha(self) -> None:
+        marco = customtkinter.CTkFrame(self, fg_color="transparent")
+        marco.grid(row=1, column=1, sticky="nsew", padx=(24, 44), pady=(14, 22))
         marco.grid_columnconfigure(0, weight=1)
-        marco.grid_rowconfigure(1, weight=1)
+        marco.grid_rowconfigure(1, weight=1, minsize=120)
 
-        self._encabezado(marco, "Conversacion").grid(
-            row=0, column=0, sticky="w", padx=16, pady=(14, 6))
+        self._encabezado(marco, "conversacion").grid(row=0, column=0, sticky="w")
 
         self._conversacion = customtkinter.CTkTextbox(
-            marco, fg_color=PALETA["fondo_profundo"], text_color=PALETA["texto_claro"],
-            border_width=0, font=("Segoe UI", 13), wrap="word", corner_radius=12,
+            marco, fg_color=PALETA["superficie"], text_color=PALETA["texto_claro"],
+            border_width=0, font=("Segoe UI", 13), wrap="word", corner_radius=10,
+            height=130,
         )
-        self._conversacion.grid(row=1, column=0, sticky="nsew", padx=14, pady=(0, 10))
+        self._conversacion.grid(row=1, column=0, sticky="nsew", pady=(6, 16))
         self._conversacion.configure(state="disabled")
 
-        self._construir_controles(marco).grid(
-            row=2, column=0, sticky="ew", padx=14, pady=(0, 14))
+        self._construir_controles(marco).grid(row=2, column=0, sticky="ew")
+        self._construir_laboratorio(marco).grid(row=3, column=0, sticky="ew", pady=(16, 0))
 
     def _construir_controles(self, contenedor):
-        """Controles de sustentacion (T-14), dentro de la distribucion nueva.
+        """Controles de sustentacion (T-14), sin caja que los encierre.
 
         No estan escondidos en un menu a proposito: la sustentacion consiste en
         ensenar el efecto de estos numeros en vivo, asi que tienen que estar a la vista
         y al lado de la conversacion sobre la que actuan.
         """
-        marco = customtkinter.CTkFrame(contenedor, fg_color=PALETA["superficie_alta"],
-                                       corner_radius=12)
+        marco = customtkinter.CTkFrame(contenedor, fg_color="transparent")
         marco.grid_columnconfigure(1, weight=1)
 
-        # --- Selector de modelo, en caliente ---
+        self._encabezado(marco, "controles").grid(
+            row=0, column=0, columnspan=3, sticky="w", pady=(0, 10))
+
         customtkinter.CTkLabel(
-            marco, text="Modelo", text_color=PALETA["texto_tenue"],
-            font=("Segoe UI", 11),
-        ).grid(row=0, column=0, sticky="w", padx=(12, 8), pady=(10, 4))
+            marco, text="modelo", text_color=PALETA["texto_tenue"],
+            font=("Segoe UI", 12), anchor="w",
+        ).grid(row=1, column=0, sticky="w", padx=(0, 14))
 
         self._selector_modelo = customtkinter.CTkOptionMenu(
             marco,
             values=[MODELO_LLM_PREDETERMINADO, MODELO_LLM_ALTERNO],
             command=self._cambiar_modelo,
-            fg_color=PALETA["superficie"], button_color=PALETA["turquesa"],
-            button_hover_color=PALETA["rosa"], text_color=PALETA["texto_claro"],
+            fg_color=PALETA["superficie"], button_color=PALETA["superficie_alta"],
+            button_hover_color=PALETA["turquesa"], text_color=PALETA["texto_claro"],
             font=("Segoe UI", 11), dropdown_font=("Segoe UI", 11),
+            corner_radius=8, height=30,
         )
-        self._selector_modelo.grid(row=0, column=1, columnspan=2, sticky="ew",
-                                   padx=(0, 12), pady=(10, 4))
+        self._selector_modelo.grid(row=1, column=1, columnspan=2, sticky="ew", pady=2)
 
-        # --- Sliders de muestreo ---
         self._slider_temperatura, self._valor_temperatura = self._construir_slider(
-            marco, fila=1, etiqueta="Temperatura", minimo=0.0, maximo=TEMPERATURA_MAXIMA,
+            marco, fila=2, etiqueta="temperatura", minimo=0.0, maximo=TEMPERATURA_MAXIMA,
             inicial=TEMPERATURA_PREDETERMINADA, al_mover=self._cambiar_temperatura)
 
         self._slider_top_p, self._valor_top_p = self._construir_slider(
-            marco, fila=2, etiqueta="top_p", minimo=0.1, maximo=1.0,
+            marco, fila=3, etiqueta="top_p", minimo=0.1, maximo=1.0,
             inicial=TOP_P_PREDETERMINADO, al_mover=self._cambiar_top_p)
 
-        # --- Indicador de memoria ---
-        # wraplength para que el aviso de descarte, que es la frase mas larga de la
-        # ventana, se parta en dos lineas en vez de ensanchar la columna.
+        # El indicador ocupa SU PROPIA FILA a lo ancho. Compartiendo fila con un boton
+        # se quedaba sin sitio y se cortaba a media palabra: se leia "Memoria 1/10 · 20"
+        # comiendose "tokens". Se intento acortando el texto y volvio a pasar en cuanto
+        # la ventana se estrechaba: la causa no era el texto sino la celda.
         self._indicador_memoria = customtkinter.CTkLabel(
             marco, text="", text_color=PALETA["texto_tenue"], font=("Segoe UI", 11),
-            anchor="w", justify="left", wraplength=420,
+            anchor="w", justify="left", wraplength=460,
         )
-        # El indicador ocupa SU PROPIA FILA, a lo ancho de las tres columnas.
-        # Compartiendo fila con el boton se quedaba sin sitio y se cortaba a media
-        # palabra: se leia "Memoria 1/10 · 20" comiendose "tokens". Se intento
-        # acortando el texto y volvio a pasar en cuanto la ventana se estrechaba. La
-        # causa no era la longitud del texto sino la celda; se arregla la celda.
         self._indicador_memoria.grid(row=4, column=0, columnspan=3, sticky="ew",
-                                     padx=12, pady=(2, 10))
+                                     pady=(10, 0))
 
-        customtkinter.CTkButton(
-            marco, text="Ver system prompt", width=130, height=26,
-            fg_color=PALETA["superficie"], hover_color=PALETA["turquesa"],
-            text_color=PALETA["texto_claro"], font=("Segoe UI", 11),
-            command=self._mostrar_system_prompt,
-        ).grid(row=3, column=2, sticky="e", padx=(0, 12), pady=(6, 2))
-
+        # El acceso al system prompt NO vive aqui: esta abajo, en la fila unica de
+        # botones junto a los del laboratorio. La pantalla de la duena da 760 px utiles
+        # y esta fila extra era justo lo que no cabia.
         return marco
 
     def _construir_slider(self, contenedor, fila, etiqueta, minimo, maximo,
                           inicial, al_mover):
         customtkinter.CTkLabel(
             contenedor, text=etiqueta, text_color=PALETA["texto_tenue"],
-            font=("Segoe UI", 11),
-        ).grid(row=fila, column=0, sticky="w", padx=(12, 8), pady=2)
+            font=("Segoe UI", 12), anchor="w",
+        ).grid(row=fila, column=0, sticky="w", padx=(0, 14), pady=4)
 
         slider = customtkinter.CTkSlider(
             contenedor, from_=minimo, to=maximo, command=al_mover,
-            fg_color=PALETA["superficie"], progress_color=PALETA["turquesa"],
+            fg_color=PALETA["superficie_alta"], progress_color=PALETA["turquesa"],
             button_color=PALETA["rosa"], button_hover_color=PALETA["texto_claro"],
-            height=16,
+            height=14, button_length=0, button_corner_radius=9,
         )
         slider.set(inicial)
-        slider.grid(row=fila, column=1, sticky="ew", padx=(0, 8), pady=2)
+        slider.grid(row=fila, column=1, sticky="ew", padx=(0, 14), pady=4)
 
         valor = customtkinter.CTkLabel(
-            contenedor, text=f"{inicial:.2f}", text_color=PALETA["turquesa"],
-            font=("Consolas", 12), width=44,
+            contenedor, text=f"{inicial:.2f}", text_color=PALETA["texto_claro"],
+            font=("Consolas", 12), width=44, anchor="e",
         )
-        valor.grid(row=fila, column=2, sticky="e", padx=(0, 12), pady=2)
+        valor.grid(row=fila, column=2, sticky="e", pady=4)
         return slider, valor
 
-    # --- Columna derecha: el laboratorio, ya sin pestana (T-13 + T-19) -------
-
-    def _construir_columna_laboratorio(self) -> None:
-        """El laboratorio, ahora visible a la vez que la conversacion.
+    def _construir_laboratorio(self, contenedor):
+        """El laboratorio, visible a la vez que la conversacion.
 
         Muestra, sobre la ULTIMA frase que dijo la usuaria: como se corta en tokens y
         que numero le toca a cada uno, y el mapa de atencion de BETO para esa misma
@@ -342,67 +358,82 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         y self-attention: no con un ejemplo de libro, sino con lo que se acaba de decir.
 
         Todo el calculo lo hace `exploration/transformer_lab.py`. Aqui no se
-        reimplementa nada: si el laboratorio y esta columna dijeran cosas distintas,
+        reimplementa nada: si el laboratorio y esta seccion dijeran cosas distintas,
         una de las dos estaria mintiendo en la sustentacion.
+
+        En este diseno el laboratorio se resume en dos lineas y el detalle se abre en
+        la superposicion. La version anterior le daba una columna entera y quedaba
+        vacia casi todo el rato.
         """
-        marco = customtkinter.CTkFrame(self, fg_color=PALETA["superficie"], corner_radius=14,
-                                       border_width=1, border_color=PALETA["superficie_alta"])
-        marco.grid(row=0, column=2, sticky="nsew", padx=(7, 14), pady=14)
+        marco = customtkinter.CTkFrame(contenedor, fg_color="transparent")
         marco.grid_columnconfigure(0, weight=1)
-        marco.grid_rowconfigure(2, weight=1)
 
-        # Titulo y subtitulo van en su PROPIO contenedor apilado. Ponerlos los dos en
-        # la misma celda del grid los superpone: se vio en pantalla, con el subtitulo
-        # escrito encima del titulo.
-        cabecera = customtkinter.CTkFrame(marco, fg_color="transparent")
-        cabecera.grid(row=0, column=0, sticky="ew", padx=16, pady=(14, 6))
-        self._encabezado(cabecera, "Laboratorio").pack(anchor="w")
-        customtkinter.CTkLabel(
-            cabecera, text="analisis del transformer", text_color=PALETA["texto_tenue"],
-            font=("Consolas", 9),
-        ).pack(anchor="w", padx=(4, 0))
+        self._encabezado(marco, "laboratorio").grid(row=0, column=0, sticky="w")
 
-        # anchor y justify a la izquierda, y wraplength holgado respecto al ancho de
-        # la columna: con el escalado de Windows al 133 % un wraplength de 280 se
-        # dibuja mas ancho que la columna y la frase se salia por los dos lados.
-        # Se comprobo abriendo la ventana, no leyendo el codigo.
         self._laboratorio_frase = customtkinter.CTkLabel(
-            marco, text="Habla y aqui aparecera el analisis de lo que dijiste.",
-            text_color=PALETA["texto_tenue"], font=("Segoe UI", 11, "italic"),
-            wraplength=195, justify="left", anchor="w",
+            marco, text="habla y aqui aparecera el analisis de lo que dijiste",
+            text_color=PALETA["texto_tenue"], font=("Segoe UI", 11),
+            wraplength=440, justify="left", anchor="w",
         )
-        self._laboratorio_frase.grid(row=1, column=0, sticky="ew", padx=16, pady=(0, 6))
+        self._laboratorio_frase.grid(row=1, column=0, sticky="ew", pady=(6, 2))
 
-        self._laboratorio_tokens = customtkinter.CTkTextbox(
-            marco, fg_color=PALETA["fondo_profundo"], text_color=PALETA["texto_claro"],
-            border_width=0, font=("Consolas", 11), wrap="none", corner_radius=12,
+        self._laboratorio_resumen = customtkinter.CTkLabel(
+            marco, text="—", text_color=PALETA["texto_claro"],
+            font=("Consolas", 12), anchor="w",
         )
-        self._laboratorio_tokens.grid(row=2, column=0, sticky="nsew", padx=14, pady=(0, 8))
-        self._laboratorio_tokens.configure(state="disabled")
+        self._laboratorio_resumen.grid(row=2, column=0, sticky="ew", pady=(0, 8))
+
+        botones = customtkinter.CTkFrame(marco, fg_color="transparent")
+        botones.grid(row=3, column=0, sticky="ew")
+
+        customtkinter.CTkButton(
+            botones, text="system prompt", width=130, height=34, corner_radius=17,
+            fg_color="transparent", hover_color=PALETA["superficie"],
+            text_color=PALETA["texto_tenue"], font=("Segoe UI", 12),
+            border_width=1, border_color=PALETA["superficie_alta"],
+            command=self._mostrar_system_prompt,
+        ).pack(side="left", padx=(0, 10))
+
+        self._boton_tokens = customtkinter.CTkButton(
+            botones, text="ver los tokens", width=140, height=34, corner_radius=17,
+            fg_color="transparent", hover_color=PALETA["superficie"],
+            text_color=PALETA["turquesa"], font=("Segoe UI", 12),
+            border_width=1, border_color=PALETA["turquesa"],
+            command=self._abrir_superposicion_de_tokens, state="disabled",
+        )
+        self._boton_tokens.pack(side="left")
 
         self._boton_mapa = customtkinter.CTkButton(
-            marco, text="Ver el mapa de atencion", height=40, corner_radius=20,
-            fg_color=PALETA["superficie_alta"], hover_color=PALETA["rosa"],
-            text_color=PALETA["texto_claro"], font=("Segoe UI", 12, "bold"),
-            border_width=2, border_color=PALETA["rosa"],
+            botones, text="mapa de atencion", width=160, height=34,
+            corner_radius=17, fg_color="transparent", hover_color=PALETA["superficie"],
+            text_color=PALETA["rosa"], font=("Segoe UI", 12),
+            border_width=1, border_color=PALETA["rosa"],
             command=self._abrir_superposicion_del_mapa, state="disabled",
         )
-        self._boton_mapa.grid(row=3, column=0, sticky="ew", padx=14, pady=(0, 16))
+        self._boton_mapa.pack(side="left", padx=(10, 0))
+
+        return marco
+
+    def _abrir_superposicion_de_tokens(self) -> None:
+        """La tabla de tokens completa, que ya no cabe en la columna."""
+        if not self._tokens_texto:
+            return
+        self._abrir_superposicion(
+            "Como se corta en tokens tu ultima frase",
+            constructor=lambda padre: self._caja_de_texto(
+                padre, self._tokens_texto, mono=True),
+        )
 
     def _encabezado(self, contenedor, texto):
-        """Titulo de panel con corchetes y espaciado, al estilo de un panel de control.
+        """Rotulo de seccion: minuscula, fino y con espaciado.
 
-        Tipografia monoespaciada a proposito: es lo que distingue una lectura de
-        instrumento de una etiqueta de formulario, y es gratis.
+        En un diseno sin cajas, el rotulo es lo unico que separa una seccion de otra,
+        asi que va tenue a proposito: tiene que ordenar sin llamar la atencion. El
+        espaciado entre letras hace ese trabajo mejor que un tamano grande.
         """
-        # El espaciado entre letras casi triplica el ancho. Solo se aplica a titulos
-        # cortos: con uno largo se sale de la columna y se corta, que fue justo lo que
-        # paso la primera vez con "LABORATORIO DEL TRANSFORMER".
-        texto = texto.upper()
-        etiqueta = "  ".join(texto) if len(texto) <= 13 else texto
         return customtkinter.CTkLabel(
-            contenedor, text=f"[ {etiqueta} ]", text_color=PALETA["turquesa"],
-            font=("Consolas", 12, "bold"),
+            contenedor, text=" ".join(texto.lower()), text_color=PALETA["texto_tenue"],
+            font=("Segoe UI", 10), anchor="w",
         )
 
     # --- Controles de sustentacion: que hacen (T-14) -------------------------
@@ -470,10 +501,11 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             constructor=lambda padre: self._caja_de_texto(padre, SYSTEM_PROMPT),
         )
 
-    def _caja_de_texto(self, padre, contenido: str):
+    def _caja_de_texto(self, padre, contenido: str, mono: bool = False):
         caja = customtkinter.CTkTextbox(
             padre, fg_color=PALETA["fondo_profundo"], text_color=PALETA["texto_claro"],
-            font=("Segoe UI", 13), wrap="word", border_width=0, corner_radius=12,
+            font=("Consolas", 12) if mono else ("Segoe UI", 13),
+            wrap="none" if mono else "word", border_width=0, corner_radius=12,
         )
         caja.insert("1.0", contenido)
         caja.configure(state="disabled")
@@ -723,15 +755,25 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         frase = resultado["frase"]
         if len(frase) > 90:
             frase = frase[:90].rstrip() + "..."
-        self._laboratorio_frase.configure(text=f'Frase analizada: "{frase}"')
+        self._laboratorio_frase.configure(text=f'"{frase}"')
 
+        # EL RESUMEN CABE EN UNA LINEA; EL DETALLE SE ABRE APARTE. La version anterior
+        # dedicaba una columna entera a la tabla de tokens y estaba vacia casi todo el
+        # rato: solo se llena despues de hablar. Aqui quedan los tres numeros que se
+        # senalan en la sustentacion -cuantos tokens, la forma del tensor, cuantas
+        # capas por cabezas- y la tabla completa se ve pulsando el boton.
         forma = resultado["forma"]
+        self._laboratorio_resumen.configure(
+            text=f"{len(resultado['filas'])} tokens   ·   {tuple(forma)}   ·   "
+                 f"{resultado['n_capas']} capas x {resultado['n_cabezas']} cabezas"
+        )
+
         lineas = [
-            f"TOKENIZACION  ->  {len(resultado['filas'])} tokens",
-            "(tokenizador real de Qwen)",
+            f"TOKENIZACION con el tokenizador real de Qwen  ->  "
+            f"{len(resultado['filas'])} tokens",
             "",
             f"{'idx':>4}  {'ID':>9}  token",
-            f"{'-' * 4}  {'-' * 9}  {'-' * 20}",
+            f"{'-' * 4}  {'-' * 9}  {'-' * 30}",
         ]
         lineas += [
             f"{indice:>4}  {id_token:>9}  {token}"
@@ -739,18 +781,13 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         ]
         lineas += [
             "",
-            f"EMBEDDINGS de BETO: {forma}",
-            f"  = 1 frase, {forma[1]} tokens,",
-            f"    {forma[2]} numeros por token",
+            f"EMBEDDINGS de BETO: {tuple(forma)}",
+            f"  = 1 frase, {forma[1]} tokens, {forma[2]} numeros por token",
             "",
-            f"ATENCION: {resultado['n_capas']} capas",
-            f"          x {resultado['n_cabezas']} cabezas",
+            f"ATENCION: {resultado['n_capas']} capas x {resultado['n_cabezas']} cabezas",
         ]
-
-        self._laboratorio_tokens.configure(state="normal")
-        self._laboratorio_tokens.delete("1.0", "end")
-        self._laboratorio_tokens.insert("1.0", "\n".join(lineas))
-        self._laboratorio_tokens.configure(state="disabled")
+        self._tokens_texto = "\n".join(lineas)
+        self._boton_tokens.configure(state="normal")
 
         self._ruta_mapa_actual = resultado["png"]
         self._boton_mapa.configure(state="normal")

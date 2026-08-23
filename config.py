@@ -52,51 +52,45 @@ def _leer_api_key() -> str:
 TOGETHER_API_KEY = _leer_api_key()
 
 
-# --- Paleta (rediseno T-19, 2026-08-23) -------------------------------------
+# --- Paleta (rediseno T-20 "neon minimo", 2026-08-23) ------------------------
 #
-# CAMBIO DE TEMA, pedido por la duena: la interfaz pastel clara le parecia "limpia y
-# profesional" pero sin personalidad. Se pasa a un tema OSCURO con la paleta del
-# personaje que eligio como tematica: turquesa y rosa.
+# Tercera version del aspecto de la aplicacion, y esta vez elegida MIRANDO. Se le
+# dibujaron a la duena tres bocetos -claro y amable, HUD estilo Iron Man, y neon
+# minimo- y eligio el tercero. Las dos versiones anteriores se disenaron adivinando lo
+# que queria a partir de descripciones, y las dos fallaron.
 #
-# NO SE USA NINGUN ARTE DE TERCEROS. El repositorio es publico y el diseno del
-# personaje es propiedad de Crypton Future Media. Lo que se hace es tomar sus dos
-# colores -que no son propiedad de nadie- y dibujar por codigo. Ver gui/desktop_app.py.
+# La idea de esta: casi todo el espacio vacio, una sola pieza protagonista, y el resto
+# en texto fino con lineas de acento. Sin cajas ni recuadros: los paneles con borde son
+# lo que hacia que la ventana pareciera un formulario.
 #
-# LO QUE NO CAMBIA, PORQUE NO SE NEGOCIA (H-09): los cuatro estados se siguen
-# distinguiendo por COLOR Y POR FORMA. Que dos compartan color sigue siendo NO APTO
-# automatico. Lo que si se invirtio es la direccion del contraste: sobre fondo oscuro
-# el borde legible es el CLARO, no el oscuro. La prueba de contraste se actualizo para
-# medir la diferencia en valor absoluto en vez de asumir una direccion.
+# LO QUE NO CAMBIA CON EL TEMA (H-09): los cuatro estados se siguen distinguiendo por
+# COLOR Y POR FORMA. Que dos compartan color sigue siendo NO APTO automatico. Es el
+# unico punto del diseno que no se negocia, y hay pruebas que lo sostienen.
 PALETA = {
-    "fondo_profundo": "#101F27",   # el fondo de la ventana
-    "superficie": "#18303B",       # paneles sobre el fondo
-    "superficie_alta": "#1F3F4C",  # controles sobre los paneles
-    "turquesa": "#39C5BB",         # el color del personaje; acento principal
-    "rosa": "#FF6B9D",             # acento secundario
-    "texto_claro": "#E8F6F5",
-    "texto_tenue": "#8FB3B8",
+    "fondo_profundo": "#0A0A0F",   # casi negro, para que el neon respire
+    "superficie": "#0F0F16",       # apenas mas claro; se usa poco a proposito
+    "superficie_alta": "#1A1A24",  # lineas separadoras y pistas de los sliders
+    "turquesa": "#4FF0DC",         # acento principal
+    "rosa": "#FF5FA2",             # acento secundario
+    "texto_claro": "#EDEDF2",
+    "texto_tenue": "#585868",
 }
 
-# Relleno de cada estado: version apagada del color, para que la figura tenga cuerpo
-# sin competir con el borde.
+# Relleno de cada estado: apagado, para que la figura tenga cuerpo sin apagar el borde.
 COLOR_POR_ESTADO = {
-    "ESCUCHANDO": "#1F5F5B",    # turquesa apagado
-    "PENSANDO": "#2A3D6B",      # azul profundo
-    "RESPONDIENDO": "#6B2647",  # rosa apagado
-    "ATENCION": "#6B4A1F",      # ambar apagado
+    "ESCUCHANDO": "#12403C",    # turquesa profundo
+    "PENSANDO": "#1B2E5C",      # azul profundo
+    "RESPONDIENDO": "#4A1733",  # rosa profundo
+    "ATENCION": "#4A3312",      # ambar profundo
 }
 
-# Borde luminoso de cada estado, del mismo tono que su relleno.
-#
-# POR QUE EXISTE (defecto que reporto la duena el 2026-08-14, y que sigue vigente en el
-# tema oscuro): un color que el usuario no puede nombrar no esta comunicando nada. En el
-# tema claro el problema era que los pasteles se leian casi blancos; aqui seria que los
-# rellenos apagados se leen casi negros. La carga de la senal la lleva el borde.
+# Borde luminoso: es el que lleva la senal. Sobre un fondo casi negro, el relleno
+# apagado solo no comunica nada; el borde si.
 COLOR_BORDE_POR_ESTADO = {
-    "ESCUCHANDO": "#39C5BB",    # turquesa vivo
-    "PENSANDO": "#7AA5FF",      # azul claro
-    "RESPONDIENDO": "#FF6B9D",  # rosa vivo
-    "ATENCION": "#FFB347",      # ambar
+    "ESCUCHANDO": "#4FF0DC",    # turquesa neon
+    "PENSANDO": "#7FA8FF",      # azul claro
+    "RESPONDIENDO": "#FF5FA2",  # rosa neon
+    "ATENCION": "#FFC24D",      # ambar
 }
 
 
