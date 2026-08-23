@@ -287,17 +287,22 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         # ventana, se parta en dos lineas en vez de ensanchar la columna.
         self._indicador_memoria = customtkinter.CTkLabel(
             marco, text="", text_color=PALETA["texto_tenue"], font=("Segoe UI", 11),
-            anchor="w", justify="left", wraplength=240,
+            anchor="w", justify="left", wraplength=420,
         )
-        self._indicador_memoria.grid(row=3, column=0, columnspan=2, sticky="w",
-                                     padx=12, pady=(6, 10))
+        # El indicador ocupa SU PROPIA FILA, a lo ancho de las tres columnas.
+        # Compartiendo fila con el boton se quedaba sin sitio y se cortaba a media
+        # palabra: se leia "Memoria 1/10 · 20" comiendose "tokens". Se intento
+        # acortando el texto y volvio a pasar en cuanto la ventana se estrechaba. La
+        # causa no era la longitud del texto sino la celda; se arregla la celda.
+        self._indicador_memoria.grid(row=4, column=0, columnspan=3, sticky="ew",
+                                     padx=12, pady=(2, 10))
 
         customtkinter.CTkButton(
             marco, text="Ver system prompt", width=130, height=26,
             fg_color=PALETA["superficie"], hover_color=PALETA["turquesa"],
             text_color=PALETA["texto_claro"], font=("Segoe UI", 11),
             command=self._mostrar_system_prompt,
-        ).grid(row=3, column=2, sticky="e", padx=(0, 12), pady=(6, 10))
+        ).grid(row=3, column=2, sticky="e", padx=(0, 12), pady=(6, 2))
 
         return marco
 
@@ -431,7 +436,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
                 # Corto a proposito. La version larga ("... turnos - N tokens aprox.")
                 # se cortaba a media palabra en ventanas estrechas: se veia
                 # "Memoria 2/10 turnc". Un indicador cortado no informa, confunde.
-                texto = f"Memoria {turnos}/{MAX_TURNOS_MEMORIA}  ·  {tokens} tokens"
+                texto = f"Memoria: {turnos} de {MAX_TURNOS_MEMORIA} turnos  ·  {tokens} tokens aprox."
                 color = PALETA["texto_tenue"]
             self._indicador_memoria.configure(text=texto, text_color=color)
         self.after(700, self._refrescar_indicador_de_memoria)
