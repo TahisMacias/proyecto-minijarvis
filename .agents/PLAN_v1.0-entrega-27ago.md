@@ -197,7 +197,9 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
 - Depends on: T-03
 - Scope: `core/tts_engine.py`
 - Acceptance:
-  - [x] `edge-tts` con voz `es-MX-DaliaNeural`, invocado con `asyncio.run()` local.
+  - [x] `edge-tts` con voz femenina, invocado con `asyncio.run()` local.
+        Voz actual: `es-ES-XimenaNeural` (era `es-MX-DaliaNeural`; la duena la
+        cambio el 2026-08-23 eligiendo entre seis muestras).
   - [x] Reproduce el audio y devuelve el control al terminar (medido: 4.92 s).
   - [x] Si `edge-tts` falla, se propaga un error tipado sin romper el flujo.
 - Gates: `python -m compileall .`

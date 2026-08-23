@@ -343,7 +343,7 @@ exactamente lo que decia hacer.
 | Transcripcion | Together AI | `openai/whisper-large-v3` | $0.0015 / min de audio |
 | LLM predeterminado | Together AI | `Qwen/Qwen3.8-2.4T-A95B` | $2.50 / $6.25 por millon |
 | LLM alterno | Together AI | `meta-llama/Llama-3.3-70B-Instruct-Turbo` | $1.04 / $1.04 por millon |
-| Sintesis de voz | Microsoft | `edge-tts`, voz `es-MX-DaliaNeural` | sin costo |
+| Sintesis de voz | Microsoft | `edge-tts`, voz `es-ES-XimenaNeural` | sin costo |
 | Tokenizacion (laboratorio) | Hugging Face | tokenizador de `Qwen/Qwen2.5-7B-Instruct` | sin costo |
 | Embeddings y atencion | Hugging Face | `dccuchile/bert-base-spanish-wwm-cased` | sin costo |
 

@@ -37,7 +37,7 @@ import uuid
 
 import edge_tts
 
-from config import VOZ_TTS
+from config import RITMO_TTS, TONO_TTS, VOZ_TTS
 
 
 # --- Errores tipados --------------------------------------------------------
@@ -93,8 +93,19 @@ async def _sintetizar_async(texto: str, voz: str) -> bytes:
     `edge-tts` entrega el audio a pedazos segun lo va generando, intercalados con
     metadatos de sincronizacion de palabras (WordBoundary) que a nosotros no nos
     sirven: solo se conservan los fragmentos de tipo "audio".
+
+    AQUI SE APLICAN EL TONO Y EL RITMO. `config.py` los declaraba desde el 2026-08-14 y
+    **ningun archivo los usaba**: eran dos constantes que no hacian nada y un comentario
+    que afirmaba que la voz estaba ajustada. Se pasan solo cuando difieren del valor
+    neutro, porque mandar "+0Hz" fuerza a edge-tts a procesar la prosodia sin motivo.
     """
-    comunicacion = edge_tts.Communicate(texto, voz)
+    ajustes = {}
+    if TONO_TTS and TONO_TTS not in ("+0Hz", "0Hz"):
+        ajustes["pitch"] = TONO_TTS
+    if RITMO_TTS and RITMO_TTS not in ("+0%", "0%"):
+        ajustes["rate"] = RITMO_TTS
+
+    comunicacion = edge_tts.Communicate(texto, voz, **ajustes)
     fragmentos = bytearray()
     async for fragmento in comunicacion.stream():
         if fragmento["type"] == "audio":
@@ -176,7 +187,7 @@ if __name__ == "__main__":
         "Hola, soy Mini-JARVIS. Soy una inteligencia artificial, asi que mis "
         "respuestas pueden contener errores."
     )
-    print(f"Voz: {VOZ_TTS}")
+    print(f"Voz: {VOZ_TTS}  tono {TONO_TTS}  ritmo {RITMO_TTS}")
     audio = sintetizar(frase)
     print(f"MP3 sintetizado: {len(audio)} bytes.")
     print("Reproduciendo... (la llamada no regresa hasta que termine de sonar)")

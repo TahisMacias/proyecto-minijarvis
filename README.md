@@ -95,12 +95,7 @@ funcionan incluso sin conexion. Deja el PNG del mapa de atencion en
 
 1. **Manten presionado** el boton (o la **barra espaciadora**) mientras hablas.
 2. Sueltalo al terminar. La respuesta aparece en el panel y se escucha en voz alta.
-3. El indicador de arriba dice en que va, por color **y por forma**:
-
-4. Abajo tienes los controles de la sustentacion: temperatura, `top_p`, selector de
-   modelo en caliente, indicador de memoria y visor del system prompt.
-5. A la derecha, el laboratorio analiza cada frase que dices. El boton
-   **Ver el mapa de atencion** lo abre grande.
+3. La pieza grande de la izquierda dice en que va, por color **y por forma**:
 
    | Estado | Forma | Significado |
    |---|---|---|
@@ -109,6 +104,11 @@ funcionan incluso sin conexion. Deja el PNG del mapa de atencion en
    | Pensando | tres puntos | consultando al modelo |
    | Respondiendo | onda de audio | reproduciendo la voz |
    | Atencion | triangulo con `!` | algo no salio; ya volvio a reposo |
+
+4. Debajo de la conversacion estan los controles de la sustentacion: temperatura,
+   `top_p`, selector de modelo en caliente e indicador de memoria.
+5. Mas abajo, el laboratorio analiza cada frase que dices. Tres botones abren el
+   system prompt, la tabla de tokens y el mapa de atencion.
 
 ### Comprobaciones sueltas
 
@@ -137,7 +137,7 @@ pytest
 | Transcripcion (STT) | Together AI | `openai/whisper-large-v3` | $0.0015 / min de audio |
 | LLM (predeterminado) | Together AI | `Qwen/Qwen3.8-2.4T-A95B` | $2.50 entrada / $6.25 salida por millon de tokens |
 | LLM (alterno) | Together AI | `meta-llama/Llama-3.3-70B-Instruct-Turbo` | $1.04 entrada / $1.04 salida por millon de tokens |
-| Sintesis de voz (TTS) | Microsoft `edge-tts` | `es-MX-DaliaNeural` | sin costo |
+| Sintesis de voz (TTS) | Microsoft `edge-tts` | `es-ES-XimenaNeural` | sin costo |
 | Exploracion (tokenizacion) | Hugging Face | tokenizador de `Qwen/Qwen2.5-7B-Instruct`, sin pesos | sin costo |
 | Exploracion (embeddings y atencion) | Hugging Face | `dccuchile/bert-base-spanish-wwm-cased` (BETO) | sin costo |
 

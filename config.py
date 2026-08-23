@@ -139,15 +139,25 @@ MODELO_LLM_ALTERNO = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
 MODELO_STT = "openai/whisper-large-v3"
 IDIOMA_STT = "es"
 
-VOZ_TTS = "es-MX-DaliaNeural"
+# Voz elegida por la duena el 2026-08-23, escuchando seis muestras de la misma frase.
+# Antes era es-MX-DaliaNeural. edge-tts ofrece 45 voces en espanol; se le presentaron
+# una ecuatoriana, la mexicana anterior, una colombiana, una peruana y esta, mas una
+# sexta con el tono retocado. Eligio esta.
+VOZ_TTS = "es-ES-XimenaNeural"
 
-# Ajustes de la voz. edge-tts permite subir el tono y acelerar el habla sin cambiar de
-# voz. Subir el tono acerca el resultado al registro agudo y brillante del personaje
-# que la duena pidió como tematica, sin necesidad de clonar ninguna voz real.
-# Valores conservadores: mas alla de +50Hz la voz empieza a sonar metalica y se pierde
-# claridad, que es lo ultimo que conviene en un asistente que se escucha por altavoz.
-TONO_TTS = "+35Hz"
-RITMO_TTS = "+8%"
+# Tono y ritmo: NEUTROS, y es una decision, no un descuido.
+#
+# Estas dos constantes existen desde el 2026-08-14 con los valores "+35Hz" y "+8%", y
+# un comentario que decia que servian para acercar la voz al registro agudo del
+# personaje que entonces se iba a usar de tematica. Dos cosas estaban mal: la tematica
+# cambio, y sobre todo **ningun archivo las leia**. Eran dos constantes muertas
+# afirmando que la voz estaba ajustada. Se conectaron de verdad en core/tts_engine.py.
+#
+# Ya conectadas, se ponen a cero: la duena eligio la muestra SIN retoque, y aplicarle
+# un tono que ella no escogio seria entregarle algo distinto de lo que pidio. Se dejan
+# declaradas porque el motor las respeta y basta cambiarlas aqui para probar otra cosa.
+TONO_TTS = "+0Hz"
+RITMO_TTS = "+0%"
 
 
 # --- Captura de audio (correccion del 2026-08-14) ---------------------------
