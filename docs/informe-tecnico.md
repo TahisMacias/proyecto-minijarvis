@@ -22,8 +22,8 @@ piensa una respuesta con un modelo de lenguaje real y la contesta en voz alta,
 recordando lo que se hablo en turnos anteriores.
 
 Ademas de conversar, **usa herramientas**: resuelve operaciones matematicas de forma
-exacta, consulta el estado real de la computadora, busca en internet y abre paginas web
-de una lista autorizada.
+exacta, dice la hora, consulta el clima y el estado real de la computadora, busca en
+internet y abre paginas web de una lista autorizada.
 
 Y junto a la conversacion, la misma ventana muestra **que le pasa por dentro a un
 Transformer** con la ultima frase dicha: en que pedazos se corta, que numero le
@@ -178,6 +178,55 @@ franja iluminada justo a la izquierda de la diagonal, y es un patron clasico y m
 documentado en modelos tipo BERT.
 
 Imagen: `exploration/mapa_atencion.png`.
+
+### 3.5 Encoder-only y decoder-only: el proyecto usa los dos
+
+El enunciado (seccion 3.1) pide poder explicar por que los LLM conversacionales usan
+arquitectura **decoder-only**. Este proyecto es un buen sitio para verlo porque tiene
+un modelo de cada tipo funcionando a la vez.
+
+**BETO, el del laboratorio, es encoder-only.** Su trabajo es LEER: recibe la frase
+entera de golpe y construye una representacion de cada palabra mirando a las de su
+izquierda y a las de su derecha. Por eso se le pueden pedir los embeddings y las
+matrices de atencion de toda la frase: ya la ha visto completa. No sirve para
+conversar, porque no esta hecho para producir texto nuevo.
+
+**Qwen, el que responde en la aplicacion, es decoder-only.** Su trabajo es ESCRIBIR:
+genera una palabra, la anade a lo que lleva escrito, y con eso genera la siguiente.
+A eso se le llama **autoregresivo**. Cada palabra solo puede mirar hacia atras, nunca
+hacia adelante, porque lo que va delante todavia no existe.
+
+Y ahi esta el motivo de que los asistentes usen decoder-only: **conversar es generar
+texto**, y generar texto es exactamente lo que hace un decoder. Un encoder entiende
+muy bien y no produce nada; un decoder produce, y para eso tiene que entender lo
+suficiente.
+
+Es tambien la razon de la limitacion de la seccion 5: se pueden mirar por dentro las
+tripas de BETO porque corre aqui, y no las de Qwen porque corre en un servidor ajeno.
+
+### 3.6 Preentrenamiento, fine-tuning e instruction-tuning
+
+Otra de las preguntas guia: que diferencia hay entre el modelo usado y un modelo base
+sin ajustar. Son tres etapas distintas.
+
+**Preentrenamiento.** El modelo lee cantidades enormes de texto y aprende una sola
+tarea: predecir la palabra siguiente. De ahi sale un **modelo base**, que sabe muchisimo
+del lenguaje y no sabe conversar. Si a un modelo base se le escribe "Hola, quien eres",
+lo mas probable es que continue el texto -inventando un dialogo entero, o una lista de
+preguntas parecidas- en vez de contestar, porque continuar texto es literalmente lo
+unico que le ensenaron.
+
+**Fine-tuning.** Se sigue entrenando el modelo base sobre un conjunto de datos mas
+pequeno y especifico, para especializarlo en un dominio o un estilo.
+
+**Instruction-tuning.** Es el fine-tuning concreto que convierte un modelo base en uno
+de chat: se le entrena con ejemplos de instruccion y respuesta hasta que aprende que,
+cuando le llega algo que parece una pregunta, lo que toca es responderla.
+
+**Los dos modelos de este proyecto son instruction-tuned**, y se nota en el nombre:
+`Qwen2.5-0.5B-Instruct` y `Llama-3.3-70B-Instruct-Turbo` llevan "Instruct" justo por
+eso. Sin esa etapa, el system prompt que define la personalidad de la asistente no
+serviria de nada: un modelo base no obedece instrucciones, las continua.
 
 ---
 

@@ -205,6 +205,59 @@ def _formatear(valor) -> str:
 
 
 # ===========================================================================
+# hora - un modelo de lenguaje no tiene reloj
+# ===========================================================================
+#
+# Esta en la lista de "funciones reales" de la seccion 5.2 del enunciado, junto al
+# clima y la busqueda web. Es la misma clase de limitacion que la calculadora: el
+# modelo aprendio de textos escritos en el pasado y no tiene forma de saber que dia es
+# hoy. Preguntado a secas, se inventa una fecha con total seguridad.
+
+_DIAS = ("lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo")
+_MESES = ("enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+          "agosto", "septiembre", "octubre", "noviembre", "diciembre")
+
+
+def hora(ahora=None) -> str:
+    """Hora y fecha del reloj de esta maquina, en una frase para decir en voz alta.
+
+    `ahora` se inyecta en las pruebas: sin eso habria que comparar contra el reloj
+    real y la prueba fallaria un dia al ano, a medianoche, sin que nadie entendiera
+    por que.
+    """
+    from datetime import datetime
+
+    ahora = ahora or datetime.now()
+
+    # Las 14:05 se dicen "dos y cinco de la tarde", no "catorce cero cinco". Se lee en
+    # voz alta: los numeros de reloj de 24 horas suenan a locutor de aeropuerto.
+    hora24 = ahora.hour
+    minuto = ahora.minute
+    if hora24 < 6:
+        franja = "de la madrugada"
+    elif hora24 < 12:
+        franja = "de la manana"
+    elif hora24 < 20:
+        franja = "de la tarde"
+    else:
+        franja = "de la noche"
+
+    hora12 = hora24 % 12 or 12
+    if minuto == 0:
+        reloj = f"{hora12} en punto {franja}"
+    elif minuto == 30:
+        reloj = f"{hora12} y media {franja}"
+    elif minuto == 15:
+        reloj = f"{hora12} y cuarto {franja}"
+    else:
+        reloj = f"{hora12} y {minuto} {franja}"
+
+    fecha = (f"{_DIAS[ahora.weekday()]} {ahora.day} de {_MESES[ahora.month - 1]} "
+             f"de {ahora.year}")
+    return f"Son las {reloj}. Hoy es {fecha}."
+
+
+# ===========================================================================
 # estado_laptop - telemetria real, no inventada
 # ===========================================================================
 
@@ -529,6 +582,7 @@ def abrir_pagina(url: str, lanzar=None, ruta_navegador: str = RUTA_EDGE) -> str:
 _IMPLEMENTACIONES = {
     "calcular": lambda a: calcular(a.get("expresion", "")),
     "clima": lambda a: clima(a.get("ciudad", "")),
+    "hora": lambda a: hora(),
     "estado_laptop": lambda a: estado_laptop(),
     "buscar_web": lambda a: buscar_web(a.get("consulta", "")),
     "abrir_pagina": lambda a: abrir_pagina(a.get("url", "")),

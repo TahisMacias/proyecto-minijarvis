@@ -26,6 +26,7 @@ from tools.system_skills import (
     construir_comando,
     ejecutar_herramienta,
     estado_laptop,
+    hora,
     validar_url,
 )
 
@@ -339,11 +340,11 @@ def test_cada_herramienta_declarada_tiene_implementacion():
         )
 
 
-def test_las_cinco_herramientas_estan_declaradas():
-    """La quinta, `clima`, la pidio la duena: es lo primero que se le pregunta a un
-    asistente de voz y no estaba."""
+def test_las_seis_herramientas_estan_declaradas():
+    """`clima` y `hora` se anadieron al releer la seccion 5.2 del enunciado, que las
+    nombra las dos en su lista de funciones reales."""
     assert NOMBRES_DECLARADOS == {
-        "calcular", "clima", "estado_laptop", "buscar_web", "abrir_pagina"
+        "calcular", "clima", "hora", "estado_laptop", "buscar_web", "abrir_pagina"
     }
 
 
@@ -457,4 +458,40 @@ def test_sin_ciudad_se_pide_la_ciudad():
 
 def test_el_clima_esta_enchufado_al_despachador():
     peticion = type("P", (), {"nombre": "clima", "argumentos": {"ciudad": "Guayaquil"}})()
+    assert "no existe" not in ejecutar_herramienta(peticion)
+
+
+# ===========================================================================
+# hora - el modelo no tiene reloj
+# ===========================================================================
+
+def test_la_hora_se_dice_como_la_diria_una_persona():
+    """Las 14:05 se dicen "dos y cinco de la tarde". Esto se lee EN VOZ ALTA: un
+    reloj de 24 horas suena a locutor de aeropuerto."""
+    from datetime import datetime
+    respuesta = hora(datetime(2026, 8, 23, 14, 5))
+    assert "2 y 5 de la tarde" in respuesta
+    assert "14" not in respuesta
+
+
+@pytest.mark.parametrize("h,m,esperado", [
+    (0, 30, "12 y media de la madrugada"),
+    (9, 15, "9 y cuarto de la manana"),
+    (14, 0, "2 en punto de la tarde"),
+    (21, 47, "9 y 47 de la noche"),
+    (12, 0, "12 en punto de la tarde"),
+])
+def test_las_franjas_del_dia_y_las_medias(h, m, esperado):
+    from datetime import datetime
+    assert esperado in hora(datetime(2026, 8, 23, h, m))
+
+
+def test_la_fecha_va_en_palabras_y_completa():
+    from datetime import datetime
+    respuesta = hora(datetime(2026, 8, 23, 10, 0))
+    assert "domingo 23 de agosto de 2026" in respuesta
+
+
+def test_la_hora_esta_enchufada_al_despachador():
+    peticion = type("P", (), {"nombre": "hora", "argumentos": {}})()
     assert "no existe" not in ejecutar_herramienta(peticion)

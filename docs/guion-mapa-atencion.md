@@ -102,6 +102,24 @@ eligio esta porque es **la mas facil de ver**: la cabeza 4 de la capa 6 resulto 
 
 ---
 
+## Dos preguntas mas del enunciado, con su respuesta corta
+
+**"¿Por que los LLM usan arquitectura decoder-only?"**
+
+> "Porque conversar es generar texto. Un encoder como BETO lee la frase entera y la
+> entiende muy bien, pero no produce nada nuevo. Un decoder genera palabra por palabra,
+> mirando solo hacia atras, que es justo lo que hace falta para responder. En este
+> proyecto estan los dos: BETO encoder para mirar por dentro, Qwen decoder para
+> conversar."
+
+**"¿Que diferencia hay entre tu modelo y un modelo base sin fine-tuning?"**
+
+> "Un modelo base solo sabe continuar texto: si le escribes 'hola, quien eres', te
+> continua la conversacion inventada en vez de contestarte. El nuestro paso ademas por
+> instruction-tuning, que le ensena que una pregunta se responde. Por eso el
+> identificador lleva la palabra Instruct. Sin esa etapa, el system prompt que define
+> la personalidad de Elena no serviria de nada."
+
 ## Si te preguntan algo que no sabes
 
 Dilo. Es una respuesta valida y queda mejor que inventar:

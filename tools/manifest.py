@@ -25,6 +25,7 @@ NOMBRE_BUSCAR_WEB = "buscar_web"
 NOMBRE_ABRIR_PAGINA = "abrir_pagina"
 NOMBRE_CALCULAR = "calcular"
 NOMBRE_CLIMA = "clima"
+NOMBRE_HORA = "hora"
 
 
 MANIFIESTO: list[dict] = [
@@ -83,6 +84,20 @@ MANIFIESTO: list[dict] = [
                 },
                 "required": ["ciudad"],
             },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": NOMBRE_HORA,
+            "description": (
+                "Dice la hora y la fecha de ahora mismo, leidas del reloj de esta "
+                "computadora. USA SIEMPRE esta herramienta cuando pregunten la hora, "
+                "el dia, la fecha, en que mes o ano estamos, o cuanto falta para algo. "
+                "No lo respondas de memoria: tu no tienes reloj y no sabes que dia es "
+                "hoy."
+            ),
+            "parameters": {"type": "object", "properties": {}, "required": []},
         },
     },
     {
