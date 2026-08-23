@@ -629,8 +629,9 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             self._escribir("...", f"usando la herramienta {evento.texto}")
         elif evento.tipo is TipoEvento.ERROR:
             # El texto ya viene redactado para una persona: el orquestador se encarga
-            # de que ninguna traza tecnica llegue hasta aqui.
-            self._escribir("Aviso", evento.texto)
+            # de que ninguna traza tecnica llegue hasta aqui. Va en ambar para que se
+            # lea junto al triangulo del mismo color, no como dos cosas sueltas.
+            self._escribir("Aviso", evento.texto, avisar=True)
 
     # --- Laboratorio (T-13) ---------------------------------------------------
 
@@ -745,9 +746,27 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             border_color=COLOR_BORDE_POR_ESTADO.get(estado.value, BORDE_REPOSO),
         )
 
-    def _escribir(self, quien: str, texto: str) -> None:
+    def _escribir(self, quien: str, texto: str, avisar: bool = False) -> None:
+        """Escribe una linea en el panel de conversacion.
+
+        `avisar` la pinta del MISMO ambar que el triangulo del estado ATENCION.
+
+        No es decoracion. El mensaje de error sale en esta columna, el indicador de
+        estado esta en la de al lado, y quien acaba de hablar mira el texto. Se
+        comprobo con el mainloop real que el triangulo SI se dibujaba sus segundos
+        completos, y la duena aun asi no lo vio dos veces seguidas: para cuando
+        terminaba de leer el aviso, la figura ya habia vuelto a reposo. El color une
+        las dos mitades del mismo aviso, el que se lee y el que se ve.
+        """
         self._conversacion.configure(state="normal")
+        inicio = self._conversacion.index("end-1c")
         self._conversacion.insert("end", f"{quien}: {texto}\n\n")
+        if avisar:
+            fin = self._conversacion.index("end-1c")
+            self._conversacion.tag_add("aviso", inicio, fin)
+            self._conversacion.tag_config(
+                "aviso", foreground=COLOR_BORDE_POR_ESTADO["ATENCION"]
+            )
         self._conversacion.see("end")
         self._conversacion.configure(state="disabled")
 

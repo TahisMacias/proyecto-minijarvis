@@ -113,7 +113,7 @@ escribe al lado lo que no. Tarda unos quince minutos.
 
 - [X] **A.1** Abre con doble clic en `Iniciar Mini-JARVIS.bat`. Se abre una ventana
       oscura, ancha, con tres columnas.
-- [ ] **A.2** ¿Te gusta? Es tu tematica. Si algo te chirria (un color, un tamano, una
+- [no me gusta ni el color ni el diseño se ve anticuado y muy cargado. si se puede mejorar y modernizar visualmente mejor. ] **A.2** ¿Te gusta? Es tu tematica. Si algo te chirria (un color, un tamano, una
       palabra), anotalo aqui aunque sea una tonteria: es tu proyecto y se cambia.
 - [ ] **A.3** A la derecha del todo pone "LABORATORIO DEL TRANSFORMER" y esta vacio.
       Es normal: se llena cuando hables.

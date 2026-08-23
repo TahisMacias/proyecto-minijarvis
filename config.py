@@ -170,10 +170,23 @@ UMBRAL_DE_SILENCIO = 180
 
 
 # --- Interfaz (correccion del 2026-08-14) -----------------------------------
-# Cuanto se queda a la vista el estado ATENCION antes de volver a reposo. Antes la
-# transicion era instantanea: el estado ocurria, pero duraba microsegundos y nadie lo
-# veia nunca. Un aviso que no se alcanza a ver no es un aviso.
-SEGUNDOS_EN_ATENCION = 2.5
+# Cuanto se queda a la vista el estado ATENCION antes de volver a reposo.
+#
+# Historia de este numero, que ya va por su tercera version:
+#   instantaneo -> el estado ocurria durante microsegundos y nadie lo veia jamas.
+#   2.5 s       -> medido y correcto, y la duena SIGUIO sin verlo (2026-08-17).
+#   5.0 s       -> el actual.
+#
+# La segunda vez se comprobo con el mainloop real que la ventana SI pintaba el
+# triangulo durante 2.5 s exactos. El mecanismo estaba bien; lo que fallaba es que el
+# mensaje de error aparece en la columna del CENTRO y el indicador esta en la de la
+# IZQUIERDA. Quien acaba de hablar mira el texto, no la figura, y para cuando levanta
+# la vista ya se fue.
+#
+# Por eso este numero sube Y ademas el aviso del chat se pinta del mismo ambar que el
+# triangulo (ver gui/desktop_app.py). Un aviso que no se alcanza a ver no es un aviso,
+# aunque el reloj diga que estuvo ahi.
+SEGUNDOS_EN_ATENCION = 5.0
 
 
 # --- Memoria conversacional (diseno, seccion 8) -----------------------------
