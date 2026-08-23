@@ -210,7 +210,10 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         marco.grid_columnconfigure(0, weight=1)
 
         customtkinter.CTkLabel(
-            marco, text=NOMBRE_ASISTENTE.lower(), text_color=PALETA["texto_claro"],
+            # El nombre va TAL CUAL, con su mayuscula. El resto de la ventana va en
+            # minuscula por el diseno C, pero un nombre propio no es un rotulo: dejarlo
+            # en minuscula lo convertia en una etiqueta mas.
+            marco, text=NOMBRE_ASISTENTE, text_color=PALETA["texto_claro"],
             font=("Segoe UI", 26, "bold"), anchor="w",
         ).grid(row=0, column=0, sticky="w")
 
