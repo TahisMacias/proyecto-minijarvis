@@ -19,7 +19,8 @@ embeddings y el mecanismo de self-attention de la arquitectura Transformer.
 - **Python 3.14.5** (version verificada; el proyecto no se ha probado en otras versiones)
 - Sistema operativo **Windows**
 - Microfono funcional
-- Conexion a internet (el STT y el LLM se ejecutan en la nube via Together AI)
+- Conexion a internet para el modo normal. **Tambien funciona sin ella**: ver
+  "Modo sin internet" mas abajo.
 - Una clave de API de [Together AI](https://api.together.xyz)
 
 ## Instalacion
@@ -130,6 +131,44 @@ Ejecutar la bateria de pruebas (no necesita microfono, red ni saldo de API):
 pytest
 ```
 
+## Modo sin internet
+
+Mini-JARVIS funciona con el wifi apagado. La nube sigue siendo el camino normal porque
+responde mucho mejor; cuando se cae la conexion, la aplicacion **lo nota sola** y pasa
+a tres modelos que viven en esta maquina. No hay que tocar ningun ajuste.
+
+**Antes hay que descargarlos, una vez y con internet:**
+
+```powershell
+python -m core.modo_local
+```
+
+Son unos 700 MB y tarda un par de minutos. Hazlo con tiempo: si no, la primera vez que
+se caiga la red habra que descargarlos justo en ese momento.
+
+Que cambia cuando entra el respaldo, medido en una laptop sin tarjeta grafica:
+
+| Pieza | Con internet | Sin internet |
+|---|---|---|
+| Oir | Whisper en la nube, ~2 s | Whisper local (`base`), ~2 s |
+| Pensar | Qwen3.8, billones de parametros, 1-3 s | Qwen2.5-0.5B, 494 millones, ~4 palabras/s |
+| Hablar | voz neuronal de Microsoft | voz de Windows, mas robotica |
+| Herramientas | las cinco | ninguna |
+
+**La diferencia se nota y la aplicacion no la disimula**: cuando el respaldo entra, lo
+dice en la conversacion y aparece un aviso ambar arriba a la derecha.
+
+Dos cosas que el respaldo NO hace, a proposito:
+
+- **No se activa si la clave de API es invalida o la cuenta se quedo sin saldo.** Solo
+  ante falta de red. Cambiar al modelo pequeno ante un problema de credenciales
+  esconderia la causa real.
+- **No usa herramientas.** Un modelo de 494 millones de parametros no elige bien entre
+  cinco herramientas, y una llamada mal elegida es peor que ninguna.
+
+El modulo de exploracion del Transformer **siempre** funciona sin internet, porque BETO
+se ejecuta en local desde el principio.
+
 ## Modelos y proveedores utilizados
 
 | Etapa | Proveedor | Modelo | Costo |
@@ -138,6 +177,9 @@ pytest
 | LLM (predeterminado) | Together AI | `Qwen/Qwen3.8-2.4T-A95B` | $2.50 entrada / $6.25 salida por millon de tokens |
 | LLM (alterno) | Together AI | `meta-llama/Llama-3.3-70B-Instruct-Turbo` | $1.04 entrada / $1.04 salida por millon de tokens |
 | Sintesis de voz (TTS) | Microsoft `edge-tts` | `es-ES-XimenaNeural` | sin costo |
+| STT sin internet | local | `faster-whisper base` | sin costo |
+| LLM sin internet | local | `Qwen/Qwen2.5-0.5B-Instruct` | sin costo |
+| Voz sin internet | Windows SAPI | voz `es-ES` instalada | sin costo |
 | Exploracion (tokenizacion) | Hugging Face | tokenizador de `Qwen/Qwen2.5-7B-Instruct`, sin pesos | sin costo |
 | Exploracion (embeddings y atencion) | Hugging Face | `dccuchile/bert-base-spanish-wwm-cased` (BETO) | sin costo |
 
@@ -178,6 +220,7 @@ core/audio_capture.py          microfono -> WAV en memoria
 core/stt_client.py             WAV -> texto (Whisper)
 core/llm_engine.py             mensajes -> respuesta del modelo
 core/tts_engine.py             texto -> voz reproducida
+core/modo_local.py             respaldo sin internet: oir, pensar y hablar en local
 core/orchestrator.py           maquina de estados y el hilo de cada turno
 tools/manifest.py              lo que el modelo lee para saber que puede pedir
 tools/system_skills.py         lo que hacen las herramientas (sin eval, lista blanca)

@@ -34,6 +34,14 @@ def main() -> int:
         from core.stt_client import transcribir
         from core.tts_engine import hablar
         from gui.desktop_app import AplicacionMiniJarvis
+        from core.modo_local import (
+            MotorConRespaldo,
+            MotorLocal,
+            TranscriptorConRespaldo,
+            VozConRespaldo,
+            hablar_local,
+            transcribir_local,
+        )
         from tools.manifest import MANIFIESTO
         from tools.system_skills import ejecutar_herramienta
     except Exception as excepcion:  # noqa: BLE001
@@ -56,8 +64,24 @@ def main() -> int:
         system_prompt=SYSTEM_PROMPT,
         max_turnos=config.MAX_TURNOS_MEMORIA,
     )
-    motor = MotorLLM()
     grabadora = GrabadoraDeVoz()
+
+    # --- Modo sin internet (T-21) -------------------------------------------
+    # Las tres piezas que hablan con la nube se envuelven con su equivalente local.
+    # La nube sigue siendo el camino principal; lo local entra solo si falla por falta
+    # de red. El orquestador recibe los envoltorios sin enterarse de que existen: por
+    # eso esto no obliga a tocar ni una linea de core/orchestrator.py.
+    #
+    # Los modelos locales NO se cargan aqui. Se cargan la primera vez que hagan falta,
+    # porque cuestan casi un minuto y casi nunca hacen falta.
+    avisos_de_modo = []
+
+    motor = MotorConRespaldo(
+        MotorLLM(), MotorLocal(), avisar=avisos_de_modo.append)
+    transcriptor = TranscriptorConRespaldo(
+        transcribir, transcribir_local, avisar=avisos_de_modo.append)
+    voz = VozConRespaldo(
+        hablar, hablar_local, avisar=avisos_de_modo.append)
 
     # La ventana recibe una fabrica, no un orquestador ya hecho: solo ella sabe como
     # construir el puente `after(0, ...)` hacia su propio hilo, y ese puente es un
@@ -65,9 +89,9 @@ def main() -> int:
     def crear_orquestador(notificar):
         return Orquestador(
             grabadora=grabadora,
-            transcriptor=transcribir,
+            transcriptor=transcriptor,
             motor=motor,
-            voz=hablar,
+            voz=voz,
             memoria=memoria,
             notificar=notificar,
             # Aqui es donde el Tool Calling entra en la aplicacion (T-15). El
@@ -83,7 +107,8 @@ def main() -> int:
     # La ventana recibe tambien el motor y la memoria: los controles de
     # sustentacion (T-14) actuan sobre ellos -sliders sobre el motor, indicador de
     # turnos sobre la memoria- sin pasar por el orquestador, que ya estaba cerrado.
-    aplicacion = AplicacionMiniJarvis(crear_orquestador, motor=motor, memoria=memoria)
+    aplicacion = AplicacionMiniJarvis(
+        crear_orquestador, motor=motor, memoria=memoria, avisos_de_modo=avisos_de_modo)
     aplicacion.mainloop()
     return 0
 

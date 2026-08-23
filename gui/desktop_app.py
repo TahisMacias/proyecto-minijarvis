@@ -101,7 +101,8 @@ BORDE_REPOSO = PALETA["texto_tenue"]
 class AplicacionMiniJarvis(customtkinter.CTk):
     """Ventana principal. Solo pinta y recoge pulsaciones; no piensa por su cuenta."""
 
-    def __init__(self, crear_orquestador, motor=None, memoria=None) -> None:
+    def __init__(self, crear_orquestador, motor=None, memoria=None,
+                 avisos_de_modo=None) -> None:
         super().__init__()
 
         customtkinter.set_appearance_mode("dark")
@@ -116,6 +117,9 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         # abrir sin ellos en una prueba.
         self._motor = motor
         self._memoria = memoria
+        # Lista compartida con main.py: los envoltorios del modo local le anaden
+        # un aviso cuando cambian de nube a local o al reves. Se vacia al leerla.
+        self._avisos_de_modo = avisos_de_modo if avisos_de_modo is not None else []
 
         self._estado = Estado.REPOSO
         self._paso_animacion = 0
@@ -209,6 +213,16 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             marco, text="asistente de voz", text_color=PALETA["texto_tenue"],
             font=("Segoe UI", 12), anchor="w",
         ).grid(row=1, column=0, sticky="w", pady=(0, 12))
+
+        # Indicador de modo, arriba a la derecha. Un asistente que de pronto responde
+        # peor y no explica por que es peor que uno que falla: si el respaldo local
+        # entra, tiene que verse.
+        self._indicador_modo = customtkinter.CTkLabel(
+            marco, text="", text_color=PALETA["texto_tenue"],
+            font=("Consolas", 11), anchor="e",
+        )
+        self._indicador_modo.grid(row=0, column=1, rowspan=2, sticky="e")
+        marco.grid_columnconfigure(1, weight=0)
 
         # La linea separadora es un frame de 1 px de alto. En un diseno sin cajas es lo
         # unico que organiza la pantalla, asi que hace bastante trabajo para lo que es.
@@ -491,7 +505,28 @@ class AplicacionMiniJarvis(customtkinter.CTk):
                 texto = f"Memoria: {turnos} de {MAX_TURNOS_MEMORIA} turnos  ·  {tokens} tokens aprox."
                 color = PALETA["texto_tenue"]
             self._indicador_memoria.configure(text=texto, text_color=color)
+        self._revisar_modo()
         self.after(700, self._refrescar_indicador_de_memoria)
+
+    def _revisar_modo(self) -> None:
+        """Muestra si esta respondiendo la nube o el respaldo local.
+
+        Los avisos los deja `core/modo_local` en una lista compartida. Se leen aqui y
+        se vacian, para no repetir el mismo mensaje en cada latido.
+        """
+        while self._avisos_de_modo:
+            self._escribir("Aviso", self._avisos_de_modo.pop(0), avisar=True)
+
+        local = any(
+            getattr(pieza, "usando_local", False)
+            for pieza in (self._motor,) if pieza is not None
+        )
+        if local:
+            self._indicador_modo.configure(
+                text="◈ SIN INTERNET · modelo local",
+                text_color=COLOR_BORDE_POR_ESTADO["ATENCION"])
+        else:
+            self._indicador_modo.configure(text="")
 
     def _mostrar_system_prompt(self) -> None:
         """Visor de solo lectura: lo que se le dice al modelo antes de cada turno."""

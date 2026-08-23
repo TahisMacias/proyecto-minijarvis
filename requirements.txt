@@ -44,3 +44,16 @@ matplotlib==3.11.1
 transformers==5.15.0
 torch==2.13.0
 numpy==2.5.2
+
+# --- Modo sin internet (T-21) ---
+# Respaldo local para cuando no hay conexion: oir, pensar y hablar en esta maquina.
+# El modelo de lenguaje local NO necesita libreria nueva: usa torch y transformers, que
+# ya estaban para el laboratorio del Transformer. Se intento primero llama-cpp-python,
+# que es lo habitual para esto, y NO tiene rueda para Python 3.14: compilarlo desde
+# codigo fuente en Windows era exactamente el riesgo que este proyecto no puede correr
+# a tres dias de la entrega.
+#
+# Los MODELOS no vienen aqui: se descargan con `python -m core.modo_local`, una vez y
+# con internet. Son unos 700 MB entre los dos.
+faster-whisper==1.2.1
+pyttsx3==2.99
