@@ -67,13 +67,13 @@ from core.orchestrator import Estado, TipoEvento
 
 TITULO = "Mini-JARVIS"
 
-ANCHO_VENTANA = 1040          # dos columnas: conversacion y laboratorio
+ANCHO_VENTANA = 1120          # tres columnas: reactor, conversacion y laboratorio
 ALTO_VENTANA = 720
 FRACCION_MAXIMA_DE_PANTALLA = 0.88
 
 MILIS_ANTIRREBOTE_ESPACIO = 60
 
-LADO_LIENZO = 210             # el modulo de estado, mas grande que antes (T-19)
+LADO_LIENZO = 264             # el reactor HUD: tres anillos, marcas y barrido
 MILIS_ANIMACION = 90
 
 LEYENDA_POR_ESTADO = {
@@ -159,7 +159,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         # de descarte hacia crecer la columna central y la del laboratorio se quedaba
         # con el titulo y el boton cortados. Se vio abriendo la ventana con la memoria
         # llena, no leyendo el codigo.
-        self.grid_columnconfigure(0, weight=0, minsize=300)  # izquierda: estado
+        self.grid_columnconfigure(0, weight=0, minsize=336)  # izquierda: el reactor HUD
         self.grid_columnconfigure(1, weight=3, minsize=380)  # centro: conversacion
         self.grid_columnconfigure(2, weight=2, minsize=330)  # derecha: laboratorio
         self.grid_rowconfigure(0, weight=1)
@@ -182,7 +182,8 @@ class AplicacionMiniJarvis(customtkinter.CTk):
     # --- Columna izquierda: el modulo de estado, ahora grande (T-19) ---------
 
     def _construir_columna_estado(self) -> None:
-        marco = customtkinter.CTkFrame(self, fg_color=PALETA["superficie"], corner_radius=18)
+        marco = customtkinter.CTkFrame(self, fg_color=PALETA["superficie"], corner_radius=14,
+                                       border_width=1, border_color=PALETA["superficie_alta"])
         marco.grid(row=0, column=0, sticky="nsew", padx=(14, 7), pady=14)
         marco.grid_columnconfigure(0, weight=1)
         marco.grid_rowconfigure(2, weight=1)
@@ -193,9 +194,9 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         ).grid(row=0, column=0, pady=(22, 2))
 
         customtkinter.CTkLabel(
-            marco, text="asistente de voz", text_color=PALETA["rosa"],
-            font=("Segoe UI", 12),
-        ).grid(row=1, column=0, pady=(0, 10))
+            marco, text="· S I S T E M A   D E   V O Z ·", text_color=PALETA["rosa"],
+            font=("Consolas", 10),
+        ).grid(row=1, column=0, pady=(0, 6))
 
         self._lienzo = tkinter.Canvas(
             marco, width=LADO_LIENZO, height=LADO_LIENZO,
@@ -227,7 +228,8 @@ class AplicacionMiniJarvis(customtkinter.CTk):
     # --- Columna central: conversacion + controles de sustentacion (T-14) ----
 
     def _construir_columna_conversacion(self) -> None:
-        marco = customtkinter.CTkFrame(self, fg_color=PALETA["superficie"], corner_radius=18)
+        marco = customtkinter.CTkFrame(self, fg_color=PALETA["superficie"], corner_radius=14,
+                                       border_width=1, border_color=PALETA["superficie_alta"])
         marco.grid(row=0, column=1, sticky="nsew", padx=7, pady=14)
         marco.grid_columnconfigure(0, weight=1)
         marco.grid_rowconfigure(1, weight=1)
@@ -343,13 +345,22 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         reimplementa nada: si el laboratorio y esta columna dijeran cosas distintas,
         una de las dos estaria mintiendo en la sustentacion.
         """
-        marco = customtkinter.CTkFrame(self, fg_color=PALETA["superficie"], corner_radius=18)
+        marco = customtkinter.CTkFrame(self, fg_color=PALETA["superficie"], corner_radius=14,
+                                       border_width=1, border_color=PALETA["superficie_alta"])
         marco.grid(row=0, column=2, sticky="nsew", padx=(7, 14), pady=14)
         marco.grid_columnconfigure(0, weight=1)
         marco.grid_rowconfigure(2, weight=1)
 
-        self._encabezado(marco, "Laboratorio del Transformer").grid(
-            row=0, column=0, sticky="w", padx=16, pady=(14, 6))
+        # Titulo y subtitulo van en su PROPIO contenedor apilado. Ponerlos los dos en
+        # la misma celda del grid los superpone: se vio en pantalla, con el subtitulo
+        # escrito encima del titulo.
+        cabecera = customtkinter.CTkFrame(marco, fg_color="transparent")
+        cabecera.grid(row=0, column=0, sticky="ew", padx=16, pady=(14, 6))
+        self._encabezado(cabecera, "Laboratorio").pack(anchor="w")
+        customtkinter.CTkLabel(
+            cabecera, text="analisis del transformer", text_color=PALETA["texto_tenue"],
+            font=("Consolas", 9),
+        ).pack(anchor="w", padx=(4, 0))
 
         # anchor y justify a la izquierda, y wraplength holgado respecto al ancho de
         # la columna: con el escalado de Windows al 133 % un wraplength de 280 se
@@ -379,9 +390,19 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         self._boton_mapa.grid(row=3, column=0, sticky="ew", padx=14, pady=(0, 16))
 
     def _encabezado(self, contenedor, texto):
+        """Titulo de panel con corchetes y espaciado, al estilo de un panel de control.
+
+        Tipografia monoespaciada a proposito: es lo que distingue una lectura de
+        instrumento de una etiqueta de formulario, y es gratis.
+        """
+        # El espaciado entre letras casi triplica el ancho. Solo se aplica a titulos
+        # cortos: con uno largo se sale de la columna y se corta, que fue justo lo que
+        # paso la primera vez con "LABORATORIO DEL TRANSFORMER".
+        texto = texto.upper()
+        etiqueta = "  ".join(texto) if len(texto) <= 13 else texto
         return customtkinter.CTkLabel(
-            contenedor, text=texto.upper(), text_color=PALETA["turquesa"],
-            font=("Segoe UI", 12, "bold"),
+            contenedor, text=f"[ {etiqueta} ]", text_color=PALETA["turquesa"],
+            font=("Consolas", 12, "bold"),
         )
 
     # --- Controles de sustentacion: que hacen (T-14) -------------------------
@@ -783,6 +804,16 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         self.after(MILIS_ANIMACION, self._animar)
 
     def _dibujar_estado(self) -> None:
+        """Pinta el reactor HUD entero: cromo alrededor, figura del estado en el centro.
+
+        EL CROMO Y LA SENAL SON COSAS DISTINTAS, y conviene no confundirlas al leer
+        esto. Los anillos, las marcas y el barrido son **decoracion**: dan el aspecto
+        de aparato encendido que pide la seccion 5.2 del enunciado ("interfaz visual
+        tipo HUD") y que el criterio del 15 % premia como refuerzo de la identidad
+        Jarvis. La **senal** sigue siendo la figura del centro, y sigue cumpliendo H-09:
+        cuatro formas distintas, cuatro colores distintos. Si manana hubiera que quitar
+        todo el cromo por rendimiento, la aplicacion seguiria siendo usable.
+        """
         lienzo = self._lienzo
         lienzo.delete("all")
 
@@ -790,8 +821,12 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         borde = COLOR_BORDE_POR_ESTADO.get(self._estado.value, BORDE_REPOSO)
         centro = LADO_LIENZO / 2
 
-        self._dibujar_halo(lienzo, centro, borde)
+        # --- cromo ---
+        self._dibujar_marco_hud(lienzo, borde)
+        self._dibujar_anillos_hud(lienzo, centro, borde)
+        self._dibujar_barrido(lienzo, centro, borde)
 
+        # --- senal ---
         if self._estado is Estado.ESCUCHANDO:
             self._dibujar_circulo_con_pulso(lienzo, centro, color, borde)
         elif self._estado is Estado.PENSANDO:
@@ -803,60 +838,125 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         else:
             self._dibujar_reposo(lienzo, centro, borde)
 
-    def _dibujar_halo(self, lienzo, centro, borde) -> None:
-        """Arte original: anillos concentricos tenues que giran despacio.
+    # --- Cromo del HUD ---------------------------------------------------------
 
-        Es lo unico "decorativo" de la ventana y esta hecho con codigo, no con una
-        imagen: el repositorio es publico y no se sube arte de terceros. Da la
-        sensacion de aparato encendido sin competir con la figura del estado, que es
-        la que comunica.
-        """
-        fase = self._paso_animacion / 30.0
-        for indice in range(3):
-            radio = 78 + indice * 9 + math.sin(fase + indice) * 3
-            lienzo.create_oval(
-                centro - radio, centro - radio, centro + radio, centro + radio,
-                outline=borde, width=1, dash=(2, 14),
+    def _dibujar_marco_hud(self, lienzo, borde) -> None:
+        """Cuatro escuadras en las esquinas, como una mira o un visor."""
+        largo, margen = 26, 6
+        lado = LADO_LIENZO
+        esquinas = (
+            ((margen, margen + largo), (margen, margen), (margen + largo, margen)),
+            ((lado - margen - largo, margen), (lado - margen, margen),
+             (lado - margen, margen + largo)),
+            ((margen, lado - margen - largo), (margen, lado - margen),
+             (margen + largo, lado - margen)),
+            ((lado - margen - largo, lado - margen), (lado - margen, lado - margen),
+             (lado - margen, lado - margen - largo)),
+        )
+        for puntos in esquinas:
+            lienzo.create_line(
+                *[c for punto in puntos for c in punto],
+                fill=borde, width=2, capstyle="projecting",
             )
+
+    def _dibujar_anillos_hud(self, lienzo, centro, borde) -> None:
+        """Tres anillos concentricos girando a distinta velocidad, con marcas de dial.
+
+        Todo esto es arte ORIGINAL generado por codigo. El repositorio es publico y no
+        se sube ninguna imagen de terceros; lo unico que se toma prestado son dos
+        colores, que no son propiedad de nadie.
+
+        Los anillos giran en sentidos alternos y a velocidades distintas a proposito:
+        con la misma velocidad el conjunto parece una sola pieza rigida, y es el
+        desfase entre ellos lo que da la sensacion de mecanismo vivo.
+        """
+        paso = self._paso_animacion
+
+        # Anillo exterior: marcas de dial, una larga cada cinco.
+        radio = LADO_LIENZO / 2 - 20
+        giro = paso * 0.6
+        for indice in range(48):
+            angulo = math.radians(indice * 7.5 + giro)
+            largo = 9 if indice % 5 == 0 else 4
+            cos_a, sen_a = math.cos(angulo), math.sin(angulo)
+            lienzo.create_line(
+                centro + cos_a * radio, centro + sen_a * radio,
+                centro + cos_a * (radio - largo), centro + sen_a * (radio - largo),
+                fill=borde, width=1,
+            )
+
+        # Anillo medio: tres arcos separados, girando al reves.
+        radio_medio = radio - 16
+        base = -paso * 1.4
+        for sector in range(3):
+            lienzo.create_arc(
+                centro - radio_medio, centro - radio_medio,
+                centro + radio_medio, centro + radio_medio,
+                start=base + sector * 120, extent=76,
+                style="arc", outline=borde, width=2,
+            )
+
+        # Anillo interior: dos arcos finos y rapidos, en el otro sentido.
+        radio_interior = radio_medio - 13
+        base = paso * 2.6
+        for sector in range(2):
+            lienzo.create_arc(
+                centro - radio_interior, centro - radio_interior,
+                centro + radio_interior, centro + radio_interior,
+                start=base + sector * 180, extent=54,
+                style="arc", outline=borde, width=1,
+            )
+
+    def _dibujar_barrido(self, lienzo, centro, borde) -> None:
+        """Linea de barrido que gira, como el radar de una pantalla de control."""
+        angulo = math.radians(self._paso_animacion * 3.2)
+        radio = LADO_LIENZO / 2 - 22
+        lienzo.create_line(
+            centro, centro,
+            centro + math.cos(angulo) * radio, centro + math.sin(angulo) * radio,
+            fill=borde, width=1, dash=(3, 6),
+        )
+
+    # --- La senal: cuatro formas propias, mas la de reposo (H-09) --------------
 
     def _dibujar_circulo_con_pulso(self, lienzo, centro, color, borde) -> None:
         """ESCUCHANDO: circulo lleno que late despacio, como un microfono abierto."""
         fase = self._paso_animacion % 20
-        radio = 52 + (fase if fase <= 10 else 20 - fase) * 1.6
+        radio = 40 + (fase if fase <= 10 else 20 - fase) * 1.4
         lienzo.create_oval(
             centro - radio, centro - radio, centro + radio, centro + radio,
-            fill=color, outline=borde, width=6,
+            fill=color, outline=borde, width=5,
         )
 
     def _dibujar_puntos(self, lienzo, centro, color, borde) -> None:
         """PENSANDO: tres puntos que se encienden en secuencia, como quien delibera."""
         encendido = (self._paso_animacion // 4) % 3
         for indice in range(3):
-            x = centro + (indice - 1) * 46
-            radio = 23 if indice == encendido else 15
+            x = centro + (indice - 1) * 38
+            radio = 19 if indice == encendido else 12
             lienzo.create_oval(
                 x - radio, centro - radio, x + radio, centro + radio,
                 fill=color if indice == encendido else PALETA["superficie"],
-                outline=borde, width=5,
+                outline=borde, width=4,
             )
 
     def _dibujar_onda(self, lienzo, centro, color, borde) -> None:
         """RESPONDIENDO: barras de distinta altura, la forma clasica de suena audio."""
-        alturas = [30, 54, 76, 54, 30]
+        alturas = [26, 46, 66, 46, 26]
         desfase = self._paso_animacion // 2
         for indice, altura_base in enumerate(alturas):
             # Cada barra respira con un desfase distinto: la onda parece moverse.
             oscilacion = ((desfase + indice * 2) % 8) * 4
             altura = altura_base + oscilacion - 16
-            x = centro + (indice - 2) * 32
+            x = centro + (indice - 2) * 27
             lienzo.create_rectangle(
-                x - 11, centro - altura / 2, x + 11, centro + altura / 2,
-                fill=color, outline=borde, width=4,
+                x - 9, centro - altura / 2, x + 9, centro + altura / 2,
+                fill=color, outline=borde, width=3,
             )
 
     def _dibujar_triangulo(self, lienzo, centro, color, borde) -> None:
         """ATENCION: triangulo con borde, la forma universal de mira esto."""
-        lado = 146
+        lado = 120
         altura = lado * 0.87
         lienzo.create_polygon(
             centro, centro - altura / 2,
@@ -865,7 +965,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             fill=color, outline=borde, width=4,
         )
         lienzo.create_text(
-            centro, centro + 18, text="!", fill=borde, font=("Segoe UI", 40, "bold"),
+            centro, centro + 14, text="!", fill=borde, font=("Segoe UI", 34, "bold"),
         )
 
     def _dibujar_reposo(self, lienzo, centro, borde) -> None:
@@ -876,7 +976,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         el tamano menor y la ausencia de pulso hacen que se distingan sin depender del
         color.
         """
-        radio = 44
+        radio = 36
         lienzo.create_oval(
             centro - radio, centro - radio, centro + radio, centro + radio,
             fill=PALETA["superficie_alta"], outline=borde, width=3, dash=(6, 5),
