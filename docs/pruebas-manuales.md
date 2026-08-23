@@ -143,7 +143,7 @@ Manten presionado el boton (o la barra espaciadora), habla, suelta.
 El tema cambio de claro a oscuro, asi que lo que firmaste el 14 de agosto era sobre
 otra ventana. Hay que volver a mirarlo.
 
-- [ ] **C.1** Habla y **mira la figura grande de la izquierda**, sin leer el texto.
+- [X] **C.1** Habla y **mira la figura grande de la izquierda**, sin leer el texto.
       Mientras hablas: circulo turquesa que late. Al soltar: tres puntos azules.
       Cuando responde: barras rosas. ¿Se distinguen?
 - [ ] **C.2** Ahora **entrecierra los ojos** hasta que casi no distingas el color.
@@ -153,18 +153,18 @@ otra ventana. Hay que volver a mirarlo.
 
 ## D. El mapa de atencion
 
-- [ ] **D.1** Despues de hablar, pulsa **"Ver el mapa de atencion"** abajo a la
+- [X] **D.1** Despues de hablar, pulsa **"Ver el mapa de atencion"** abajo a la
       derecha. Se abre grande encima de la ventana.
 - [ ] **D.2** Se ve una linea de cuadros rosas en diagonal. Eso significa que cada
       palabra esta mirando sobre todo a la palabra anterior. **Es lo que vas a
       explicar en la sustentacion.** ¿Lo entiendes mirandolo? Si no, dime que parte.
-- [ ] **D.3** Cierrala con el boton rosa "Cerrar". Prueba tambien la tecla Escape.
+- [X] **D.3** Cierrala con el boton rosa "Cerrar". Prueba tambien la tecla Escape.
 
 ## E. Los controles de abajo (para la sustentacion)
 
-- [ ] **E.1** Baja **Temperatura** casi a cero. Di *"cuentame algo sobre la musica"*.
+- [X] **E.1** Baja **Temperatura** casi a cero. Di *"cuentame algo sobre la musica"*.
       Fijate en la respuesta.
-- [ ] **E.2** Sube **Temperatura** al maximo. Di **la misma frase**. La respuesta debe
+- [X: el tope era 1.5 y atascaba al modelo; ahora 1.4, commit 74ff313] **E.2** Sube **Temperatura** al maximo. Di **la misma frase**. La respuesta debe
       ser mas rara o mas creativa. ¿Notas la diferencia? Es lo que te van a preguntar.
 - [ ] **E.3** Cambia el **Modelo** al segundo de la lista y sigue hablando sin cerrar
       nada. Debe seguir acordandose de lo anterior.
