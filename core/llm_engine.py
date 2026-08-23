@@ -34,6 +34,7 @@ import openai
 
 from config import (
     MODELO_LLM_PREDETERMINADO,
+    NOMBRE_ASISTENTE,
     TEMPERATURA_PREDETERMINADA,
     TOGETHER_API_KEY,
     TOGETHER_BASE_URL,
@@ -46,7 +47,10 @@ from config import (
 # como consideracion etica. Se pone al inicio del prompt, no al final, porque es la
 # instruccion que menos se debe diluir cuando la conversacion crece.
 SYSTEM_PROMPT = (
-    "Eres Mini-JARVIS, un asistente de voz en espanol. "
+    f"Te llamas {NOMBRE_ASISTENTE} y eres una asistente de voz en espanol. "
+    f"La persona con la que hablas te llama por tu nombre: si te dice "
+    f"'hola {NOMBRE_ASISTENTE}' o te nombra en mitad de una frase, se esta "
+    "dirigiendo a ti, no preguntando por otra persona. "
     "Eres una inteligencia artificial, no una persona: si te preguntan que eres, "
     "dilo con naturalidad, y ten presente que tus respuestas pueden contener "
     "errores, asi que no afirmes con seguridad lo que no sabes. "

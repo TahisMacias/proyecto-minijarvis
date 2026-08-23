@@ -26,8 +26,8 @@ directa de codigo desde este archivo.
 - [x] H-06. **[OK 2026-08-14, prueba 3 del recorrido manual]** Tres turnos
       encadenados con referencia al anterior: mantuvo el hilo.
 - [~] H-07. **[OK 2026-08-14 sobre la voz ANTERIOR]** La voz se entiende y suena
-      natural. Se firmo con `es-MX-DaliaNeural`.
-      **La voz cambio el 2026-08-23 a `es-ES-XimenaNeural`**, elegida por la duena
+      natural. Se firmo con `es-MX-DaliaNeural`; despues fue `es-ES-XimenaNeural`.
+      **La voz actual es `es-AR-ElenaNeural`** (2026-08-23), elegida por la duena
       escuchando seis muestras. La firma no se hereda: conviene volver a oirla dentro
       de la aplicacion, no solo en la muestra suelta.
 - [x] H-08. **[OK 2026-08-14, prueba 4 del recorrido manual]** Mover, redimensionar y

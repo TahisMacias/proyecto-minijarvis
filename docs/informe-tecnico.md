@@ -10,6 +10,12 @@ Repositorio: https://github.com/TahisMacias/proyecto-minijarvis
 
 ## 1. Que es Mini-JARVIS
 
+**Nota sobre el nombre.** Mini-JARVIS es el proyecto; la asistente se llama **Elena**,
+y es a quien se dirige la usuaria ("hola Elena"). La seccion 4 del enunciado deja la
+personalidad a criterio del equipo siempre que quede definida en un system prompt
+documentado, y asi esta: el nombre vive en una unica constante, `NOMBRE_ASISTENTE` de
+`config.py`, de donde lo leen la ventana, el saludo y los dos system prompts.
+
 Mini-JARVIS es un asistente de voz en espanol que corre como aplicacion de escritorio en
 Windows. Se mantiene presionado un boton, se habla, y el asistente transcribe lo dicho,
 piensa una respuesta con un modelo de lenguaje real y la contesta en voz alta,
@@ -343,7 +349,7 @@ exactamente lo que decia hacer.
 | Transcripcion | Together AI | `openai/whisper-large-v3` | $0.0015 / min de audio |
 | LLM predeterminado | Together AI | `Qwen/Qwen3.8-2.4T-A95B` | $2.50 / $6.25 por millon |
 | LLM alterno | Together AI | `meta-llama/Llama-3.3-70B-Instruct-Turbo` | $1.04 / $1.04 por millon |
-| Sintesis de voz | Microsoft | `edge-tts`, voz `es-ES-XimenaNeural` | sin costo |
+| Sintesis de voz | Microsoft | `edge-tts`, voz `es-AR-ElenaNeural` | sin costo |
 | Tokenizacion (laboratorio) | Hugging Face | tokenizador de `Qwen/Qwen2.5-7B-Instruct` | sin costo |
 | Embeddings y atencion | Hugging Face | `dccuchile/bert-base-spanish-wwm-cased` | sin costo |
 

@@ -1,5 +1,12 @@
 # Mini-JARVIS
 
+**La asistente se llama Elena.** Mini-JARVIS es el nombre del proyecto; Elena es a
+quien se le habla: se le dice "hola Elena" y responde a su nombre. La seccion 4 del
+enunciado lo permite explicitamente ("puede ser una replica cercana a JARVIS o una
+identidad propia, siempre que quede definida mediante un system prompt claro y
+documentado"). Su identidad vive en `SYSTEM_PROMPT`, en `core/llm_engine.py`, y su
+nombre en una sola constante: `NOMBRE_ASISTENTE`, en `config.py`.
+
 Mini-JARVIS es un asistente conversacional por voz en espanol, desarrollado como
 proyecto academico para la asignatura Redes Neuronales (Desarrollo de Software) de
 CENESTUR. Funciona con push-to-talk: el usuario mantiene presionado un boton, habla,
@@ -185,7 +192,7 @@ se ejecuta en local desde el principio.
 | Transcripcion (STT) | Together AI | `openai/whisper-large-v3` | $0.0015 / min de audio |
 | LLM (predeterminado) | Together AI | `Qwen/Qwen3.8-2.4T-A95B` | $2.50 entrada / $6.25 salida por millon de tokens |
 | LLM (alterno) | Together AI | `meta-llama/Llama-3.3-70B-Instruct-Turbo` | $1.04 entrada / $1.04 salida por millon de tokens |
-| Sintesis de voz (TTS) | Microsoft `edge-tts` | `es-ES-XimenaNeural` | sin costo |
+| Sintesis de voz (TTS) | Microsoft `edge-tts` | `es-AR-ElenaNeural` | sin costo |
 | STT sin internet | local | `faster-whisper base` | sin costo |
 | LLM sin internet | local | `Qwen/Qwen2.5-0.5B-Instruct` | sin costo |
 | Voz sin internet | Windows SAPI | voz `es-ES` instalada | sin costo |

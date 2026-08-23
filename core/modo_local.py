@@ -28,9 +28,9 @@ primera vez que se necesitan de verdad, y se quedan en memoria a partir de ahi.
 from __future__ import annotations
 
 import io
-import os
-import tempfile
 import threading
+
+from config import NOMBRE_ASISTENTE
 
 # Modelo pequeno a proposito: en una laptop sin tarjeta grafica, cualquier cosa mas
 # grande tarda tanto que deja de ser un respaldo y pasa a ser una espera.
@@ -158,8 +158,9 @@ class MotorLocal:
     # este modelo: el primer mensaje de la ventana lo dice al abrirse, y el indicador de
     # modo avisa de que esta respondiendo el modelo pequeno.
     SYSTEM_PROMPT_LOCAL = (
-        "Eres Mini-JARVIS, un asistente de voz en espanol. Eres una inteligencia "
-        "artificial. Responde siempre, en una o dos frases cortas y en espanol."
+        f"Te llamas {NOMBRE_ASISTENTE} y eres una asistente de voz en espanol. "
+        "Eres una inteligencia artificial. Responde siempre, en una o dos frases "
+        "cortas y en espanol."
     )
 
     def __init__(self) -> None:

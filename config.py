@@ -139,23 +139,34 @@ MODELO_LLM_ALTERNO = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
 MODELO_STT = "openai/whisper-large-v3"
 IDIOMA_STT = "es"
 
-# Voz elegida por la duena el 2026-08-23, escuchando seis muestras de la misma frase.
-# Antes era es-MX-DaliaNeural. edge-tts ofrece 45 voces en espanol; se le presentaron
-# una ecuatoriana, la mexicana anterior, una colombiana, una peruana y esta, mas una
-# sexta con el tono retocado. Eligio esta.
-VOZ_TTS = "es-ES-XimenaNeural"
+# --- Identidad del asistente ------------------------------------------------
+#
+# El PROYECTO se llama Mini-JARVIS: es el nombre de la tarea y asi se queda en el
+# repositorio, el informe y la sustentacion. La ASISTENTE se llama Elena, que es a
+# quien le habla la duena.
+#
+# La seccion 4 del enunciado lo permite explicitamente: "la personalidad del asistente
+# (nombre, tono, estilo de respuesta) queda a criterio de cada equipo: puede ser una
+# replica cercana a JARVIS o una identidad propia, siempre que quede definida mediante
+# un system prompt claro y documentado".
+#
+# El nombre vive AQUI y no escrito a mano en cada archivo. Si manana se cambia, se
+# cambia en un sitio: la ventana, el saludo, el system prompt de la nube y el del
+# modelo local lo leen todos de esta constante.
+NOMBRE_ASISTENTE = "Elena"
+
+# Voz elegida por la duena el 2026-08-23 escuchando ocho muestras de la misma frase.
+# Es argentina y se llama Elena, igual que la asistente: el nombre y la voz van juntos.
+# Antes fueron es-MX-DaliaNeural y es-ES-XimenaNeural.
+VOZ_TTS = "es-AR-ElenaNeural"
 
 # Tono y ritmo: NEUTROS, y es una decision, no un descuido.
 #
-# Estas dos constantes existen desde el 2026-08-14 con los valores "+35Hz" y "+8%", y
-# un comentario que decia que servian para acercar la voz al registro agudo del
-# personaje que entonces se iba a usar de tematica. Dos cosas estaban mal: la tematica
-# cambio, y sobre todo **ningun archivo las leia**. Eran dos constantes muertas
-# afirmando que la voz estaba ajustada. Se conectaron de verdad en core/tts_engine.py.
-#
-# Ya conectadas, se ponen a cero: la duena eligio la muestra SIN retoque, y aplicarle
-# un tono que ella no escogio seria entregarle algo distinto de lo que pidio. Se dejan
-# declaradas porque el motor las respeta y basta cambiarlas aqui para probar otra cosa.
+# Estas dos constantes existieron desde el 2026-08-14 con valores "+35Hz" y "+8%" y un
+# comentario que decia que la voz estaba ajustada, pero **ningun archivo las leia**:
+# eran dos constantes muertas afirmando un ajuste inexistente. Se conectaron de verdad
+# en core/tts_engine.py, y una vez conectadas se ponen a cero, porque la duena eligio
+# las muestras SIN retoque. Se dejan declaradas porque el motor ya las respeta.
 TONO_TTS = "+0Hz"
 RITMO_TTS = "+0%"
 

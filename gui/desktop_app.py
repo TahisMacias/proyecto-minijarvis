@@ -55,6 +55,7 @@ from config import (
     MAX_TURNOS_MEMORIA,
     MODELO_LLM_ALTERNO,
     MODELO_LLM_PREDETERMINADO,
+    NOMBRE_ASISTENTE,
     PALETA,
     TEMPERATURA_MAXIMA,
     TEMPERATURA_PREDETERMINADA,
@@ -65,7 +66,10 @@ from core.orchestrator import Estado, TipoEvento
 
 # --- Constantes de presentacion --------------------------------------------
 
-TITULO = "Mini-JARVIS"
+# El PROYECTO se llama Mini-JARVIS (nombre de la tarea); la ASISTENTE se llama
+# como diga config.NOMBRE_ASISTENTE, que es a quien le habla la usuaria. La barra
+# de la ventana lleva los dos para que se entienda de un vistazo cual es cual.
+TITULO = f"{NOMBRE_ASISTENTE} · Mini-JARVIS"
 
 ANCHO_VENTANA = 1000          # dos columnas: el reactor y todo lo demas
 # El diseno C apila conversacion, controles y laboratorio en una sola columna, asi
@@ -193,9 +197,10 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         self.protocol("WM_DELETE_WINDOW", self._al_cerrar)
 
         self._escribir(
-            "mini-jarvis",
-            "Hola. Soy una inteligencia artificial, asi que mis respuestas pueden "
-            "contener errores. Manten presionado el boton y hablame.",
+            NOMBRE_ASISTENTE,
+            f"Hola, soy {NOMBRE_ASISTENTE}. Soy una inteligencia artificial, asi que "
+            "mis respuestas pueden contener errores. Manten presionado el boton y "
+            "hablame.",
         )
 
     def _construir_cabecera(self) -> None:
@@ -205,13 +210,13 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         marco.grid_columnconfigure(0, weight=1)
 
         customtkinter.CTkLabel(
-            marco, text="mini-jarvis", text_color=PALETA["texto_claro"],
+            marco, text=NOMBRE_ASISTENTE.lower(), text_color=PALETA["texto_claro"],
             font=("Segoe UI", 26, "bold"), anchor="w",
         ).grid(row=0, column=0, sticky="w")
 
         customtkinter.CTkLabel(
-            marco, text="asistente de voz", text_color=PALETA["texto_tenue"],
-            font=("Segoe UI", 12), anchor="w",
+            marco, text="asistente de voz  ·  mini-jarvis",
+            text_color=PALETA["texto_tenue"], font=("Segoe UI", 12), anchor="w",
         ).grid(row=1, column=0, sticky="w", pady=(0, 12))
 
         # Indicador de modo, arriba a la derecha. Un asistente que de pronto responde
@@ -712,7 +717,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             self._escribir("Tu", evento.texto)
             self._analizar_en_segundo_plano(evento.texto)
         elif evento.tipo is TipoEvento.RESPUESTA:
-            self._escribir("Mini-JARVIS", evento.texto)
+            self._escribir(NOMBRE_ASISTENTE, evento.texto)
         elif evento.tipo is TipoEvento.HERRAMIENTA:
             self._escribir("...", f"usando la herramienta {evento.texto}")
         elif evento.tipo is TipoEvento.ERROR:
