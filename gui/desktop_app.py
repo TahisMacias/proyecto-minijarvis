@@ -287,7 +287,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         # ventana, se parta en dos lineas en vez de ensanchar la columna.
         self._indicador_memoria = customtkinter.CTkLabel(
             marco, text="", text_color=PALETA["texto_tenue"], font=("Segoe UI", 11),
-            anchor="w", justify="left", wraplength=300,
+            anchor="w", justify="left", wraplength=240,
         )
         self._indicador_memoria.grid(row=3, column=0, columnspan=2, sticky="w",
                                      padx=12, pady=(6, 10))
@@ -424,11 +424,14 @@ class AplicacionMiniJarvis(customtkinter.CTk):
             turnos = self._memoria.numero_de_turnos()
             tokens = self._memoria.estimar_tokens()
             if self._memoria.esta_llena():
-                texto = (f"Memoria {turnos}/{MAX_TURNOS_MEMORIA} - {tokens} tokens\n"
-                         "El proximo turno ya descarta el mas antiguo.")
+                texto = (f"Memoria {turnos}/{MAX_TURNOS_MEMORIA}  ·  {tokens} tokens\n"
+                         "Ya descarta el turno mas antiguo.")
                 color = PALETA["rosa"]
             else:
-                texto = f"Memoria {turnos}/{MAX_TURNOS_MEMORIA} turnos - {tokens} tokens aprox."
+                # Corto a proposito. La version larga ("... turnos - N tokens aprox.")
+                # se cortaba a media palabra en ventanas estrechas: se veia
+                # "Memoria 2/10 turnc". Un indicador cortado no informa, confunde.
+                texto = f"Memoria {turnos}/{MAX_TURNOS_MEMORIA}  ·  {tokens} tokens"
                 color = PALETA["texto_tenue"]
             self._indicador_memoria.configure(text=texto, text_color=color)
         self.after(700, self._refrescar_indicador_de_memoria)

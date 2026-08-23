@@ -8,10 +8,11 @@ y el asistente transcribe el audio, genera una respuesta con un modelo de lengua
 exploracion que evidencia, de forma didactica, como funcionan la tokenizacion, los
 embeddings y el mecanismo de self-attention de la arquitectura Transformer.
 
-> **Estado actual: el nucleo funciona de extremo a extremo.** El ciclo completo
-> —hablar, transcribir, pensar y responder con voz— esta implementado y verificado.
-> El tool calling (que Mini-JARVIS consulte la bateria, busque en la web o abra una
-> pagina) es la fase siguiente y todavia no esta disponible.
+> **Estado actual: completo y verificado.** El ciclo entero —hablar, transcribir,
+> pensar y responder con voz— funciona, con memoria entre turnos. Mini-JARVIS ademas
+> **usa herramientas**: resuelve cuentas exactas, consulta el estado de la laptop,
+> busca en internet y abre paginas de una lista blanca. La ventana muestra a la vez la
+> conversacion y el analisis del Transformer de la ultima frase.
 
 ## Requisitos
 
@@ -96,6 +97,11 @@ funcionan incluso sin conexion. Deja el PNG del mapa de atencion en
 2. Sueltalo al terminar. La respuesta aparece en el panel y se escucha en voz alta.
 3. El indicador de arriba dice en que va, por color **y por forma**:
 
+4. Abajo tienes los controles de la sustentacion: temperatura, `top_p`, selector de
+   modelo en caliente, indicador de memoria y visor del system prompt.
+5. A la derecha, el laboratorio analiza cada frase que dices. El boton
+   **Ver el mapa de atencion** lo abre grande.
+
    | Estado | Forma | Significado |
    |---|---|---|
    | Reposo | circulo punteado | listo para escucharte |
@@ -130,23 +136,31 @@ pytest
 |---|---|---|---|
 | Transcripcion (STT) | Together AI | `openai/whisper-large-v3` | $0.0015 / min de audio |
 | LLM (predeterminado) | Together AI | `Qwen/Qwen3.8-2.4T-A95B` | $2.50 entrada / $6.25 salida por millon de tokens |
-| LLM (alterno) | Together AI | `Qwen/Qwen2.5-7B-Instruct-Turbo` | $0.30 entrada / $0.30 salida por millon de tokens |
+| LLM (alterno) | Together AI | `meta-llama/Llama-3.3-70B-Instruct-Turbo` | $1.04 entrada / $1.04 salida por millon de tokens |
 | Sintesis de voz (TTS) | Microsoft `edge-tts` | `es-MX-DaliaNeural` | sin costo |
 | Exploracion (tokenizacion) | Hugging Face | tokenizador de `Qwen/Qwen2.5-7B-Instruct`, sin pesos | sin costo |
 | Exploracion (embeddings y atencion) | Hugging Face | `dccuchile/bert-base-spanish-wwm-cased` (BETO) | sin costo |
 
 Estos dos modelos de lenguaje **se eligieron probandolos uno por uno contra la API
 real**, no leyendo el catalogo. Aparecer en `GET /v1/models` no significa estar
-disponible: los identificadores "grandes" mas obvios (`Qwen2.5-72B-Instruct`,
-`Llama-3.3-70B-Instruct`, `Qwen3-Next-80B` y otros) devuelven `HTTP 400 non-serverless
-model`, porque estan en el catalogo de Together pero no en su servicio compartido:
-usarlos exigiria pagar un endpoint dedicado. Se probaron 26 identificadores; estos dos
-son los que responden.
+disponible: de los 169 modelos de chat que lista Together, **solo 20 responden**. El
+resto devuelve `HTTP 400 non-serverless model`, porque estan en el catalogo pero no en
+el servicio compartido. El campo `running` del catalogo tampoco sirve: viene en `false`
+para todos.
 
-El predeterminado es un modelo de razonamiento (escribe un borrador interno antes de
-contestar, y por eso gasta mas tokens de salida). El alterno es a proposito mucho mas
-pequeno: el contraste entre ambos se nota en vivo, y es lo que hace util el selector
-de modelo durante la sustentacion.
+**Y la disponibilidad cambia con el tiempo.** El alterno era
+`Qwen/Qwen2.5-7B-Instruct-Turbo`, que funcionaba el 14 de agosto y devolvia `HTTP 503`
+tres dias despues. Si algun modelo deja de responder, hay que volver a probar el
+catalogo y actualizar `config.py`.
+
+El predeterminado es un modelo de razonamiento: escribe un borrador interno antes de
+contestar, y por eso gasta mas tokens de salida. El alterno es de otra familia y no
+razona antes de responder, asi que contesta mas rapido y mas escueto. El contraste se
+nota en vivo y es lo que hace util el selector durante la sustentacion.
+
+**Aviso sobre la temperatura:** el slider llega hasta 1.4 y no mas. Midiendo contra la
+API, a partir de 1.5 el modelo de razonamiento se atasca unos 100 segundos en dos de
+cada tres intentos.
 
 La fuente unica de verdad de estos identificadores es [`config.py`](config.py); si
 alguna vez esta tabla y ese archivo no coinciden, manda `config.py`.
@@ -165,10 +179,12 @@ core/stt_client.py             WAV -> texto (Whisper)
 core/llm_engine.py             mensajes -> respuesta del modelo
 core/tts_engine.py             texto -> voz reproducida
 core/orchestrator.py           maquina de estados y el hilo de cada turno
+tools/manifest.py              lo que el modelo lee para saber que puede pedir
+tools/system_skills.py         lo que hacen las herramientas (sin eval, lista blanca)
 gui/desktop_app.py             la ventana
 main.py                        punto de entrada
 exploration/transformer_lab.py laboratorio del Transformer (independiente)
-tests/                         pruebas deterministas
+tests/                         pruebas deterministas (133)
 ```
 
 ## Si algo falla

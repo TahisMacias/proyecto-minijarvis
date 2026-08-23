@@ -116,15 +116,31 @@ TOGETHER_BASE_URL = "https://api.together.xyz/v1"
 # ~2.5 s, que es aceptable para voz. No existe ninguna variante de 27B en Together.
 MODELO_LLM_PREDETERMINADO = "Qwen/Qwen3.8-2.4T-A95B"
 
-# El alterno es a proposito MUCHO mas pequeno: el contraste entre un modelo enorme y
-# uno de 7B se nota en vivo, y es lo que hace util el selector durante la sustentacion.
-MODELO_LLM_ALTERNO = "Qwen/Qwen2.5-7B-Instruct-Turbo"
+# ALTERNO CAMBIADO EL 2026-08-17. El anterior, Qwen2.5-7B-Instruct-Turbo, funcionaba
+# el 14 de agosto y para el 17 devolvia HTTP 503 en todos los intentos: Together lo
+# retiro en esos tres dias. Lo encontro la duena usando el selector.
+#
+# Se probaron los 169 modelos de chat del catalogo uno por uno. Solo 20 responden. De
+# esos, en espanol y con este system prompt:
+#     Qwen/Qwen3.5-9B                         12 s, 1300 tokens  -> inservible para voz
+#     openai/gpt-oss-20b                      1.7 s, 170 tokens  -> aceptable
+#     meta-llama/Llama-3.3-70B-Instruct-Turbo 1.5 s,  65 tokens  -> elegido
+#
+# El elegido es ademas el que el diseno original pedia: la seccion 4 del spec proponia
+# un selector Qwen / Llama, y se descarto en T-07 porque entonces Llama no respondia.
+# Ahora si, asi que el selector recupera su intencion: dos FAMILIAS distintas de modelo,
+# no dos tamanos de la misma. Para la sustentacion es mejor comparacion.
+#
+# NOTA: el campo `running` del catalogo esta en false para los 169. No sirve para saber
+# que modelo esta vivo. La unica forma sigue siendo pedirle algo y ver si contesta.
+MODELO_LLM_ALTERNO = "meta-llama/Llama-3.3-70B-Instruct-Turbo"
 
 # Precio por millon de tokens en Together, consultado el 2026-08-14. Se anota aqui
 # porque el saldo es limitado y conviene saber que cuesta cada turno.
-#   Qwen3.8-2.4T-A95B          entrada $2.50   salida $6.25
-#   Qwen2.5-7B-Instruct-Turbo  entrada $0.30   salida $0.30
-#   whisper-large-v3           $0.0015 por minuto de audio
+#   Qwen3.8-2.4T-A95B              entrada $2.50   salida $6.25
+#   Llama-3.3-70B-Instruct-Turbo   entrada $1.04   salida $1.04
+#   whisper-large-v3               $0.0015 por minuto de audio
+# Precios releidos del catalogo el 2026-08-17, no copiados de la web.
 
 MODELO_STT = "openai/whisper-large-v3"
 IDIOMA_STT = "es"
