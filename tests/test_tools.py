@@ -261,7 +261,38 @@ def test_la_busqueda_resume_los_resultados():
 
 def test_una_busqueda_sin_resultados_se_dice_con_palabras():
     respuesta = buscar_web("algo rarisimo", buscador=lambda c, max_results: [])
-    assert "no devolvio ningun resultado" in respuesta
+    assert "No pude completar la busqueda" in respuesta
+
+
+def test_una_busqueda_vacia_se_reintenta_una_vez():
+    """Defecto real del 2026-08-23: la libreria anterior devolvia cero resultados de
+    forma intermitente para la MISMA consulta, sin lanzar error. El modelo recibia una
+    busqueda vacia y contestaba que no tenia acceso a internet.
+
+    Se migro a `ddgs`, que resulto estable, y ademas se reintenta una vez: un buscador
+    publico y gratuito puede tener un mal momento, y esto se demuestra en vivo.
+    """
+    intentos = []
+
+    def a_la_segunda(consulta, max_results):
+        intentos.append(consulta)
+        return [] if len(intentos) == 1 else [{"title": "T", "body": "cuerpo"}]
+
+    respuesta = buscar_web("lo que sea", buscador=a_la_segunda)
+    assert len(intentos) == 2, "no reintento"
+    assert "cuerpo" in respuesta, "descarto el resultado del segundo intento"
+
+
+def test_no_se_reintenta_si_el_primer_intento_ya_trajo_algo():
+    """Reintentar cuando no hace falta seria pagar un segundo viaje a la red por nada."""
+    intentos = []
+
+    def siempre_bien(consulta, max_results):
+        intentos.append(consulta)
+        return [{"title": "T", "body": "cuerpo"}]
+
+    buscar_web("x", buscador=siempre_bien)
+    assert len(intentos) == 1
 
 
 def test_si_el_buscador_falla_no_se_rompe_el_turno():

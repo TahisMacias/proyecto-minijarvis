@@ -32,6 +32,7 @@ import ast
 import math
 import operator
 import subprocess
+import time
 from urllib.parse import urlparse
 
 from config import DOMINIOS_PERMITIDOS
@@ -270,23 +271,34 @@ def buscar_web(consulta: str, buscador=None) -> str:
 
     if buscador is None:
         try:
-            from duckduckgo_search import DDGS
+            from ddgs import DDGS
         except ImportError:
-            return "No puedo buscar en internet: falta la libreria duckduckgo-search."
+            return "No puedo buscar en internet: falta la libreria ddgs."
         buscador = DDGS().text
 
-    try:
-        resultados = buscador(consulta, max_results=MAXIMO_RESULTADOS_WEB)
-    except Exception:  # noqa: BLE001 - sin red, bloqueo del buscador, cambio de API
+    # SE REINTENTA UNA VEZ, y no por adorno. Con la libreria anterior
+    # (`duckduckgo_search`, descontinuada) la MISMA consulta devolvia unas veces cuatro
+    # resultados y otras cero, sin lanzar ningun error. El modelo recibia una busqueda
+    # vacia y contestaba que no tenia acceso a internet, que es exactamente lo que la
+    # duena vio el 2026-08-23 preguntando por el Big Ben. Se migro a `ddgs`, que en
+    # seis intentos seguidos respondio las seis veces, pero un buscador publico y
+    # gratuito siempre puede tener un mal momento y esto se demuestra en vivo.
+    resultados = []
+    for intento in range(2):
+        try:
+            resultados = list(buscador(consulta, max_results=MAXIMO_RESULTADOS_WEB) or [])
+        except Exception:  # noqa: BLE001 - sin red, bloqueo del buscador, cambio de API
+            resultados = []
+        if resultados:
+            break
+        if intento == 0:
+            time.sleep(1.0)
+
+    if not resultados:
         return (
             f"No pude completar la busqueda de {consulta}. Puede que no haya conexion "
-            "a internet en este momento."
+            "a internet, o que el buscador este rechazando peticiones ahora mismo."
         )
-
-    resultados = list(resultados or [])
-    if not resultados:
-        return f"La busqueda de {consulta} no devolvio ningun resultado."
-
     lineas = [f"Resultados de la busqueda de {consulta}:"]
     for indice, resultado in enumerate(resultados[:MAXIMO_RESULTADOS_WEB], start=1):
         titulo = str(resultado.get("title", "sin titulo")).strip()

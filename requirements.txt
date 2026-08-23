@@ -27,15 +27,13 @@ pillow==12.3.0
 #
 #   psutil, duckduckgo-search  ->  herramientas de Tool Calling (T-15, Fase 2).
 #
-#   tiktoken  ->  reservada para T-14. AVISO: hasta la revision del 2026-08-17 el
+#   tiktoken  ->  reservada para T-14. AVISO: hasta la revision del 2026-08-23 el
 #   comentario de este archivo decia que tiktoken servia para "el conteo de tokens del
 #   indicador de memoria". Era falso. core/memory.py NO usa ningun tokenizador: estima
 #   con la regla de 4 caracteres por token y documenta a proposito por que (truncar por
 #   turnos es predecible y se prueba sin red; la cuenta exacta solo la sabe el
 #   proveedor). Si T-14 termina necesitando la cuenta exacta, esta fijada; si no, esta
 #   linea se puede borrar sin tocar una sola linea de codigo.
-psutil==7.2.2
-duckduckgo-search==8.1.1
 tiktoken==0.13.0
 
 # --- Pruebas (gates deterministas del plan: T-04, T-09, T-15) ---
