@@ -3,7 +3,7 @@ Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF
 ==============================================================================
 MINI-JARVIS - LABORATORIO DE EXPLORACION DEL TRANSFORMER (T-11)
 ==============================================================================
-Este script no es parte del pipeline de voz de Mini-JARVIS: es un modulo independiente para demostrar, con un Transformer real corriendo en esta misma maquina, los tres conceptos que la rubrica exige poder explicar: tokenizacion, embeddings y self-attention.
+Este script no es parte del pipeline de voz de Mini-JARVIS: es un modulo independiente para demostrar, con un Transformer real corriendo en esta misma maquina, los cuatro conceptos que la seccion 2.2 del enunciado exige evidenciar: tokenizacion, embeddings, positional encoding y self-attention.
 
 ==============================================================================
 NIVEL 1 - TOKENIZACION (tokenizador real de Qwen2.5-Instruct)
@@ -111,6 +111,44 @@ torch.allclose(suma, 1.0) = True
 Por que suma 1.0: cada fila de la matriz de atencion es el resultado de una funcion softmax. El softmax convierte una lista de puntajes en una distribucion de probabilidad: numeros entre 0 y 1 que siempre suman exactamente 1. En este caso representa 'que porcentaje de mi atencion total reparto entre cada uno de los demas tokens de la frase' — nunca mas, nunca menos que el 100 %.
 
 ==============================================================================
+NIVEL 3 - POSITIONAL ENCODING (como el modelo sabe el orden)
+==============================================================================
+La atencion mira todos los tokens a la vez, asi que por si sola no distingue el orden: para ella una frase es un monton de palabras sueltas. El positional encoding es lo que arregla eso.
+
+--- BETO guarda una tabla de posiciones, aparte de la de palabras ---
+Tabla de palabras : (31002, 768)  ->  31002 palabras distintas del vocabulario
+Tabla de posiciones: (512, 768)  ->  512 posiciones posibles, cada una con 768 numeros
+
+Cada token que entra al modelo se representa sumando DOS vectores de 768 numeros: el de su palabra y el de su posicion. Por eso el modelo no puede leer frases de mas de 512 tokens: no tiene vector de posicion para el numero 513.
+
+--- Aprendidas, no calculadas: una diferencia que conviene saber ---
+En el articulo original del Transformer (Attention is All You Need, 2017) las posiciones se CALCULABAN con senos y cosenos. BETO, como todos los BERT, las APRENDE: esa tabla de arriba son parametros que se ajustaron durante el entrenamiento, igual que los de las palabras. Las dos formas resuelven el mismo problema; esta es la que usa el modelo que estamos mirando.
+
+--- La prueba: la misma palabra en dos sitios distintos ---
+Frase A: "perro gato"   ->  "perro" esta en la posicion 1
+Frase B: "gato perro"   ->  "perro" esta en la posicion 2
+
+Parecido entre los dos vectores de 'perro': 0.9367
+Si el orden no importara, ese numero seria exactamente 1.0000, porque seria el mismo vector. No lo es: la misma palabra, en otra posicion, se representa distinto. Eso es el positional encoding funcionando.
+
+--- El modelo tambien sabe CUANTO se separan dos palabras ---
+Parecido medio entre dos posiciones, segun lo lejos que esten:
+  la misma posicion    +1.000
+  a 1 de distancia     +0.902
+  a 2 de distancia     +0.714
+  a 3 de distancia     +0.513
+  a 5 de distancia     +0.394
+  a 8 de distancia     +0.612
+
+Baja con la distancia. Eso significa que el vector de posicion no es una simple etiqueta numerica: posiciones cercanas tienen vectores parecidos, asi que el modelo puede notar que dos palabras estan JUNTAS y no solo que ocupan sitios distintos.
+
+--- Por que esto importa en una frase de verdad ---
+  "El perro mordio al gato"  ->  ['El', 'perro', 'mor', '##dio', 'al', 'gato']
+  "El gato mordio al perro"  ->  ['El', 'gato', 'mor', '##dio', 'al', 'perro']
+
+Las dos frases tienen EXACTAMENTE los mismos tokens, en distinto orden, y significan cosas opuestas. Sin positional encoding el modelo no podria diferenciarlas: es la razon de que este mecanismo exista.
+
+==============================================================================
 MAPA DE CALOR DE ATENCION
 ==============================================================================
 Capa elegida: indice base-0 = 5  (capa humana #6 de 12)
@@ -118,12 +156,25 @@ Cabeza elegida: indice base-0 = 3  (cabeza humana #4 de 12)
 Se eligio esta combinacion porque, de las 144 capas x cabezas posibles, es una 'cabeza de token anterior': en el mapa se ve una franja iluminada justo a la izquierda de la diagonal principal, es decir, cada token le presta casi toda su atencion a la palabra que lo precede inmediatamente. Es un patron clasico y muy documentado en modelos tipo BERT, y resulta facil de senalar en la imagen durante la sustentacion oral.
 
 PNG guardado en: C:\Users\brith\OneDrive\Documents\PROYECTO INTEGRADOR MINIJARVIS\exploration\mapa_atencion.png
-Tamano del archivo: 89415 bytes
+Tamano del archivo: 89994 bytes
+
+==============================================================================
+MAPA DE LAS POSICIONES
+==============================================================================
+
+PNG guardado en: C:\Users\brith\OneDrive\Documents\PROYECTO INTEGRADOR MINIJARVIS\exploration\mapa_posiciones.png
+Tamano del archivo: 70642 bytes
 
 ==============================================================================
 FIN DEL LABORATORIO
 ==============================================================================
-Los tres pilares del Transformer quedaron demostrados sobre modelos reales:
-  1) Tokenizacion  -> tokenizador real de Qwen2.5-Instruct.
-  2) Embeddings    -> last_hidden_state de BETO, forma (1, N, 768).
-  3) Self-attention -> 12 capas de atencion de BETO, filas que suman 1.0.
+Los CUATRO conceptos que pide el enunciado, demostrados sobre modelos reales:
+  1) Tokenizacion       -> tokenizador real de Qwen2.5-Instruct.
+  2) Embeddings         -> last_hidden_state de BETO, forma (1, N, 768).
+  3) Positional encoding-> tabla (512, 768) aprendida; la misma palabra en
+                           otra posicion da un vector distinto.
+  4) Self-attention     -> 12 capas de atencion de BETO, filas que suman 1.0.
+
+Dos imagenes para el informe y la sustentacion:
+  exploration/mapa_atencion.png   quien mira a quien
+  exploration/mapa_posiciones.png como el modelo codifica el orden

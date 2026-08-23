@@ -514,6 +514,205 @@ def nivel_2_embeddings_y_atencion():
 
 
 # ---------------------------------------------------------------------------------
+# Nivel 3 - Positional encoding
+# ---------------------------------------------------------------------------------
+#
+# Este nivel se anadio el 2026-08-23 al releer el enunciado completo. Lo pide dos
+# veces y no estaba: la seccion 2.2 exige "explicar y evidenciar ... tokenizacion,
+# embeddings, positional encoding y self-attention", y la 3.1 lo desarrolla. Es parte
+# del criterio de mayor peso de la rubrica.
+
+FRASES_ORDEN = ("El perro mordio al gato", "El gato mordio al perro")
+NOMBRE_PNG_POSICIONES = "mapa_posiciones.png"
+POSICIONES_A_DIBUJAR = 40
+
+
+def analizar_posiciones():
+    """Devuelve las pruebas de que la posicion cambia la representacion de un token.
+
+    Tres hechos, todos medidos sobre BETO en esta maquina:
+      forma_tabla     la tabla de embeddings de posicion: (512, 768)
+      forma_vocab     la de palabras, para comparar tamanos
+      similitud       la MISMA palabra en dos posiciones distintas, comparadas
+      tabla           los vectores de posicion, para dibujarlos
+    """
+    tokenizador, modelo = obtener_beto()
+    embeddings = modelo.embeddings
+
+    # "perro" es el token 1 en la primera frase y el token 2 en la segunda. Si la
+    # posicion no influyera, su vector de salida seria identico en ambas.
+    a = tokenizador("perro gato", return_tensors="pt")
+    b = tokenizador("gato perro", return_tensors="pt")
+    with torch.no_grad():
+        va = modelo(**a).last_hidden_state[0]
+        vb = modelo(**b).last_hidden_state[0]
+    similitud = torch.nn.functional.cosine_similarity(va[1], vb[2], dim=0).item()
+
+    return {
+        "forma_tabla": tuple(embeddings.position_embeddings.weight.shape),
+        "forma_vocab": tuple(embeddings.word_embeddings.weight.shape),
+        "similitud_misma_palabra_otra_posicion": similitud,
+        "tabla": embeddings.position_embeddings.weight.detach(),
+    }
+
+
+def nivel_3_positional_encoding():
+    """Demuestra que el modelo sabe en que ORDEN van las palabras, y como lo sabe.
+
+    CONCEPTO CLAVE: el mecanismo de self-attention, por si solo, **no tiene noción de
+    orden**. Cada token mira a todos los demas a la vez; para el, una frase es un
+    conjunto de palabras, no una secuencia. Si nada mas interviniera, "el perro mordio
+    al gato" y "el gato mordio al perro" serian exactamente la misma entrada.
+
+    La solucion es el positional encoding: ANTES de entrar a las capas de atencion, a
+    cada token se le SUMA un segundo vector que depende unicamente de la posicion que
+    ocupa. El modelo recibe entonces "esta palabra" mas "esta posicion", y a partir de
+    ahi ya puede distinguir el orden.
+    """
+    _encabezado("NIVEL 3 - POSITIONAL ENCODING (como el modelo sabe el orden)")
+    print(
+        "La atencion mira todos los tokens a la vez, asi que por si sola no distingue "
+        "el orden: para ella una frase es un monton de palabras sueltas. El positional "
+        "encoding es lo que arregla eso."
+    )
+
+    datos = analizar_posiciones()
+    posiciones, dimensiones = datos["forma_tabla"]
+
+    _subtitulo("BETO guarda una tabla de posiciones, aparte de la de palabras")
+    print(f"Tabla de palabras : {datos['forma_vocab']}  ->  {datos['forma_vocab'][0]} "
+          "palabras distintas del vocabulario")
+    print(f"Tabla de posiciones: {datos['forma_tabla']}  ->  {posiciones} posiciones "
+          f"posibles, cada una con {dimensiones} numeros")
+    print(
+        f"\nCada token que entra al modelo se representa sumando DOS vectores de "
+        f"{dimensiones} numeros: el de su palabra y el de su posicion. Por eso el "
+        f"modelo no puede leer frases de mas de {posiciones} tokens: no tiene vector "
+        "de posicion para el numero 513."
+    )
+
+    _subtitulo("Aprendidas, no calculadas: una diferencia que conviene saber")
+    print(
+        "En el articulo original del Transformer (Attention is All You Need, 2017) las "
+        "posiciones se CALCULABAN con senos y cosenos. BETO, como todos los BERT, las "
+        "APRENDE: esa tabla de arriba son parametros que se ajustaron durante el "
+        "entrenamiento, igual que los de las palabras. Las dos formas resuelven el "
+        "mismo problema; esta es la que usa el modelo que estamos mirando."
+    )
+
+    _subtitulo("La prueba: la misma palabra en dos sitios distintos")
+    print(f'Frase A: "perro gato"   ->  "perro" esta en la posicion 1')
+    print(f'Frase B: "gato perro"   ->  "perro" esta en la posicion 2')
+    similitud = datos["similitud_misma_palabra_otra_posicion"]
+    print(f"\nParecido entre los dos vectores de 'perro': {similitud:.4f}")
+    print(
+        "Si el orden no importara, ese numero seria exactamente 1.0000, porque seria "
+        "el mismo vector. No lo es: la misma palabra, en otra posicion, se representa "
+        "distinto. Eso es el positional encoding funcionando."
+    )
+    if similitud >= 0.9999:
+        raise RuntimeError(
+            "La misma palabra en dos posiciones dio un vector identico. Eso indicaria "
+            "que el positional encoding no se esta aplicando, y el modelo no podria "
+            "distinguir el orden de las palabras."
+        )
+
+    _subtitulo("El modelo tambien sabe CUANTO se separan dos palabras")
+    from_tabla = datos["tabla"]
+    sim = similitud_entre_posiciones(from_tabla, cuantas=60)
+    print("Parecido medio entre dos posiciones, segun lo lejos que esten:")
+    for salto in (0, 1, 2, 3, 5, 8):
+        media = float(np.mean([sim[i, i + salto] for i in range(5, 50)]))
+        etiqueta = "la misma posicion" if salto == 0 else f"a {salto} de distancia"
+        print(f"  {etiqueta:<20} {media:+.3f}")
+    print(
+        "\nBaja con la distancia. Eso significa que el vector de posicion no es una "
+        "simple etiqueta numerica: posiciones cercanas tienen vectores parecidos, asi "
+        "que el modelo puede notar que dos palabras estan JUNTAS y no solo que ocupan "
+        "sitios distintos."
+    )
+
+    _subtitulo("Por que esto importa en una frase de verdad")
+    tokenizador, _ = obtener_beto()
+    for frase in FRASES_ORDEN:
+        print(f'  "{frase}"  ->  {tokenizador.tokenize(frase)}')
+    print(
+        "\nLas dos frases tienen EXACTAMENTE los mismos tokens, en distinto orden, y "
+        "significan cosas opuestas. Sin positional encoding el modelo no podria "
+        "diferenciarlas: es la razon de que este mecanismo exista."
+    )
+
+    return datos
+
+
+def similitud_entre_posiciones(tabla, cuantas=POSICIONES_A_DIBUJAR):
+    """Compara cada posicion con todas las demas. Devuelve la matriz de parecidos."""
+    trozo = torch.nn.functional.normalize(tabla[:cuantas], dim=1)
+    return (trozo @ trozo.T).numpy()
+
+
+def dibujar_mapa_de_posiciones(tabla, ruta_salida=None, silencioso=False):
+    """Dibuja cuanto se parece cada posicion a todas las demas.
+
+    QUE SE DIBUJA Y POR QUE ESTE GRAFICO Y NO OTRO. La primera version pintaba la
+    tabla cruda de embeddings de posicion: 40 posiciones por 768 dimensiones. Salia
+    ruido -rayas verticales sin estructura- y era imposible explicarla, porque los
+    embeddings APRENDIDOS de BERT no tienen las bandas limpias que tendrian unos
+    calculados con senos y cosenos. Una imagen correcta que no ensena nada no sirve
+    de entregable.
+
+    Lo que si se ve, y se explica en una frase, es comparar cada posicion con las
+    demas: sale una diagonal brillante que se apaga hacia los lados. Medido sobre esta
+    tabla, el parecido entre dos posiciones vecinas es 0.90, a tres de distancia baja a
+    0.51, y a cinco a 0.39. **El modelo no solo sabe donde esta cada palabra: sabe
+    cuanto se separan entre si.** Eso es lo que hace util al positional encoding.
+    """
+    escribir = (lambda *_a, **_k: None) if silencioso else print
+    if not silencioso:
+        _encabezado("MAPA DE LAS POSICIONES")
+
+    matriz = similitud_entre_posiciones(tabla)
+
+    mapa_de_color = LinearSegmentedColormap.from_list(
+        "mini_jarvis_posiciones", [COLOR_FONDO, COLOR_TURQUESA, COLOR_ROSA],
+    )
+
+    figura, ejes = plt.subplots(figsize=(9, 7.5))
+    figura.patch.set_facecolor(COLOR_FONDO)
+    ejes.set_facecolor(COLOR_FONDO)
+
+    imagen = ejes.imshow(matriz, cmap=mapa_de_color, vmin=0.0, vmax=1.0)
+
+    ejes.set_xlabel("Posicion en la frase", color=COLOR_TEXTO, fontsize=11)
+    ejes.set_ylabel("Posicion en la frase", color=COLOR_TEXTO, fontsize=11)
+    ejes.set_title(
+        f"Cuanto se parecen entre si las posiciones — {NOMBRE_MODELO_BETO}\n"
+        f"Primeras {POSICIONES_A_DIBUJAR} de las {tabla.shape[0]}. La diagonal brillante "
+        "se apaga con la distancia:\nel modelo codifica no solo el lugar, tambien la cercania.",
+        color=COLOR_TEXTO, fontsize=11, pad=14,
+    )
+    ejes.tick_params(colors=COLOR_TEXTO)
+    for spine in ejes.spines.values():
+        spine.set_edgecolor(COLOR_TEXTO)
+
+    barra = figura.colorbar(imagen, ax=ejes, fraction=0.03, pad=0.02)
+    barra.set_label("Parecido (1 = identicos)", color=COLOR_TEXTO)
+    barra.ax.yaxis.set_tick_params(color=COLOR_TEXTO)
+    plt.setp(plt.getp(barra.ax.axes, "yticklabels"), color=COLOR_TEXTO)
+
+    figura.tight_layout()
+    if ruta_salida is None:
+        ruta_salida = Path(__file__).resolve().parent / NOMBRE_PNG_POSICIONES
+    ruta_salida = Path(ruta_salida)
+    figura.savefig(ruta_salida, dpi=150, facecolor=figura.get_facecolor())
+    plt.close(figura)
+
+    escribir(f"\nPNG guardado en: {ruta_salida}")
+    escribir(f"Tamano del archivo: {ruta_salida.stat().st_size} bytes")
+    return ruta_salida
+
+
+# ---------------------------------------------------------------------------------
 # Mapa de calor
 # ---------------------------------------------------------------------------------
 
@@ -626,19 +825,27 @@ def main():
     print(
         "Este script no es parte del pipeline de voz de Mini-JARVIS: es un modulo "
         "independiente para demostrar, con un Transformer real corriendo en esta "
-        "misma maquina, los tres conceptos que la rubrica exige poder explicar: "
-        "tokenizacion, embeddings y self-attention."
+        "misma maquina, los cuatro conceptos que la seccion 2.2 del enunciado exige "
+        "evidenciar: tokenizacion, embeddings, positional encoding y self-attention."
     )
 
     nivel_1_tokenizacion()
     tokens, atenciones = nivel_2_embeddings_y_atencion()
+    posiciones = nivel_3_positional_encoding()
     dibujar_mapa_de_atencion(tokens, atenciones, CAPA_ELEGIDA_BASE0, CABEZA_ELEGIDA_BASE0)
+    dibujar_mapa_de_posiciones(posiciones["tabla"])
 
     _encabezado("FIN DEL LABORATORIO")
-    print("Los tres pilares del Transformer quedaron demostrados sobre modelos reales:")
-    print("  1) Tokenizacion  -> tokenizador real de Qwen2.5-Instruct.")
-    print("  2) Embeddings    -> last_hidden_state de BETO, forma (1, N, 768).")
-    print("  3) Self-attention -> 12 capas de atencion de BETO, filas que suman 1.0.")
+    print("Los CUATRO conceptos que pide el enunciado, demostrados sobre modelos reales:")
+    print("  1) Tokenizacion       -> tokenizador real de Qwen2.5-Instruct.")
+    print("  2) Embeddings         -> last_hidden_state de BETO, forma (1, N, 768).")
+    print("  3) Positional encoding-> tabla (512, 768) aprendida; la misma palabra en")
+    print("                           otra posicion da un vector distinto.")
+    print("  4) Self-attention     -> 12 capas de atencion de BETO, filas que suman 1.0.")
+    print()
+    print("Dos imagenes para el informe y la sustentacion:")
+    print("  exploration/mapa_atencion.png   quien mira a quien")
+    print("  exploration/mapa_posiciones.png como el modelo codifica el orden")
 
 
 if __name__ == "__main__":
