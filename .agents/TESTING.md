@@ -65,7 +65,7 @@ directa de codigo desde este archivo.
       - `calcular` -> **57.79**, la pregunta que origino la herramienta. Resuelta.
       - `estado_laptop` -> porcentaje real de bateria.
       - `buscar_web` -> resultados reales.
-      - `abrir_kiosk` -> Wikipedia a pantalla completa, **tras corregir un defecto que
+      - `abrir_pagina` -> Wikipedia a pantalla completa, **tras corregir un defecto que
         encontro ella**: se construia `--kiosk=url` y Edge, para el que `--kiosk` es un
         interruptor sin valor, ignoraba la direccion y abria su pagina de inicio.
         Corregido en `d2b212a` y reprobado por ella.

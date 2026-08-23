@@ -4,7 +4,7 @@ Este modulo es la unica fuente de verdad de configuracion del proyecto: carga la
 clave de API desde el archivo .env de la raiz, valida que exista y expone como
 constantes de modulo la paleta de colores, los identificadores de los modelos,
 los limites de memoria y tool calling, y la lista blanca de dominios para la
-herramienta abrir_kiosk.
+herramienta abrir_pagina.
 
 Ningun otro modulo debe leer variables de entorno ni redefinir estas constantes
 por su cuenta: todos importan de aqui.
@@ -201,11 +201,11 @@ MAX_TURNOS_MEMORIA = 10
 # que tenga.
 LIMITE_RONDAS_TOOL_CALLING = 2
 
-# Lista blanca de dominios para abrir_kiosk (diseno, seccion 9). Minusculas,
+# Lista blanca de dominios para abrir_pagina (diseno, seccion 9). Minusculas,
 # sin esquema ni barra final. La fija el Ingeniero: no se amplia ni se reduce
 # aqui. La logica de validacion de URL vive en tools/system_skills.py (T-15),
 # fuera del alcance de este archivo.
-DOMINIOS_PERMITIDOS_KIOSK = frozenset(
+DOMINIOS_PERMITIDOS = frozenset(
     {
         "youtube.com",
         "www.youtube.com",

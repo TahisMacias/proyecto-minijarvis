@@ -22,7 +22,7 @@ from __future__ import annotations
 
 NOMBRE_ESTADO_LAPTOP = "estado_laptop"
 NOMBRE_BUSCAR_WEB = "buscar_web"
-NOMBRE_ABRIR_KIOSK = "abrir_kiosk"
+NOMBRE_ABRIR_PAGINA = "abrir_pagina"
 NOMBRE_CALCULAR = "calcular"
 NOMBRE_CLIMA = "clima"
 
@@ -124,9 +124,9 @@ MANIFIESTO: list[dict] = [
     {
         "type": "function",
         "function": {
-            "name": NOMBRE_ABRIR_KIOSK,
+            "name": NOMBRE_ABRIR_PAGINA,
             "description": (
-                "Abre una pagina web en el navegador, a pantalla completa. Solo "
+                "Abre una pagina web en una ventana del navegador. Solo "
                 "funciona con una lista corta de sitios permitidos: YouTube, "
                 "Wikipedia, Google y GitHub. Si te piden abrir cualquier otro sitio, "
                 "la herramienta lo rechazara: dilo con naturalidad en vez de insistir."

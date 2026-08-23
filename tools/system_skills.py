@@ -34,7 +34,7 @@ import operator
 import subprocess
 from urllib.parse import urlparse
 
-from config import DOMINIOS_PERMITIDOS_KIOSK
+from config import DOMINIOS_PERMITIDOS
 
 
 # ===========================================================================
@@ -404,7 +404,7 @@ def clima(ciudad: str, pedir=None) -> str:
 
 
 # ===========================================================================
-# abrir_kiosk - el unico sitio donde este proyecto lanza un proceso
+# abrir_pagina - el unico sitio donde este proyecto lanza un proceso
 # ===========================================================================
 
 RUTA_EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
@@ -436,7 +436,7 @@ def validar_url(url: str) -> str:
     if not host:
         raise UrlNoPermitida("Esa direccion no tiene un sitio web reconocible.")
 
-    if host not in DOMINIOS_PERMITIDOS_KIOSK:
+    if host not in DOMINIOS_PERMITIDOS:
         raise UrlNoPermitida(
             f"El sitio {host} no esta en la lista de sitios permitidos. Solo puedo "
             "abrir YouTube, Wikipedia, Google y GitHub."
@@ -452,29 +452,34 @@ def construir_comando(url_validada: str, ruta_navegador: str = RUTA_EDGE) -> lis
     de una linea de ordenes. Con una lista y sin shell, unos caracteres raros dentro
     de la direccion son solo caracteres raros.
 
-    LA DIRECCION VA COMO ARGUMENTO SUELTO, NO PEGADA A `--kiosk`. La primera version
-    de esta funcion generaba `--kiosk=https://...` y Edge abria su pagina de inicio en
-    lugar de la pedida: en Chromium `--kiosk` es un INTERRUPTOR, no una opcion con
-    valor, asi que al pegarle un `=algo` la direccion se pierde y el navegador arranca
-    con lo que tenga configurado. Lo encontro la duena probando la aplicacion el
-    2026-08-23: pidio Wikipedia y le salio la pagina de importar datos de Edge.
-    Ninguna prueba lo habria visto, porque el comando estaba bien FORMADO; lo que
-    estaba mal era su significado para el programa que lo recibe.
+    VENTANA NORMAL, NO PANTALLA COMPLETA. Las dos primeras versiones abrian el
+    navegador en modo kiosco. Funcionaba, y era un fastidio de usar: ocupaba la
+    pantalla entera, sin barra de titulo ni boton de cerrar, y la duena se quedaba
+    atrapada sin saber como salir. La respuesta "cierrala con Alt+F4" no es una
+    respuesta: si hay que explicar como salir de algo, ese algo esta mal hecho.
+    Ahora se abre una ventana corriente y maximizada, con su X.
+
+    LA DIRECCION VA COMO ARGUMENTO SUELTO, NO PEGADA CON UN IGUAL. La primera version
+    generaba `--kiosk=https://...` y Edge abria su pagina de inicio en lugar de la
+    pedida: en Chromium esos interruptores no llevan valor, asi que al pegarle un
+    `=algo` la direccion se perdia. Lo encontro la duena el 2026-08-23. Ninguna prueba
+    lo habria visto, porque el comando estaba bien FORMADO; lo que estaba mal era su
+    significado para el programa que lo recibe.
 
     `--no-first-run` evita que en un perfil recien creado Edge se plante en su
     asistente de bienvenida antes de mostrar nada.
     """
     return [
         ruta_navegador,
-        "--kiosk",
+        "--new-window",
         url_validada,
-        "--edge-kiosk-type=fullscreen",
+        "--start-maximized",
         "--no-first-run",
     ]
 
 
-def abrir_kiosk(url: str, lanzar=None, ruta_navegador: str = RUTA_EDGE) -> str:
-    """Abre una url permitida a pantalla completa.
+def abrir_pagina(url: str, lanzar=None, ruta_navegador: str = RUTA_EDGE) -> str:
+    """Abre una url permitida en una ventana del navegador.
 
     `lanzar` se inyecta en las pruebas: se verifica que el comando este bien armado
     **sin abrir ningun navegador de verdad**, que es lo que pide el criterio de T-15.
@@ -502,7 +507,7 @@ def abrir_kiosk(url: str, lanzar=None, ruta_navegador: str = RUTA_EDGE) -> str:
     except Exception:  # noqa: BLE001
         return "No pude abrir la pagina en el navegador."
 
-    return f"Listo, abri {url_validada} a pantalla completa."
+    return f"Listo, ya tienes {url_validada} abierta en el navegador."
 
 
 # ===========================================================================
@@ -514,7 +519,7 @@ _IMPLEMENTACIONES = {
     "clima": lambda a: clima(a.get("ciudad", "")),
     "estado_laptop": lambda a: estado_laptop(),
     "buscar_web": lambda a: buscar_web(a.get("consulta", "")),
-    "abrir_kiosk": lambda a: abrir_kiosk(a.get("url", "")),
+    "abrir_pagina": lambda a: abrir_pagina(a.get("url", "")),
 }
 
 

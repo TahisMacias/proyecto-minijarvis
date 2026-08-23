@@ -76,7 +76,7 @@ critico ya no es el codigo, es el informe y el video.
 - Codigo entregado: `config.py`, los seis modulos de `core/`, `gui/desktop_app.py`,
   `main.py`, `exploration/transformer_lab.py`, `Iniciar Mini-JARVIS.bat`.
 - **`tools/` entregado (T-15)**: `calcular`, `estado_laptop`, `buscar_web` y
-  `abrir_kiosk`. La calculadora **no usa `eval`**: analiza con `ast` contra lista
+  `abrir_pagina`. La calculadora **no usa `eval`**: analiza con `ast` contra lista
   blanca y evalua el arbol a mano. Verificado contra la API real: el modelo las pide
   por su cuenta.
 - **Ventana rediseñada (T-19 + T-14)**: tema oscuro turquesa y rosa, tres columnas sin

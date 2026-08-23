@@ -91,7 +91,7 @@ requisitos obligatorios de la seccion 5.1 del enunciado.
   - [x] `TOGETHER_API_KEY` se lee de `.env` con `python-dotenv`. Ninguna clave literal.
   - [x] Si falta la clave, mensaje claro y la app no arranca a medias.
   - [x] Paleta pastel, IDs de modelo, voz TTS y limites de memoria centralizados aqui.
-  - [x] Lista blanca de dominios para `abrir_kiosk` definida aqui.
+  - [x] Lista blanca de dominios para `abrir_pagina` definida aqui.
 - Gates: `python -m compileall .`; `git grep` sin coincidencias de patrones de secreto.
 - Human checks: none
 - Risk triggers: **si** — manejo de credenciales. Auditoria del modelo obligatoria.
@@ -444,18 +444,18 @@ Solo empieza si la Fase 1 cerro. En este orden estricto: lo que no entre, se des
   texto. No hace falta ningun servicio externo: Python es la calculadora.
   **Restriccion de seguridad, no negociable: nada de `eval` ni `exec` sobre lo que
   devuelva el modelo.** La expresion se analiza con `ast` contra una lista blanca de
-  operaciones y funciones matematicas. Es la misma clase de riesgo que `abrir_kiosk`.
+  operaciones y funciones matematicas. Es la misma clase de riesgo que `abrir_pagina`.
 - Acceptance:
   - [ ] `estado_laptop` con `psutil`: bateria, RAM y CPU en tono conversacional.
   - [ ] `buscar_web` con `duckduckgo-search`.
-  - [ ] `abrir_kiosk`: **valida la URL contra la lista blanca antes** de construir el
+  - [ ] `abrir_pagina`: **valida la URL contra la lista blanca antes** de construir el
         comando, y arma el comando como lista de argumentos, nunca concatenando cadenas.
   - [ ] Los esquemas JSON del manifest son validos y el LLM los invoca correctamente.
-  - [ ] Tests de las tres; de `abrir_kiosk` se verifica la lista blanca y la
+  - [ ] Tests de las tres; de `abrir_pagina` se verifica la lista blanca y la
         construccion del comando **sin lanzar el proceso**.
 - Gates: `pytest tests/test_tools.py`
 - Human checks: H-15
-- Risk triggers: **si** — `abrir_kiosk` ejecuta un proceso. Auditoria obligatoria.
+- Risk triggers: **si** — `abrir_pagina` ejecuta un proceso. Auditoria obligatoria.
 - STOP when: se proponga ejecutar cualquier comando fuera de la lista blanca.
 
 ### T-19 - Rediseno visual y de distribucion (NUEVA, pedida el 2026-08-14)

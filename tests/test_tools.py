@@ -2,7 +2,7 @@
 
 Nada de esto sale a la red, abre un navegador ni gasta saldo. Lo que se verifica es lo
 que puede hacer dano: que la calculadora no ejecute nada que no sea aritmetica, y que
-`abrir_kiosk` no lance un proceso hacia un sitio que no este en la lista blanca.
+`abrir_pagina` no lance un proceso hacia un sitio que no este en la lista blanca.
 
 La prueba mas importante del archivo es `test_no_hay_eval_ni_exec_en_el_codigo`: no
 comprueba un comportamiento, comprueba una PROHIBICION. Las demas dicen que hoy la
@@ -19,7 +19,7 @@ import pytest
 from tools.manifest import MANIFIESTO, NOMBRES_DECLARADOS
 from tools.system_skills import (
     UrlNoPermitida,
-    abrir_kiosk,
+    abrir_pagina,
     buscar_web,
     calcular,
     clima,
@@ -143,7 +143,7 @@ def test_una_expresion_larguisima_se_rechaza_por_tamano():
 
 
 # ===========================================================================
-# abrir_kiosk - la lista blanca, sin lanzar ningun proceso
+# abrir_pagina - la lista blanca, sin lanzar ningun proceso
 # ===========================================================================
 
 @pytest.mark.parametrize("url", [
@@ -194,12 +194,12 @@ def test_la_url_viaja_en_un_solo_argumento():
     assert comando.count(url) == 1
 
 
-def test_la_url_va_suelta_y_no_pegada_a_kiosk():
+def test_la_url_va_suelta_y_no_pegada_al_interruptor():
     """Defecto real que la duena encontro el 2026-08-23: pidio Wikipedia y salio Edge
     con su pagina de importar datos.
 
     En Chromium `--kiosk` es un INTERRUPTOR, no una opcion con valor. Escribir
-    `--kiosk=https://...` no da error: el navegador ignora la direccion y arranca con
+    `--new-window=https://...` no da error: el navegador ignora la direccion y arranca con
     su pagina de inicio. El comando estaba bien formado y aun asi hacia lo que no era.
 
     Por eso esta prueba comprueba la POSICION y no solo la presencia: la direccion
@@ -208,11 +208,11 @@ def test_la_url_va_suelta_y_no_pegada_a_kiosk():
     url = "https://es.wikipedia.org/wiki/Transformer"
     comando = construir_comando(url)
 
-    assert "--kiosk" in comando, "falta el interruptor --kiosk"
-    assert not any(parte.startswith("--kiosk=") for parte in comando), (
+    assert "--new-window" in comando, "falta el interruptor --kiosk"
+    assert not any(parte.startswith("--new-window=") for parte in comando), (
         "la direccion esta pegada a --kiosk con un igual; Edge la ignora"
     )
-    assert comando[comando.index("--kiosk") + 1] == url, (
+    assert comando[comando.index("--new-window") + 1] == url, (
         "la direccion debe ir justo despues de --kiosk"
     )
 
@@ -220,7 +220,7 @@ def test_la_url_va_suelta_y_no_pegada_a_kiosk():
 def test_un_sitio_prohibido_no_lanza_ningun_proceso():
     """La comprobacion que de verdad importa: se valida ANTES de construir y lanzar."""
     lanzamientos = []
-    respuesta = abrir_kiosk("https://banco-falso.com", lanzar=lanzamientos.append)
+    respuesta = abrir_pagina("https://banco-falso.com", lanzar=lanzamientos.append)
     assert lanzamientos == [], "se intento lanzar un proceso hacia un sitio prohibido"
     assert "no esta en la lista" in respuesta
 
@@ -228,13 +228,13 @@ def test_un_sitio_prohibido_no_lanza_ningun_proceso():
 def test_un_sitio_permitido_si_lanza_el_comando_correcto():
     url = "https://es.wikipedia.org/wiki/Transformer"
     lanzamientos = []
-    respuesta = abrir_kiosk(url, lanzar=lanzamientos.append)
+    respuesta = abrir_pagina(url, lanzar=lanzamientos.append)
 
     assert len(lanzamientos) == 1
     comando = lanzamientos[0]
     # La direccion, suelta y justo detras del interruptor. Ver
     # test_la_url_va_suelta_y_no_pegada_a_kiosk para el porque.
-    assert comando[comando.index("--kiosk") + 1] == url
+    assert comando[comando.index("--new-window") + 1] == url
     assert "Listo" in respuesta
 
 
@@ -242,7 +242,7 @@ def test_si_falta_el_navegador_se_explica_sin_reventar():
     def lanzar_que_falla(_comando):
         raise FileNotFoundError("no existe msedge.exe")
 
-    respuesta = abrir_kiosk("https://google.com", lanzar=lanzar_que_falla)
+    respuesta = abrir_pagina("https://google.com", lanzar=lanzar_que_falla)
     assert "No encontre Microsoft Edge" in respuesta
 
 
@@ -312,7 +312,7 @@ def test_las_cinco_herramientas_estan_declaradas():
     """La quinta, `clima`, la pidio la duena: es lo primero que se le pregunta a un
     asistente de voz y no estaba."""
     assert NOMBRES_DECLARADOS == {
-        "calcular", "clima", "estado_laptop", "buscar_web", "abrir_kiosk"
+        "calcular", "clima", "estado_laptop", "buscar_web", "abrir_pagina"
     }
 
 

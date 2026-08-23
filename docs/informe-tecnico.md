@@ -53,7 +53,7 @@ explica en la seccion 5.
                          │ calcular           │    │
                          │ estado_laptop      │    │
                          │ buscar_web         │    │
-                         │ abrir_kiosk        │    │
+                         │ abrir_pagina       │    │
                          └─────────┬──────────┘    │
                                    │ resultado     │
                                    └───────►───────┘
@@ -366,5 +366,5 @@ el informe o en el video.
 La voz de la usuaria **nunca se escribe en disco**: se graba en memoria y desaparece
 cuando nadie la referencia. Es un dato personal y no se conserva.
 
-`abrir_kiosk` solo abre paginas de una lista blanca cerrada, validando el dominio real
+`abrir_pagina` solo abre paginas de una lista blanca cerrada, validando el dominio real
 de la direccion antes de construir el comando.
