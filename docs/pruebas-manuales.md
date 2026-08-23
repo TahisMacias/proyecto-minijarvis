@@ -166,7 +166,7 @@ otra ventana. Hay que volver a mirarlo.
       Fijate en la respuesta.
 - [X: el tope era 1.5 y atascaba al modelo; ahora 1.4, commit 74ff313] **E.2** Sube **Temperatura** al maximo. Di **la misma frase**. La respuesta debe
       ser mas rara o mas creativa. ¿Notas la diferencia? Es lo que te van a preguntar.
-- [ ] **E.3** Cambia el **Modelo** al segundo de la lista y sigue hablando sin cerrar
+- [X: Llama recordo el dato que se le dijo a Qwen] **E.3** Cambia el **Modelo** al segundo de la lista y sigue hablando sin cerrar
       nada. Debe seguir acordandose de lo anterior.
 - [ ] **E.4** Pulsa **"Ver system prompt"**. Es el texto que se le manda al modelo
       antes de cada frase. Leelo: te lo pueden preguntar.
