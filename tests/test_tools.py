@@ -188,10 +188,32 @@ def test_el_comando_es_una_lista_de_argumentos():
 
 def test_la_url_viaja_en_un_solo_argumento():
     """Aunque llevara espacios o simbolos, sigue siendo UN argumento, no varios."""
-    comando = construir_comando("https://google.com/buscar?q=a&b=c")
-    kiosk = [parte for parte in comando if parte.startswith("--kiosk=")]
-    assert len(kiosk) == 1
-    assert kiosk[0] == "--kiosk=https://google.com/buscar?q=a&b=c"
+    url = "https://google.com/buscar?q=a&b=c"
+    comando = construir_comando(url)
+    assert comando.count(url) == 1
+
+
+def test_la_url_va_suelta_y_no_pegada_a_kiosk():
+    """Defecto real que la duena encontro el 2026-08-17: pidio Wikipedia y salio Edge
+    con su pagina de importar datos.
+
+    En Chromium `--kiosk` es un INTERRUPTOR, no una opcion con valor. Escribir
+    `--kiosk=https://...` no da error: el navegador ignora la direccion y arranca con
+    su pagina de inicio. El comando estaba bien formado y aun asi hacia lo que no era.
+
+    Por eso esta prueba comprueba la POSICION y no solo la presencia: la direccion
+    tiene que ser el argumento inmediatamente siguiente a `--kiosk`.
+    """
+    url = "https://es.wikipedia.org/wiki/Transformer"
+    comando = construir_comando(url)
+
+    assert "--kiosk" in comando, "falta el interruptor --kiosk"
+    assert not any(parte.startswith("--kiosk=") for parte in comando), (
+        "la direccion esta pegada a --kiosk con un igual; Edge la ignora"
+    )
+    assert comando[comando.index("--kiosk") + 1] == url, (
+        "la direccion debe ir justo despues de --kiosk"
+    )
 
 
 def test_un_sitio_prohibido_no_lanza_ningun_proceso():
@@ -203,11 +225,15 @@ def test_un_sitio_prohibido_no_lanza_ningun_proceso():
 
 
 def test_un_sitio_permitido_si_lanza_el_comando_correcto():
+    url = "https://es.wikipedia.org/wiki/Transformer"
     lanzamientos = []
-    respuesta = abrir_kiosk("https://es.wikipedia.org/wiki/Transformer",
-                            lanzar=lanzamientos.append)
+    respuesta = abrir_kiosk(url, lanzar=lanzamientos.append)
+
     assert len(lanzamientos) == 1
-    assert lanzamientos[0][1] == "--kiosk=https://es.wikipedia.org/wiki/Transformer"
+    comando = lanzamientos[0]
+    # La direccion, suelta y justo detras del interruptor. Ver
+    # test_la_url_va_suelta_y_no_pegada_a_kiosk para el porque.
+    assert comando[comando.index("--kiosk") + 1] == url
     assert "Listo" in respuesta
 
 

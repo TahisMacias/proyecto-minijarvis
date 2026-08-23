@@ -345,8 +345,26 @@ def construir_comando(url_validada: str, ruta_navegador: str = RUTA_EDGE) -> lis
     Es la diferencia entre que el sistema trate la direccion como un dato o como parte
     de una linea de ordenes. Con una lista y sin shell, unos caracteres raros dentro
     de la direccion son solo caracteres raros.
+
+    LA DIRECCION VA COMO ARGUMENTO SUELTO, NO PEGADA A `--kiosk`. La primera version
+    de esta funcion generaba `--kiosk=https://...` y Edge abria su pagina de inicio en
+    lugar de la pedida: en Chromium `--kiosk` es un INTERRUPTOR, no una opcion con
+    valor, asi que al pegarle un `=algo` la direccion se pierde y el navegador arranca
+    con lo que tenga configurado. Lo encontro la duena probando la aplicacion el
+    2026-08-17: pidio Wikipedia y le salio la pagina de importar datos de Edge.
+    Ninguna prueba lo habria visto, porque el comando estaba bien FORMADO; lo que
+    estaba mal era su significado para el programa que lo recibe.
+
+    `--no-first-run` evita que en un perfil recien creado Edge se plante en su
+    asistente de bienvenida antes de mostrar nada.
     """
-    return [ruta_navegador, f"--kiosk={url_validada}", "--edge-kiosk-type=fullscreen"]
+    return [
+        ruta_navegador,
+        "--kiosk",
+        url_validada,
+        "--edge-kiosk-type=fullscreen",
+        "--no-first-run",
+    ]
 
 
 def abrir_kiosk(url: str, lanzar=None, ruta_navegador: str = RUTA_EDGE) -> str:
