@@ -26,6 +26,10 @@ NOMBRE_ABRIR_PAGINA = "abrir_pagina"
 NOMBRE_CALCULAR = "calcular"
 NOMBRE_CLIMA = "clima"
 NOMBRE_HORA = "hora"
+NOMBRE_VOLUMEN = "volumen"
+NOMBRE_BRILLO = "brillo"
+NOMBRE_ABRIR_CARPETA = "abrir_carpeta"
+NOMBRE_YOUTUBE = "reproducir_youtube"
 
 
 MANIFIESTO: list[dict] = [
@@ -133,6 +137,96 @@ MANIFIESTO: list[dict] = [
                     }
                 },
                 "required": ["consulta"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": NOMBRE_VOLUMEN,
+            "description": (
+                "Sube, baja o silencia el volumen de esta computadora. Usala cuando "
+                "te pidan mas volumen, menos volumen, que subas o bajes el sonido, o "
+                "que silencies."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "accion": {
+                        "type": "string",
+                        "enum": ["subir", "bajar", "silenciar"],
+                        "description": "Que hacer con el volumen.",
+                    }
+                },
+                "required": ["accion"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": NOMBRE_BRILLO,
+            "description": (
+                "Sube o baja el brillo de la pantalla. Usala cuando te digan que la "
+                "pantalla esta muy oscura o muy clara, o que subas o bajes el brillo."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "accion": {
+                        "type": "string",
+                        "enum": ["subir", "bajar"],
+                        "description": "Que hacer con el brillo.",
+                    }
+                },
+                "required": ["accion"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": NOMBRE_ABRIR_CARPETA,
+            "description": (
+                "Abre una carpeta en el explorador de archivos. Solo puede abrir estas: "
+                "descargas, documentos, escritorio, imagenes, musica, videos y la "
+                "carpeta del proyecto. Si te piden otra, dilo con naturalidad."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "carpeta": {
+                        "type": "string",
+                        "enum": ["descargas", "documentos", "escritorio", "imagenes",
+                                 "musica", "videos", "proyecto"],
+                        "description": "Cual de las carpetas conocidas abrir.",
+                    }
+                },
+                "required": ["carpeta"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": NOMBRE_YOUTUBE,
+            "description": (
+                "Busca algo en YouTube y lo abre en el navegador. Usala cuando te "
+                "pidan poner, buscar o reproducir una cancion, un video o un artista. "
+                "Abre la pagina de resultados para que la persona elija cual ver."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "busqueda": {
+                        "type": "string",
+                        "description": (
+                            "Que buscar en YouTube: el nombre de la cancion, el "
+                            "artista o el tema del video."
+                        ),
+                    }
+                },
+                "required": ["busqueda"],
             },
         },
     },

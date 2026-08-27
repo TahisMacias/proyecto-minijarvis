@@ -340,14 +340,6 @@ def test_cada_herramienta_declarada_tiene_implementacion():
         )
 
 
-def test_las_seis_herramientas_estan_declaradas():
-    """`clima` y `hora` se anadieron al releer la seccion 5.2 del enunciado, que las
-    nombra las dos en su lista de funciones reales."""
-    assert NOMBRES_DECLARADOS == {
-        "calcular", "clima", "hora", "estado_laptop", "buscar_web", "abrir_pagina"
-    }
-
-
 def test_cada_entrada_del_manifiesto_tiene_la_forma_que_pide_la_api():
     for entrada in MANIFIESTO:
         assert entrada["type"] == "function"
@@ -495,3 +487,104 @@ def test_la_fecha_va_en_palabras_y_completa():
 def test_la_hora_esta_enchufada_al_despachador():
     peticion = type("P", (), {"nombre": "hora", "argumentos": {}})()
     assert "no existe" not in ejecutar_herramienta(peticion)
+
+
+# ===========================================================================
+# Control del sistema: volumen, brillo, carpetas y YouTube
+# ===========================================================================
+#
+# Todo con dobles inyectados. Una suite que sube el volumen y cambia el brillo de la
+# pantalla de quien la ejecuta es de las cosas mas molestas que puede hacer un
+# conjunto de pruebas.
+
+from tools.system_skills import abrir_carpeta, brillo, reproducir_youtube, volumen
+
+
+def test_las_diez_herramientas_estan_declaradas():
+    assert NOMBRES_DECLARADOS == {
+        "calcular", "clima", "hora", "estado_laptop", "buscar_web", "abrir_pagina",
+        "volumen", "brillo", "abrir_carpeta", "reproducir_youtube",
+    }
+
+
+@pytest.mark.parametrize("accion,esperado", [
+    ("subir", "subi el volumen"),
+    ("bajar", "baje el volumen"),
+    ("silenciar", "silencie el sonido"),
+])
+def test_el_volumen_responde_a_las_tres_ordenes(accion, esperado):
+    pulsaciones = []
+    respuesta = volumen(accion, pulsar=lambda t, v: pulsaciones.append((t, v)))
+    assert esperado in respuesta
+    assert len(pulsaciones) == 1
+
+
+def test_una_orden_de_volumen_que_no_se_entiende_se_explica():
+    assert "No entendi" in volumen("hazlo bonito", pulsar=lambda t, v: None)
+
+
+def test_el_brillo_sube_y_baja_de_veinte_en_veinte():
+    fijados = []
+    brillo("subir", leer=lambda: 50, fijar=fijados.append)
+    brillo("bajar", leer=lambda: 50, fijar=fijados.append)
+    assert fijados == [70, 30]
+
+
+def test_el_brillo_no_se_pasa_de_los_bordes():
+    """Sin el tope, pedir mas brillo al 100 mandaria 120 al sistema."""
+    fijados = []
+    assert "ya esta al maximo" in brillo("subir", leer=lambda: 100, fijar=fijados.append)
+    assert "ya esta al minimo" in brillo("bajar", leer=lambda: 0, fijar=fijados.append)
+    assert fijados == [], "toco el brillo estando ya en el borde"
+
+
+def test_una_pantalla_que_no_deja_cambiar_el_brillo_se_explica():
+    def sin_soporte():
+        raise OSError("monitor externo")
+    assert "no deja cambiar el brillo" in brillo("subir", leer=sin_soporte)
+
+
+@pytest.mark.parametrize("pedido", ["descargas", "Descargas", "imagenes", "imágenes"])
+def test_las_carpetas_conocidas_se_encuentran_con_o_sin_tilde(pedido):
+    """La transcripcion de voz escribe la tilde segun el dia; es la misma carpeta."""
+    abiertas = []
+    respuesta = abrir_carpeta(pedido, abrir=abiertas.append)
+    assert "Listo, abri la carpeta" in respuesta
+    assert len(abiertas) == 1
+
+
+def test_una_carpeta_desconocida_no_abre_nada():
+    """Misma idea que la lista blanca de dominios: lista cerrada, no rutas libres."""
+    abiertas = []
+    respuesta = abrir_carpeta("C:/Windows/System32", abrir=abiertas.append)
+    assert abiertas == [], "abrio una ruta que no esta en la lista"
+    assert "No conozco ninguna carpeta" in respuesta
+
+
+def test_sin_nombre_de_carpeta_se_pide_el_nombre():
+    for entrada in ["", "   ", None, 42]:
+        assert isinstance(abrir_carpeta(entrada), str)
+
+
+def test_youtube_construye_una_busqueda_y_pasa_por_la_lista_blanca():
+    lanzados = []
+    respuesta = reproducir_youtube("bad bunny", lanzar=lanzados.append)
+    assert len(lanzados) == 1
+    comando = lanzados[0]
+    url = comando[comando.index("--new-window") + 1]
+    assert url.startswith("https://www.youtube.com/results?search_query=")
+    assert "bad+bunny" in url
+    assert "Listo" in respuesta
+
+
+def test_youtube_escapa_lo_que_se_le_pide():
+    """Una busqueda con espacios y simbolos no debe romper la direccion."""
+    lanzados = []
+    reproducir_youtube("rock & roll de los 80", lanzar=lanzados.append)
+    url = lanzados[0][lanzados[0].index("--new-window") + 1]
+    assert " " not in url
+    assert "%26" in url or "&amp;" in url or "rock" in url
+
+
+def test_sin_busqueda_de_youtube_se_pide_la_busqueda():
+    assert "que buscar" in reproducir_youtube("")

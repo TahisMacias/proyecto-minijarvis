@@ -17,8 +17,10 @@ embeddings y el mecanismo de self-attention de la arquitectura Transformer.
 
 > **Estado actual: completo y verificado.** El ciclo entero —hablar, transcribir,
 > pensar y responder con voz— funciona, con memoria entre turnos. Mini-JARVIS ademas
-> **usa herramientas**: resuelve cuentas exactas, consulta el estado de la laptop,
-> busca en internet y abre paginas de una lista blanca. La ventana muestra a la vez la
+> **usa diez herramientas**: resuelve cuentas exactas, dice la hora, consulta el
+> clima y el estado de la laptop, busca en internet, abre paginas de una lista
+> blanca, sube y baja el volumen y el brillo, abre carpetas y pone musica en
+> YouTube. La ventana muestra a la vez la
 > conversacion y el analisis del Transformer de la ultima frase.
 
 ## Requisitos

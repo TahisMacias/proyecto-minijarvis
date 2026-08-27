@@ -575,6 +575,246 @@ def abrir_pagina(url: str, lanzar=None, ruta_navegador: str = RUTA_EDGE) -> str:
     return f"Listo, ya tienes {url_validada} abierta en el navegador."
 
 
+
+
+# ===========================================================================
+# Control del sistema: volumen, brillo, carpetas y YouTube
+# ===========================================================================
+#
+# Anadidas el 2026-08-27 a peticion de la duena, que vio estas mismas funciones en el
+# proyecto de un companero. La seccion 5.2 del enunciado las contempla entre los
+# valores agregados: "integracion con funciones reales" y "control de archivos locales".
+#
+# MISMO CRITERIO DE SEGURIDAD QUE EN EL RESTO DEL ARCHIVO: nada de rutas arbitrarias ni
+# de comandos construidos con texto del modelo. Las carpetas salen de una lista cerrada
+# y el brillo se valida como entero antes de tocar nada. Un asistente que abre "la
+# carpeta que le digas" es un asistente que abre una carpeta del sistema el dia que la
+# transcripcion salga mal.
+
+# Codigos de tecla multimedia de Windows. Se usan las teclas y no la API de audio a
+# proposito: keybd_event vive en user32, que ya viene con el sistema, mientras que
+# manejar el volumen por COM exige mas codigo y una dependencia. Para subir y bajar,
+# que es lo que se pide, las teclas hacen exactamente lo mismo.
+_TECLA_SILENCIO = 0xAD
+_TECLA_BAJAR = 0xAE
+_TECLA_SUBIR = 0xAF
+
+# Cada pulsacion mueve el volumen dos puntos. Diez pulsaciones son un 20 %, que es un
+# salto que se nota al oido sin pasarse.
+_PULSACIONES_POR_PASO = 10
+
+# El brillo se mueve de veinte en veinte: los saltos pequenos no se aprecian y obligan
+# a repetir la orden tres veces.
+_PASO_BRILLO = 20
+
+
+def _pulsar(tecla, veces=1):
+    import ctypes
+    for _ in range(veces):
+        ctypes.windll.user32.keybd_event(tecla, 0, 0, 0)   # tecla abajo
+        ctypes.windll.user32.keybd_event(tecla, 0, 2, 0)   # tecla arriba
+
+
+def volumen(accion, pulsar=None):
+    """Sube, baja o silencia el volumen del sistema.
+
+    `pulsar` se inyecta en las pruebas para no mover el volumen de verdad mientras
+    corre la suite.
+    """
+    accion = (accion or "").strip().lower()
+    pulsar = pulsar or _pulsar
+    try:
+        if accion in ("subir", "sube", "mas", "aumentar", "alto"):
+            pulsar(_TECLA_SUBIR, _PULSACIONES_POR_PASO)
+            return "Listo, subi el volumen."
+        if accion in ("bajar", "baja", "menos", "reducir", "bajo"):
+            pulsar(_TECLA_BAJAR, _PULSACIONES_POR_PASO)
+            return "Listo, baje el volumen."
+        if accion in ("silenciar", "silencio", "mutear", "quitar", "mute"):
+            pulsar(_TECLA_SILENCIO, 1)
+            return "Listo, silencie el sonido. Dime que lo actives para volver a oirme."
+        return "No entendi que hacer con el volumen. Puedo subirlo, bajarlo o silenciarlo."
+    except Exception:  # noqa: BLE001 - una herramienta nunca revienta hacia afuera
+        return "No pude cambiar el volumen en este momento."
+
+
+def _leer_brillo():
+    import subprocess
+    salida = subprocess.run(
+        ["powershell", "-NoProfile", "-Command",
+         "(Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightness)"
+         ".CurrentBrightness"],
+        capture_output=True, text=True, timeout=15, shell=False,
+    )
+    return int(salida.stdout.strip().splitlines()[0])
+
+
+def _fijar_brillo(nivel):
+    import subprocess
+    # `nivel` ya viene validado por quien llama. Se vuelve a forzar aqui porque es lo
+    # unico de este comando que no es texto fijo: es la linea por la que entraria una
+    # inyeccion si algun dia se llamara desde otro sitio sin validar.
+    nivel = max(0, min(100, int(nivel)))
+    # Invoke-CimMethod y NO llamar al metodo sobre el objeto. La primera version hacia
+    # `(Get-CimInstance ...).WmiSetBrightness(1,60)` y fallaba siempre: Get-CimInstance
+    # devuelve un CimInstance, que es solo datos y no expone los metodos de la clase
+    # WMI. El comando parecia razonable y no lo era; se vio ejecutandolo, no leyendolo.
+    orden = (
+        "Get-CimInstance -Namespace root/WMI -ClassName WmiMonitorBrightnessMethods | "
+        "Invoke-CimMethod -MethodName WmiSetBrightness "
+        "-Arguments @{Timeout=1;Brightness=" + str(nivel) + "}"
+    )
+    subprocess.run(
+        ["powershell", "-NoProfile", "-Command", orden],
+        capture_output=True, text=True, timeout=20, shell=False, check=True,
+    )
+
+
+def brillo(accion, leer=None, fijar=None):
+    """Sube o baja el brillo de la pantalla.
+
+    `leer` y `fijar` se inyectan en las pruebas: sin eso la suite cambiaria el brillo
+    de la pantalla de quien la ejecuta, que es de las cosas mas molestas que puede
+    hacer un conjunto de pruebas.
+    """
+    accion = (accion or "").strip().lower()
+    if accion in ("subir", "sube", "mas", "aumentar", "alto"):
+        delta = _PASO_BRILLO
+    elif accion in ("bajar", "baja", "menos", "reducir", "bajo"):
+        delta = -_PASO_BRILLO
+    else:
+        return "No entendi que hacer con el brillo. Puedo subirlo o bajarlo."
+
+    try:
+        actual = (leer or _leer_brillo)()
+    except Exception:  # noqa: BLE001
+        return ("Esta pantalla no deja cambiar el brillo por software. Suele pasar con "
+                "los monitores externos.")
+
+    objetivo = max(0, min(100, actual + delta))
+    if objetivo == actual:
+        borde = "al maximo" if objetivo == 100 else "al minimo"
+        return "El brillo ya esta " + borde + "."
+
+    try:
+        (fijar or _fijar_brillo)(objetivo)
+    except Exception:  # noqa: BLE001
+        return "No pude cambiar el brillo en este momento."
+    return "Listo, deje el brillo en " + str(objetivo) + " por ciento."
+
+
+def _carpetas_conocidas():
+    """Lista CERRADA de carpetas, con el mismo criterio que la lista blanca de dominios.
+
+    El modelo pide una de estas por su nombre, no una ruta. Si la transcripcion sale
+    mal, lo peor que ocurre es que no encuentre la carpeta.
+
+    LAS RUTAS SE LE PREGUNTAN A WINDOWS, no se construyen a mano. La primera version
+    hacia Path.home() mas el nombre en ingles, y en esta maquina fallaba: OneDrive tiene
+    redirigidos el Escritorio y las Imagenes, que viven dentro de la carpeta de OneDrive
+    y no en el perfil del usuario. Windows guarda las rutas de verdad en el registro y
+    ahi es donde hay que leerlas. Suponer donde vive una carpeta del usuario funciona
+    hasta que alguien tiene OneDrive, otro idioma, o las carpetas movidas de sitio.
+    """
+    import os
+    import winreg
+    from pathlib import Path
+
+    # Nombre que dice la usuaria -> clave con la que Windows guarda esa ruta.
+    CLAVES = {
+        "descargas": "{374DE290-123F-4565-9164-39C4925E467B}",
+        "documentos": "Personal",
+        "escritorio": "Desktop",
+        "imagenes": "My Pictures",
+        "musica": "My Music",
+        "videos": "My Video",
+    }
+    RUTA_REGISTRO = (
+        r"Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders"
+    )
+
+    carpetas = {}
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUTA_REGISTRO) as llave:
+            for nombre, clave in CLAVES.items():
+                try:
+                    valor, _ = winreg.QueryValueEx(llave, clave)
+                    carpetas[nombre] = Path(os.path.expandvars(valor))
+                except OSError:
+                    continue
+    except OSError:
+        # Si el registro no se deja leer, se cae a lo evidente: sirve en una maquina
+        # sin OneDrive y no empeora nada en una con el.
+        casa = Path.home()
+        carpetas = {
+            "descargas": casa / "Downloads", "documentos": casa / "Documents",
+            "escritorio": casa / "Desktop", "imagenes": casa / "Pictures",
+            "musica": casa / "Music", "videos": casa / "Videos",
+        }
+
+    carpetas["proyecto"] = Path(__file__).resolve().parents[1]
+    return carpetas
+
+
+def abrir_carpeta(nombre, abrir=None):
+    """Abre en el explorador una de las carpetas conocidas."""
+    import unicodedata
+
+    if not isinstance(nombre, str) or not nombre.strip():
+        return "No me dijiste que carpeta abrir."
+
+    # Se quitan los acentos antes de comparar: la transcripcion de voz escribe
+    # "imagenes" o "imagenes" con tilde segun el dia, y son la misma carpeta.
+    limpio = "".join(
+        c for c in unicodedata.normalize("NFD", nombre.strip().lower())
+        if unicodedata.category(c) != "Mn"
+    )
+
+    carpetas = _carpetas_conocidas()
+    destino = carpetas.get(limpio)
+    if destino is None:
+        for clave, ruta in carpetas.items():
+            if clave in limpio or limpio in clave:
+                destino, limpio = ruta, clave
+                break
+
+    if destino is None:
+        return ("No conozco ninguna carpeta que se llame " + nombre + ". Puedo abrir: "
+                + ", ".join(sorted(carpetas)) + ".")
+    if not destino.exists():
+        return "La carpeta " + limpio + " no existe en esta computadora."
+
+    try:
+        if abrir is not None:
+            abrir(destino)
+        else:
+            import os
+            os.startfile(destino)
+    except Exception:  # noqa: BLE001
+        return "No pude abrir la carpeta " + limpio + "."
+    return "Listo, abri la carpeta " + limpio + "."
+
+
+def reproducir_youtube(busqueda, lanzar=None):
+    """Busca algo en YouTube y abre los resultados en el navegador.
+
+    Se abre la BUSQUEDA y no un video concreto a proposito: para saber cual es el video
+    correcto habria que consultar la API de YouTube, que exige clave, cuota y otra
+    dependencia. Abrir la busqueda deja elegir a la persona, que es lo que cualquiera
+    hace de todos modos.
+    """
+    from urllib.parse import quote_plus
+
+    if not isinstance(busqueda, str) or not busqueda.strip():
+        return "No me dijiste que buscar en YouTube."
+
+    consulta = quote_plus(busqueda.strip())
+    url = "https://www.youtube.com/results?search_query=" + consulta
+    # Pasa por la MISMA validacion de lista blanca que abrir_pagina. La url la
+    # construimos nosotros, pero validarla igual no cuesta nada y evita que un cambio
+    # futuro se salte el control sin que nadie lo note.
+    return abrir_pagina(url, lanzar=lanzar)
+
 # ===========================================================================
 # Despachador: el unico punto por el que una peticion del modelo se ejecuta
 # ===========================================================================
@@ -583,6 +823,10 @@ _IMPLEMENTACIONES = {
     "calcular": lambda a: calcular(a.get("expresion", "")),
     "clima": lambda a: clima(a.get("ciudad", "")),
     "hora": lambda a: hora(),
+    "volumen": lambda a: volumen(a.get("accion", "")),
+    "brillo": lambda a: brillo(a.get("accion", "")),
+    "abrir_carpeta": lambda a: abrir_carpeta(a.get("carpeta", "")),
+    "reproducir_youtube": lambda a: reproducir_youtube(a.get("busqueda", "")),
     "estado_laptop": lambda a: estado_laptop(),
     "buscar_web": lambda a: buscar_web(a.get("consulta", "")),
     "abrir_pagina": lambda a: abrir_pagina(a.get("url", "")),
