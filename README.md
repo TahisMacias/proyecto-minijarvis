@@ -162,7 +162,7 @@ Que cambia cuando entra el respaldo, medido en una laptop sin tarjeta grafica:
 | Oir | Whisper en la nube, ~2 s | Whisper local (`base`), ~2 s |
 | Pensar | Qwen3.8, billones de parametros, 1-3 s | Qwen2.5-0.5B, 494 millones, ~4 palabras/s |
 | Hablar | voz neuronal de Microsoft | voz de Windows, mas robotica |
-| Herramientas | las cinco | ninguna |
+| Herramientas | las diez | ninguna |
 
 **La diferencia se nota y la aplicacion no la disimula**: cuando el respaldo entra, lo
 dice en la conversacion y aparece un aviso ambar arriba a la derecha.
@@ -182,7 +182,7 @@ Dos cosas que el respaldo NO hace, a proposito:
   ante falta de red. Cambiar al modelo pequeno ante un problema de credenciales
   esconderia la causa real.
 - **No usa herramientas.** Un modelo de 494 millones de parametros no elige bien entre
-  cinco herramientas, y una llamada mal elegida es peor que ninguna.
+  diez herramientas, y una llamada mal elegida es peor que ninguna.
 
 El modulo de exploracion del Transformer **siempre** funciona sin internet, porque BETO
 se ejecuta en local desde el principio.

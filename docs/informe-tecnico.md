@@ -23,7 +23,8 @@ recordando lo que se hablo en turnos anteriores.
 
 Ademas de conversar, **usa herramientas**: resuelve operaciones matematicas de forma
 exacta, dice la hora, consulta el clima y el estado real de la computadora, busca en
-internet y abre paginas web de una lista autorizada.
+internet, abre paginas de una lista autorizada, sube y baja el volumen y el brillo,
+abre carpetas y pone musica en YouTube. Son diez en total.
 
 Y junto a la conversacion, la misma ventana muestra **que le pasa por dentro a un
 Transformer** con la ultima frase dicha: en que pedazos se corta, que numero le
