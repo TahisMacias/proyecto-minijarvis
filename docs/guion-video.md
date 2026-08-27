@@ -11,6 +11,29 @@ El video tiene DOS trabajos, y el segundo es el que la gente olvida:
 
 ---
 
+# QUE CUBRE ESTE VIDEO, Y QUE NO
+
+La rubrica reparte 100 puntos en seis criterios. **El video llega directamente al 65 %**;
+el resto se juzga mirando el repositorio, leyendo el informe y hablando contigo.
+
+| Criterio | Peso | ¿Se ve en el video? |
+|---|---|---|
+| Comprension del Transformer y del LLM | **25 %** | **SI** — bloque del laboratorio (1:50) |
+| Funcionalidad del asistente de voz | **25 %** | **SI** — el turno completo (0:20) |
+| Interfaz y experiencia de usuario | 15 % | **SI** — se ve sola, y se narran los estados |
+| Calidad del codigo | 15 % | no: se juzga del repositorio |
+| Informe tecnico | 10 % | no: es el documento |
+| Sustentacion y demo en vivo | 10 % | **el video ES el respaldo** si la demo falla |
+
+Por eso el bloque del laboratorio no se recorta nunca: es el unico sitio del video
+donde se demuestra el criterio de mas peso.
+
+Y por eso conviene narrar lo que se ve en pantalla en vez de callarse: la rubrica dice
+que dentro de cada criterio se evalua **"la claridad con la que el equipo puede explicar
+sus decisiones"**. Ensenar sin explicar deja la mitad de los puntos sobre la mesa.
+
+---
+
 ## ANTES DE GRABAR — seis comprobaciones de dos minutos
 
 - [ ] **Wifi encendido** y funcionando.
@@ -81,13 +104,21 @@ Lo que va **entre comillas** es lo que dices tu. Lo que va en *cursiva* es lo qu
 *Cuando responda, senala la linea que dice "usando la herramienta calcular":*
 
 > "Ahi se ve: el modelo no lo calculo de cabeza, pidio la herramienta. Python hizo la
-> cuenta y le devolvio el resultado exacto. Tiene seis herramientas: calcular, la hora,
-> el clima, el estado de la laptop, busqueda web y abrir paginas de una lista
-> autorizada."
+> cuenta y le devolvio el resultado exacto."
 
-*Si te sobra tiempo, una segunda:*
+*Y una segunda, que ensena que tambien controla la computadora:*
 
-> **"Elena, ¿que hora es?"**
+> **"Elena, pon musica de Bad Bunny en YouTube"**
+
+*Cuando se abra el navegador, vuelve a la ventana y remata:*
+
+> "Tiene diez herramientas: calcular, la hora, el clima, el estado de la laptop,
+> busqueda web, abrir paginas de una lista autorizada, subir y bajar el volumen y el
+> brillo, abrir carpetas y poner musica. Ninguna la ejecuta el modelo: el modelo solo
+> PIDE, y mi codigo decide si se hace."
+
+**Esa ultima frase vale mucho** y cuesta cinco segundos: demuestra que entiendes como
+funciona el tool calling por dentro, no solo que lo tienes.
 
 ---
 
@@ -165,7 +196,7 @@ responde bien y demuestra exactamente lo mismo.
 
 Recorta en este orden. Lo de arriba se va primero:
 
-1. La segunda herramienta (la hora).
+1. La segunda herramienta (YouTube).
 2. Los controles de sustentacion enteros (2:40 – 3:10).
 3. El modo sin internet.
 
