@@ -241,10 +241,52 @@ def test_un_sitio_permitido_si_lanza_el_comando_correcto():
 
 def test_si_falta_el_navegador_se_explica_sin_reventar():
     def lanzar_que_falla(_comando):
-        raise FileNotFoundError("no existe msedge.exe")
+        raise FileNotFoundError("el ejecutable no esta")
 
     respuesta = abrir_pagina("https://google.com", lanzar=lanzar_que_falla)
-    assert "No encontre Microsoft Edge" in respuesta
+    assert "No encontre el navegador" in respuesta
+
+
+def test_se_busca_el_navegador_en_vez_de_fijarlo():
+    """La ruta del navegador NO puede estar escrita a fuego.
+
+    La primera version tenia la de Edge en una constante. Funcionaba en esta maquina y
+    era un problema en cualquier otra: la duena usa Brave. Ahora se busca entre los
+    Chromium habituales, con Brave primero.
+    """
+    from tools.system_skills import _buscar_navegador
+
+    encontrado = _buscar_navegador()
+    assert encontrado is None or encontrado.lower().endswith(".exe")
+
+    comando = construir_comando("https://google.com")
+    if encontrado is None:
+        assert comando is None, "sin navegador no puede haber comando"
+    else:
+        assert comando[0] == encontrado
+
+
+def test_sin_ningun_navegador_conocido_se_usa_el_del_sistema():
+    """No encontrar Brave, Edge ni Chrome no puede dejar la herramienta inservible:
+    cualquier Windows tiene un navegador predeterminado."""
+    import tools.system_skills as skills
+
+    original = skills._buscar_navegador
+    skills._buscar_navegador = lambda: None
+    abiertas = []
+    original_wb = None
+    try:
+        import webbrowser
+        original_wb = webbrowser.open
+        webbrowser.open = abiertas.append
+        respuesta = abrir_pagina("https://google.com")
+    finally:
+        skills._buscar_navegador = original
+        if original_wb is not None:
+            webbrowser.open = original_wb
+
+    assert abiertas == ["https://google.com"]
+    assert "Listo" in respuesta
 
 
 # ===========================================================================

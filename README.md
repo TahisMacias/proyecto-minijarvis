@@ -253,6 +253,7 @@ tests/                         pruebas deterministas (133)
 | Sintoma | Que revisar |
 |---|---|
 | `Falta la variable TOGETHER_API_KEY` | El archivo `.env` no existe o esta vacio. Repite el paso 4. |
+| "No encontre el navegador" | Instala Brave, Edge o Chrome, o comprueba que Windows tenga un navegador predeterminado. |
 | `No se encontro ningun microfono disponible` | Conecta un microfono y dale permiso en Configuracion > Privacidad > Microfono. |
 | "El servicio rechazo las credenciales" | La clave es incorrecta o la cuenta se quedo sin saldo. |
 | "Revisa tu conexion a internet" | Sin red. La aplicacion no se rompe: vuelve sola a reposo. |

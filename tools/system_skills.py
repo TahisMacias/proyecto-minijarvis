@@ -472,7 +472,6 @@ def clima(ciudad: str, pedir=None) -> str:
 # abrir_pagina - el unico sitio donde este proyecto lanza un proceso
 # ===========================================================================
 
-RUTA_EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 
 
 class UrlNoPermitida(ValueError):
@@ -510,32 +509,73 @@ def validar_url(url: str) -> str:
     return url.strip()
 
 
-def construir_comando(url_validada: str, ruta_navegador: str = RUTA_EDGE) -> list[str]:
+def _buscar_navegador():
+    """Devuelve la ruta del primer navegador que encuentre, o None.
+
+    SE BUSCA, NO SE ESCRIBE A FUEGO. La primera version tenia la ruta de Edge escrita
+    en una constante. Funcionaba en esta maquina y era un problema en cualquier otra:
+    la duena usa Brave, y una ruta fija de un navegador que la persona no usa es un
+    detalle que se nota en una demostracion.
+
+    El orden es deliberado: primero Brave, que es el que usa ella; despues Edge, que
+    viene con Windows y por lo tanto existe siempre; y Chrome al final. Los tres son
+    Chromium, asi que aceptan los mismos interruptores.
+
+    Si no hay ninguno, `abrir_pagina` cae al navegador predeterminado del sistema, que
+    funciona en cualquier maquina aunque sin control de la ventana.
+    """
+    import os
+    from pathlib import Path
+
+    programas = os.environ.get("ProgramFiles", r"C:\Program Files")
+    programas86 = os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)")
+    local = os.environ.get("LOCALAPPDATA", "")
+
+    candidatos = [
+        Path(local) / r"BraveSoftware\Brave-Browser\Application\brave.exe",
+        Path(programas) / r"BraveSoftware\Brave-Browser\Application\brave.exe",
+        Path(programas86) / r"BraveSoftware\Brave-Browser\Application\brave.exe",
+        Path(programas86) / r"Microsoft\Edge\Application\msedge.exe",
+        Path(programas) / r"Microsoft\Edge\Application\msedge.exe",
+        Path(programas) / r"Google\Chrome\Application\chrome.exe",
+        Path(programas86) / r"Google\Chrome\Application\chrome.exe",
+    ]
+    for ruta in candidatos:
+        try:
+            if ruta.is_file():
+                return str(ruta)
+        except OSError:
+            continue
+    return None
+
+
+def construir_comando(url_validada, ruta_navegador=None):
     """Arma el comando como LISTA de argumentos. Nunca como una cadena.
 
     Es la diferencia entre que el sistema trate la direccion como un dato o como parte
-    de una linea de ordenes. Con una lista y sin shell, unos caracteres raros dentro
-    de la direccion son solo caracteres raros.
+    de una linea de ordenes. Con una lista y sin shell, unos caracteres raros dentro de
+    la direccion son solo caracteres raros.
 
-    VENTANA NORMAL, NO PANTALLA COMPLETA. Las dos primeras versiones abrian el
-    navegador en modo kiosco. Funcionaba, y era un fastidio de usar: ocupaba la
-    pantalla entera, sin barra de titulo ni boton de cerrar, y la duena se quedaba
-    atrapada sin saber como salir. La respuesta "cierrala con Alt+F4" no es una
-    respuesta: si hay que explicar como salir de algo, ese algo esta mal hecho.
-    Ahora se abre una ventana corriente y maximizada, con su X.
+    VENTANA NORMAL, NO PANTALLA COMPLETA. Las dos primeras versiones abrian el navegador
+    en modo kiosco. Funcionaba, y era un fastidio de usar: ocupaba la pantalla entera,
+    sin barra de titulo ni boton de cerrar, y la duena se quedaba atrapada sin saber
+    como salir. "Cierrala con Alt+F4" no es una respuesta: si hay que explicar como
+    salir de algo, ese algo esta mal hecho.
 
     LA DIRECCION VA COMO ARGUMENTO SUELTO, NO PEGADA CON UN IGUAL. La primera version
-    generaba `--kiosk=https://...` y Edge abria su pagina de inicio en lugar de la
-    pedida: en Chromium esos interruptores no llevan valor, asi que al pegarle un
-    `=algo` la direccion se perdia. Lo encontro la duena el 2026-08-23. Ninguna prueba
-    lo habria visto, porque el comando estaba bien FORMADO; lo que estaba mal era su
-    significado para el programa que lo recibe.
+    generaba `--kiosk=https://...` y el navegador abria su pagina de inicio en lugar de
+    la pedida: en Chromium esos interruptores no llevan valor, asi que al pegarle un
+    `=algo` la direccion se perdia. Ninguna prueba lo habria visto, porque el comando
+    estaba bien FORMADO; lo que estaba mal era su significado para quien lo recibe.
 
-    `--no-first-run` evita que en un perfil recien creado Edge se plante en su
+    `--no-first-run` evita que en un perfil recien creado el navegador se plante en su
     asistente de bienvenida antes de mostrar nada.
     """
+    navegador = ruta_navegador or _buscar_navegador()
+    if navegador is None:
+        return None
     return [
-        ruta_navegador,
+        navegador,
         "--new-window",
         url_validada,
         "--start-maximized",
@@ -543,7 +583,7 @@ def construir_comando(url_validada: str, ruta_navegador: str = RUTA_EDGE) -> lis
     ]
 
 
-def abrir_pagina(url: str, lanzar=None, ruta_navegador: str = RUTA_EDGE) -> str:
+def abrir_pagina(url, lanzar=None, ruta_navegador=None):
     """Abre una url permitida en una ventana del navegador.
 
     `lanzar` se inyecta en las pruebas: se verifica que el comando este bien armado
@@ -556,6 +596,16 @@ def abrir_pagina(url: str, lanzar=None, ruta_navegador: str = RUTA_EDGE) -> str:
 
     comando = construir_comando(url_validada, ruta_navegador)
 
+    if comando is None:
+        # Ningun navegador conocido instalado. Se abre con el predeterminado del
+        # sistema, que existe siempre; se pierde el control de la ventana y no importa.
+        try:
+            import webbrowser
+            webbrowser.open(url_validada)
+        except Exception:  # noqa: BLE001
+            return "No encontre ningun navegador para abrir la pagina."
+        return "Listo, ya tienes " + url_validada + " abierta en el navegador."
+
     if lanzar is None:
         def lanzar(cmd):
             # shell=False es el valor por defecto y se deja explicito porque es la
@@ -565,16 +615,11 @@ def abrir_pagina(url: str, lanzar=None, ruta_navegador: str = RUTA_EDGE) -> str:
     try:
         lanzar(comando)
     except FileNotFoundError:
-        return (
-            "No encontre Microsoft Edge en esta computadora, asi que no pude abrir "
-            "la pagina."
-        )
+        return "No encontre el navegador en esta computadora, asi que no pude abrir la pagina."
     except Exception:  # noqa: BLE001
         return "No pude abrir la pagina en el navegador."
 
-    return f"Listo, ya tienes {url_validada} abierta en el navegador."
-
-
+    return "Listo, ya tienes " + url_validada + " abierta en el navegador."
 
 
 # ===========================================================================
