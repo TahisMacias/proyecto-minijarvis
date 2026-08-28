@@ -189,10 +189,17 @@ responde bien y demuestra exactamente lo mismo.
 
 ---
 
-## 3:30 – 3:45 · Cierre
+## 3:30 – 3:55 · Cierre, citando los modelos
 
-> "El codigo esta en un repositorio publico, con el informe tecnico y el modulo de
-> exploracion, que tambien se puede ejecutar por separado desde la consola. Gracias."
+La seccion 11 del enunciado exige **citar explicitamente que modelos y proveedores se
+usaron**. Va en el informe, pero decirlo tambien aqui cuesta quince segundos.
+
+> "Para terminar, los modelos: la voz a texto es Whisper, el modelo de lenguaje es
+> Qwen3.8 con Llama 3.3 de alternativa, los tres a traves de Together AI. La voz es
+> edge-tts de Microsoft. Y el modelo que abro por dentro en el laboratorio es BETO, un
+> BERT en espanol que corre aqui mismo. Ninguno lo entrene yo: todos son preentrenados,
+> como pide el enunciado. El codigo esta en un repositorio publico con el informe
+> tecnico. Gracias."
 
 ---
 

@@ -86,6 +86,10 @@
 - `docs/guion-video.md` (T-17): guion del video por bloques de tiempo, escrito para
   leerse mientras se graba. Incluye que recortar si sobra metraje y las tres frases
   minimas con las que el video ya cumple.
+- `docs/guion-sustentacion.md`: **el documento maestro para la sustentacion oral.**
+  Los modelos y por que esos, las seis preguntas guia con su respuesta escrita, la
+  arquitectura, las decisiones con su alternativa descartada, las limitaciones, la
+  etica y que hacer si algo falla en vivo.
 - `docs/guion-mapa-atencion.md`: como explicar el mapa de atencion, que es el 25 % de
   la rubrica. Escrito porque la duena miro el grafico y no lo entendia: correcto y sin
   explicar no vale como entregable.

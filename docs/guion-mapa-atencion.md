@@ -1,5 +1,10 @@
 # Como explicar el mapa de atencion
 
+> **Este documento explica SOLO el mapa.** Todo lo demas que te pueden preguntar en
+> la sustentacion -que modelos usas y por que, la arquitectura, las decisiones de
+> diseno, las limitaciones y que hacer si algo falla en vivo- esta en
+> `guion-sustentacion.md`.
+
 Esto es para la sustentacion oral y para el informe. Es el criterio de mayor peso de la
 rubrica: 25 %.
 
