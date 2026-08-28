@@ -1,5 +1,84 @@
 # Guion del video demostrativo
 
+# ⚡ VERSION EXPRES — 2 minutos y 50 segundos
+
+**Usa esta si la version larga se te fue de tiempo.** El enunciado corta en 4 minutos
+(seccion 8) y pasarse es un incumplimiento, no un detalle.
+
+Lo que se va: la segunda herramienta, los controles y el modo sin internet. **Duele y
+hay que hacerlo.** Esas tres cosas se ensenan igual de bien en la demo en vivo, donde
+tienes de diez a quince minutos; el video no es el sitio para meterlo todo.
+
+Lo que se queda cubre el 65 % de la rubrica igual que la version larga.
+
+---
+
+### 0:00 – 0:12 · Quien eres
+
+> "Soy Britany Macias, Desarrollo de Software, CENESTUR. Este es Mini-JARVIS, mi
+> proyecto integrador. La asistente se llama Elena y funciona por voz."
+
+### 0:12 – 1:00 · El pipeline y los estados
+
+*Manten la barra y di:* **"Hola Elena, ¿quien eres?"**
+
+*Mientras responde, narra sin pausas:*
+
+> "Miren la figura de la izquierda. Circulo turquesa latiendo: escuchando. Tres puntos
+> azules: pensando. Barras rosas: hablando. Se distinguen por color **y por forma**,
+> para que sirva tambien a una persona con daltonismo."
+
+### 1:00 – 1:30 · Una herramienta
+
+*Manten la barra y di:* **"Elena, ¿cual es la raiz cuadrada de 3340?"**
+
+> "Un modelo de lenguaje predice texto, no calcula. Ahi se ve que pidio la herramienta:
+> Python hizo la cuenta y le devolvio el resultado exacto. Tiene diez herramientas, y
+> ninguna la ejecuta el modelo: el modelo solo PIDE, mi codigo decide si se hace."
+
+### 1:30 – 2:30 · El laboratorio · **ESTO NO SE TOCA**
+
+> "Aqui abajo el laboratorio analiza lo que acabo de decir, con un Transformer real
+> corriendo en esta computadora."
+
+*Pulsa **ver los tokens**, dos segundos en pantalla.*
+
+> "Mi frase cortada en pedazos, cada uno con su numero. El modelo no lee palabras."
+
+*Cierra. Pulsa **mapa de atencion**.*
+
+> "Y esto es self-attention. Cada fila es una palabra preguntando a quien mirar; lo rosa
+> es a quien mira. La diagonal brillante: cada palabra atiende sobre todo a la que tiene
+> delante. Cada fila suma exactamente uno, porque es una distribucion de probabilidad."
+
+*Cierra.*
+
+### 2:30 – 2:50 · Cierre con los modelos
+
+> "Los modelos: Whisper para la voz a texto, Qwen3.8 para pensar con Llama 3.3 de
+> alternativa, los tres por Together AI, edge-tts para la voz, y BETO para el
+> laboratorio. Ninguno lo entrene yo. El codigo y el informe estan en un repositorio
+> publico. Gracias."
+
+---
+
+## Por que se te fue a 7 minutos, para que no vuelva a pasar
+
+Casi siempre es lo mismo, y ninguna es culpa tuya:
+
+- **Esperar a que Elena termine de hablar** sin decir nada. Narra POR ENCIMA de su voz:
+  el video se entiende igual y ahorras veinte segundos por turno.
+- **Las pausas entre bloques.** Encadena sin respirar de mas; si te trabas, sigue.
+- **Explicar de mas.** Cada frase del guion esta medida. Si te sales a improvisar, se
+  va el tiempo.
+
+**Truco:** pon un cronometro a la vista mientras grabas. Con ver el numero subiendo, el
+ritmo se ajusta solo.
+
+---
+
+# VERSION LARGA — 3 minutos y 55 segundos
+
 Duracion objetivo: **3 minutos y medio**. El enunciado pide entre 2 y 4 (seccion 8).
 
 El video tiene DOS trabajos, y el segundo es el que la gente olvida:
