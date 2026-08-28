@@ -19,14 +19,28 @@ customtkinter==6.0.0
 # de una dependencia ajena. Lo que se importa se declara y se fija.
 pillow==12.3.0
 
-# --- Reservadas para tareas AUN NO IMPLEMENTADAS ---
-# Estas tres se fijan por adelantado, pero hoy NO las importa ningun archivo del
-# proyecto. Se dejan declaradas para que la instalacion no cambie cuando se abran esas
-# tareas, y se dice aqui que estan sin usar para que nadie afirme lo contrario en el
-# informe ni en la sustentacion.
+# --- Herramientas de Tool Calling (T-15) ---
+# Las tres las importa tools/system_skills.py y hasta la revision del 2026-08-28 NINGUNA
+# estaba declarada aqui: el archivo seguia diciendo que eran "reservadas para tareas aun
+# no implementadas", texto que quedo de la Fase 1 y que dejo de ser cierto cuando T-15 se
+# implemento. En esta maquina no se noto porque ya estaban instaladas a mano.
 #
-#   psutil, duckduckgo-search  ->  herramientas de Tool Calling (T-15, Fase 2).
+# Por que importa: la seccion 6 del enunciado exige que el proyecto se pueda ejecutar en
+# UNA MAQUINA DISTINTA siguiendo el README. Sin estas lineas, un `pip install -r` limpio
+# deja fuera psutil y ddgs, y entonces `estado_laptop` y `buscar_web` fallan al usarlas.
 #
+# ddgs sustituye a duckduckgo-search, que es como se llamaba antes de la version 9: la
+# vieja devolvia cero resultados de forma intermitente y el modelo lo interpretaba como
+# falta de internet.
+#
+# httpx llega igualmente como dependencia de openai, pero aqui se importa DIRECTAMENTE
+# (tools/system_skills.py, para el clima), y lo que se importa se declara. Es el mismo
+# caso que pillow, doce lineas mas arriba.
+psutil==7.2.2
+ddgs==9.15.0
+httpx==0.28.1
+
+# --- Reservada para una tarea AUN NO IMPLEMENTADA ---
 #   tiktoken  ->  reservada para T-14. AVISO: hasta la revision del 2026-08-23 el
 #   comentario de este archivo decia que tiktoken servia para "el conteo de tokens del
 #   indicador de memoria". Era falso. core/memory.py NO usa ningun tokenizador: estima
