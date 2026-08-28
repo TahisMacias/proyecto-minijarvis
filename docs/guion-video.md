@@ -108,7 +108,11 @@ Lo que va **entre comillas** es lo que dices tu. Lo que va en *cursiva* es lo qu
 
 *Y una segunda, que ensena que tambien controla la computadora:*
 
-> **"Elena, pon musica de Bad Bunny en YouTube"**
+> **"Elena, pon musica para estudiar en YouTube"**
+
+*Aqui pide lo que TE guste: el artista, la cancion o el tipo de musica que sea. Sale tu
+voz en el video y va a quedar mas natural si dices algo que dirias de verdad. Lo unico
+que importa para la demostracion es que se vea que abre YouTube con lo que pediste.*
 
 *Cuando se abra el navegador, vuelve a la ventana y remata:*
 
@@ -196,7 +200,7 @@ responde bien y demuestra exactamente lo mismo.
 
 Recorta en este orden. Lo de arriba se va primero:
 
-1. La segunda herramienta (YouTube).
+1. La segunda herramienta (la de YouTube).
 2. Los controles de sustentacion enteros (2:40 – 3:10).
 3. El modo sin internet.
 
