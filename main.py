@@ -15,6 +15,27 @@ seria peor: la usuaria descubriria el problema recien al intentar hablar.
 from __future__ import annotations
 
 import sys
+from pathlib import Path
+
+# --- Cuando no hay consola (arranque con doble clic) ------------------------
+#
+# El lanzador `.bat` usa `pythonw.exe`, que es el mismo interprete SIN ventana negra
+# detras. Se cambio a peticion de la duena: esa consola salia en el video de la
+# sustentacion y quedaba fea.
+#
+# El precio es que `pythonw` deja `sys.stdout` y `sys.stderr` en None, y este archivo
+# imprime varios mensajes de arranque. Un `print()` contra None puede reventar, y
+# reventaria ANTES de abrir la ventana: doble clic y no pasa nada, sin ninguna pista.
+#
+# Asi que si no hay consola, los mensajes van a un archivo. No desaparecen: quedan
+# donde se pueden leer despues.
+if sys.stdout is None or sys.stderr is None:
+    _registro = open(
+        Path(__file__).resolve().parent / "registro-arranque.txt",
+        "w", encoding="utf-8", buffering=1,
+    )
+    sys.stdout = _registro
+    sys.stderr = _registro
 
 
 def main() -> int:

@@ -80,8 +80,9 @@ proyecto. Comprueba que el entorno virtual y el archivo `.env` esten en su sitio
 explica que falta si falta algo, y abre la aplicacion. Se le puede crear un acceso
 directo en el escritorio (clic derecho > Enviar a > Escritorio).
 
-Deja abierta la ventana negra que aparece detras: si se cierra, se cierra tambien el
-asistente.
+**No aparece ninguna ventana negra**: el lanzador usa `pythonw`, que es el mismo
+interprete sin consola. Los mensajes de arranque se guardan en `registro-arranque.txt`,
+en la carpeta del proyecto, por si algo falla y hace falta mirarlos.
 
 La forma manual, con el entorno virtual activado:
 

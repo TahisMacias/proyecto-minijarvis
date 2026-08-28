@@ -22,6 +22,11 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 
+# --- Registro de arranque cuando se abre con doble clic ---
+# El lanzador usa pythonw, que no tiene consola: los mensajes de arranque van
+# a este archivo en vez de perderse. Se regenera en cada arranque.
+registro-arranque.txt
+
 # --- Audio / artefactos temporales generados en runtime ---
 *.wav
 *.mp3
