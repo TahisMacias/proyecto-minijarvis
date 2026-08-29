@@ -46,3 +46,6 @@ Thumbs.db
 # --- Editores ---
 .vscode/
 .idea/
+
+# Copias de seguridad que genera Word al editar los informes
+*.wbk
