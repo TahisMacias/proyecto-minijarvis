@@ -246,7 +246,8 @@ tools/system_skills.py         lo que hacen las herramientas (sin eval, lista bl
 gui/desktop_app.py             la ventana
 main.py                        punto de entrada
 exploration/transformer_lab.py laboratorio del Transformer (independiente)
-tests/                         pruebas deterministas (133)
+docs/hacer-informe-docx.py     convierte el informe de markdown a Word
+tests/                         pruebas deterministas (189)
 ```
 
 ## Si algo falla
