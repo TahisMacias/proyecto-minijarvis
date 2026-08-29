@@ -4,7 +4,8 @@
 - `APPCORE.md`: hechos estables de producto y arquitectura objetivo.
 - `CURRENT.md`: estado activo, bloqueos y siguiente accion.
 - `CONTEXT.md`: decisiones y handoffs en orden cronologico.
-- `PLAN_v1.0-entrega-27ago.md`: plan activo. 18 tareas en 3 fases con fechas de corte.
+- `archive/PLAN_v1.0-entrega-27ago.md`: plan CERRADO el 2026-08-28 tras la entrega.
+  18 tareas en 3 fases. No hay plan activo: el proyecto esta entregado.
 - `TESTING.md`: checks humanos H-01 a H-18 mas la regresion R-01.
 - `archive/PLAN_v0.1-fundamentos.md`: superseded, nunca ejecutado. Se escribio antes
   de conocer la fecha de entrega.

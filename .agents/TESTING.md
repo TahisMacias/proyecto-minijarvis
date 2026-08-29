@@ -101,6 +101,25 @@ directa de codigo desde este archivo.
 
 ## Results
 
+- Date: **2026-08-28** (cierre de entrega). El recorrido manual completo de la Fase 1
+  es del 2026-08-14 y su detalle se conserva mas abajo.
+- Environment: Windows 11 Pro 10.0.26200; Python 3.14.5 fijado en T-01; venv en `.venv/`
+- Automatico: **189 pruebas en verde** en unos doce segundos, sin red, sin microfono y
+  sin gastar saldo de API. El codigo compila entero. Ninguna dependencia importada
+  queda sin declarar en `requirements.txt`.
+- Secretos: barrido sobre **todo el historial**, no solo sobre HEAD. `.env` nunca fue
+  versionado. El ZIP de entrega tampoco lo contiene y la clave no aparece en ninguno
+  de sus 79 archivos.
+- Verdict: **ENTREGADO CON CHECKS HUMANOS PENDIENTES.** Lo automatico esta verificado.
+  Lo perceptivo, no: H-09 BIS, H-10, H-11, H-12, H-14, H-16, H-18 y R-01 siguen sin
+  firmar. H-17 y H-19 se dan por firmados de hecho (video entregado; modo sin internet
+  probado, reprobado, corregido y vuelto a probar por la duena).
+  El detalle y la razon de cerrar asi estan en `CURRENT.md`.
+
+---
+
+### Historico: recorrido manual del 2026-08-14
+
 - Date: 2026-08-14 (recorrido manual completo de la Fase 1 + auditoria de cierre)
 - Environment: Windows 11 Pro 10.0.26200; **Python 3.14.5** fijado en T-01;
   venv en `.venv/`

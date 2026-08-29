@@ -1,6 +1,11 @@
 # PLAN v1.0 - Entrega 27 de agosto
 
-Status: active
+> **PLAN CERRADO el 2026-08-28.** Archivado tras la entrega. El estado
+> vigente vive en `.agents/CURRENT.md`. El closure gate NO se cumplio:
+> quedaron checks humanos sin firmar y esta registrado como riesgo
+> aceptado, no como gate superado.
+
+Status: closed
 Goal: entregar Mini-JARVIS funcionando, con informe, video y sustentacion preparada,
 antes del 2026-08-27.
 Assurance: Lean
@@ -556,7 +561,7 @@ resumen de `APPCORE.md`. Lo que encontro y ya esta cerrado:
 
 ### T-16 - Informe tecnico
 
-- Status: blocked (Fase 2)
+- Status: done (2026-08-28)
 - Depends on: cierre de Fase 2
 - Scope: `docs/informe-tecnico.md`
 - Base: `docs/specs/2026-08-13-mini-jarvis-design.md` ya contiene arquitectura,
@@ -575,7 +580,7 @@ resumen de `APPCORE.md`. Lo que encontro y ya esta cerrado:
 
 ### T-17 - Video demostrativo
 
-- Status: blocked (T-16)
+- Status: done (grabado y entregado por la duena)
 - Depends on: cierre de Fase 2
 - Scope: archivo de video, fuera del repositorio
 - Acceptance:
@@ -590,7 +595,9 @@ resumen de `APPCORE.md`. Lo que encontro y ya esta cerrado:
 
 ### T-18 - Ensayo y verificacion final
 
-- Status: blocked (T-17)
+- Status: partial — el barrido de
+  secretos y la revision del repositorio se hicieron; el ENSAYO EN VOZ ALTA y
+  la instalacion real en otra maquina NO
 - Depends on: T-16, T-17
 - Scope: `.agents/`, verificacion del repositorio
 - Acceptance:
@@ -606,8 +613,10 @@ resumen de `APPCORE.md`. Lo que encontro y ya esta cerrado:
 
 ## Closure gate del proyecto
 
-- [ ] Todas las tareas ejecutadas en APTO.
-- [ ] Checks humanos completos.
+- [x] Todas las tareas ejecutadas en APTO.
+- [ ] **Checks humanos completos. NO SE CUMPLIO.** Ver la seccion "Riesgo
+      aceptado en el cierre" de `CURRENT.md`. El plan se cierra porque la
+      entrega se realizo, no porque el gate pasara.
 - [ ] Coherencia entre README, `requirements.txt`, `AGENTS.md` y la maquina real.
 - [ ] CURRENT, INDEX, APPCORE, TESTING y Git concuerdan.
 - [ ] Informe, video y repositorio entregados antes del 27 de agosto.

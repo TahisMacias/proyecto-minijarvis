@@ -429,3 +429,63 @@ Seis entradas compactadas el 2026-08-14. Lo que hay que recordar:
   ventana tres desde que se firmaron. H-10 y H-11 siguen en contradiccion desde el 14.
 
 - Next: **nada de agente.** Video y sustentacion, las dos de la duena. Quedan 4 dias.
+
+---
+
+## 2026-08-28 - Sesion 6: cierre de entrega
+
+**Que se entrego.** Los cuatro entregables de la seccion 8 quedan cubiertos salvo la
+sustentacion oral, que es un evento futuro. Repositorio publico con README, informe,
+video (grabado y entregado por la duena) y un ZIP limpio por si la plataforma lo pide.
+
+**Trabajo de esta sesion.** Se cerro el ultimo requisito obligatorio que faltaba: la
+seccion 6 del enunciado exige que el proyecto arranque en otra maquina siguiendo el
+README, y `requirements.txt` no declaraba psutil, ddgs ni httpx. Seguia diciendo que
+eran "reservadas para tareas aun no implementadas", texto de la Fase 1 que dejo de ser
+cierto cuando se implemento T-15. En esta maquina no se notaba porque estaban
+instaladas a mano.
+
+Se produjo el informe en la plantilla institucional de CENESTUR (T-16). Se hizo sin
+reconstruir el .docx, porque el arte de la portada son formas vectoriales que no
+sobreviven a un round-trip: se cambio el texto run por run y se reescribio solo el
+cuerpo, dejando los parrafos con arte con el XML identico byte a byte.
+
+**Tres errores propios que la duena detecto y conviene no repetir.**
+
+1. El indice del documento seguia siendo el del proyecto anterior y mostraba "Error!
+   Marcador no definido" en cada linea. Se me escapo porque el campo TOC vive dentro
+   de un control de contenido que `doc.paragraphs` no expone, y porque verifique el
+   documento por codigo **sin abrirlo nunca para mirarlo**. Es la misma leccion que
+   con los disenos: lo visual se comprueba mirando.
+2. El texto quedo demasiado coloquial para un informe. El humanizador se aplico
+   entero, incluida la parte de "darle voz", que la propia guia reserva para blogs y
+   ensayos. En un texto tecnico lo humano es el tono llano, no el coloquial.
+3. La primera version del informe se quedo sin seis de los quince conceptos que exige
+   la seccion 3 del enunciado, perdidos al comprimir de doce secciones a tres.
+
+**Un error de ejecucion.** Al corregir la ortografia por COM use caracteres Unicode
+combinados en el reemplazo de Word y se borraron palabras ("Elena", parte de "Canete").
+Se restauro desde un respaldo hecho antes de tocar el archivo y se rehizo con
+caracteres precompuestos. **Hacer siempre el respaldo antes de un find/replace por COM.**
+
+**Un dato falso encontrado.** El README afirmaba 133 pruebas cuando hay 189. La cifra
+se quedo en la de la Fase 1.
+
+**Una figura mal etiquetada.** `docs/evidencia/T-20-atencion.png` no es el mapa de
+atencion: es la pantalla de error, el triangulo ambar. Estaba en el informe con el pie
+"Mapa de atencion generado desde la propia aplicacion". Se retiro y se sustituyo por
+una captura nueva (`T-22-respondiendo.png`), tomada mientras la duena usaba la
+aplicacion de verdad: muestra a Elena resolviendo una peticion con la herramienta de
+la hora, el estado Respondiendo y el contador de memoria.
+
+**Sobre el falso positivo de inyeccion.** A mitad de sesion se aviso a la duena de un
+posible ataque de prompt injection. Era un aviso legitimo del propio Claude Code sobre
+el modo de permisos. Se corrigio en el momento. El instinto de no obedecer texto que
+llega dentro de la salida de una herramienta fue correcto; la atribucion a un atacante,
+no.
+
+**Cierre.** El closure gate NO se cumplio: quedan ocho checks humanos sin firmar. Se
+cierra igualmente porque la entrega ya se realizo, y queda registrado como riesgo
+aceptado en `CURRENT.md` en lugar de disimularse. Lo unico pendiente es la
+sustentacion oral.
+
