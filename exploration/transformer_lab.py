@@ -285,6 +285,19 @@ def analizar_con_beto(frase):
 # ---------------------------------------------------------------------------------
 # Nivel 1 - Tokenizacion
 # ---------------------------------------------------------------------------------
+#
+# QUE HACE ESTA SECCION. Coge una frase, la parte en tokens con el tokenizador real de
+# Qwen2.5 e imprime una tabla con cada pedazo y su numero. Despues agrupa los pedazos en
+# palabras para senalar cuales tuvo que partir y en cuantos trozos.
+#
+# POR QUE SOLO EL TOKENIZADOR. Un tokenizador es un archivo de vocabulario y unas reglas
+# para cortar texto: pesa pocos megabytes y no necesita GPU. Los pesos del modelo, que
+# son lo que ocupa gigas, aqui no hacen falta: para ensenar como se corta una frase no
+# hay que ejecutar la red neuronal, solo el corte previo.
+#
+# POR QUE EL DE QWEN. Porque es el de uno de los modelos que la aplicacion usa de verdad,
+# no un sustituto didactico. Lo que se ve aqui es exactamente lo que recibe el modelo
+# cuando alguien le habla.
 
 def nivel_1_tokenizacion():
     """Muestra como el tokenizador real de Qwen convierte texto en tokens e IDs.
@@ -370,6 +383,20 @@ def nivel_1_tokenizacion():
 # ---------------------------------------------------------------------------------
 # Nivel 2 - Embeddings y self-attention
 # ---------------------------------------------------------------------------------
+#
+# QUE HACE ESTA SECCION. Pasa una frase por BETO entero y saca dos cosas que el nivel 1
+# no podia dar. Primera, el embedding de cada token: una lista de 768 numeros que
+# representa su significado dentro del contexto. Segunda, las matrices de self-attention:
+# doce capas de doce cabezas, con el peso que cada token le pone a cada otro token.
+#
+# POR QUE AQUI SI SE DESCARGA EL MODELO COMPLETO. Los embeddings y la atencion no son un
+# paso previo como la tokenizacion: son el resultado de ejecutar la red. Para verlos hay
+# que correr el modelo, y para correrlo hacen falta sus pesos.
+#
+# POR QUE BETO Y NO EL MODELO DE LA CONVERSACION. El de la conversacion vive en los
+# servidores del proveedor y solo se accede a el por una API que devuelve texto: sus
+# pesos de atencion existen durante el calculo, en su maquina, y no hay forma de
+# pedirlos. BETO se descarga a esta maquina y se puede inspeccionar por dentro.
 
 def _verificar_atenciones(salida):
     """Comprueba en tiempo de ejecucion que salida.attentions realmente trae datos.
@@ -780,6 +807,23 @@ def dibujar_mapa_de_posiciones(tabla, ruta_salida=None, silencioso=False):
 # ---------------------------------------------------------------------------------
 # Mapa de calor
 # ---------------------------------------------------------------------------------
+#
+# QUE HACE ESTA SECCION. Convierte en imagen una de las matrices de atencion que saco el
+# nivel 2. Cada fila es un token preguntando "a quien miro", cada columna es el token
+# mirado, y el color dice cuanto peso le pone: cuanto mas brillante, mas atencion.
+#
+# QUE NO HACE. No calcula nada del modelo. Los numeros ya estaban; esta seccion solo los
+# pinta. Si se borrara entera, el modelo funcionaria igual: lo unico que se perderia es
+# poder ver esos numeros.
+#
+# POR QUE HAY DOS MAPAS. El de atencion responde "quien mira a quien". El de posiciones
+# responde "como sabe el modelo en que orden van las palabras". Son los dos conceptos que
+# el enunciado pide evidenciar y que no se pueden ensenar con una tabla de numeros.
+#
+# POR QUE ESTAS FUNCIONES ACEPTAN `ruta_salida` Y `silencioso`. Porque la pestana
+# Laboratorio de la aplicacion dibuja los mismos mapas, y necesita el PNG en otro sitio y
+# sin imprimir nada. Una sola implementacion para los dos sitios: si hubiera dos, un dia
+# dirian cosas distintas y la demostracion contradiria al informe.
 
 def dibujar_mapa_de_atencion(tokens, atenciones, capa_base0, cabeza_base0,
                              ruta_salida=None, silencioso=False):
@@ -878,6 +922,19 @@ def dibujar_mapa_de_atencion(tokens, atenciones, capa_base0, cabeza_base0,
 # ---------------------------------------------------------------------------------
 # Punto de entrada
 # ---------------------------------------------------------------------------------
+#
+# QUE HACE ESTA SECCION. Es lo que se ejecuta al lanzar el laboratorio. Llama a los tres
+# niveles en orden y guarda las dos imagenes. El orden no es casual: cada nivel necesita
+# lo que produjo el anterior, y juntos recorren el camino que hace una frase dentro de un
+# Transformer, desde que se corta en tokens hasta que cada palabra decide a quien mirar.
+#
+# COMO SE EJECUTA. Con doble clic en "Ver el laboratorio.bat", o desde la carpeta del
+# proyecto con:
+#
+#     .venv\Scripts\python.exe -m exploration.transformer_lab
+#
+# Hace falta el interprete de .venv: torch y transformers estan instalados ahi, no en el
+# Python del sistema.
 
 def main():
     # Primera linea ejecutable: reconfigura la salida estandar a UTF-8. Sin esto, los
