@@ -88,7 +88,7 @@ def test_cada_estado_tiene_ademas_su_propia_forma():
 # --- Borde saturado: la senal que si se puede nombrar -----------------------
 
 def test_cada_estado_tiene_borde_saturado_propio():
-    """Defecto reportado por la duena: el verde menta se veia azul en pantalla.
+    """Defecto detectado al probar la aplicacion: el verde menta se veia azul.
 
     Los tintes de nivel 50 son casi blancos. Como decoracion funcionan; como senal
     no. El borde saturado es lo que hace que el estado se pueda nombrar de un vistazo.

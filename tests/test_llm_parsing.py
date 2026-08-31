@@ -215,8 +215,8 @@ def test_el_mensaje_crudo_se_conserva_para_el_historial():
 # Un tiempo de espera agotado NO es quedarse sin internet (2026-08-23)
 # ===========================================================================
 #
-# La duena subio el slider de temperatura al maximo y la aplicacion, tras pensar un
-# buen rato, le dijo que revisara su conexion a internet. Su conexion estaba perfecta:
+# Se subio el slider de temperatura al maximo y la aplicacion, tras pensar un
+# buen rato, pidio revisar la conexion a internet. La conexion estaba perfecta:
 # lo que pasaba es que el modelo tardaba mas que el tiempo de espera. Midiendo contra
 # la API real, a temperatura 1.5 el servidor se atasca unos 100 segundos en dos de cada
 # tres intentos; por debajo de 1.45 nunca.

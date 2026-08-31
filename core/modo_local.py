@@ -2,8 +2,8 @@
 
 POR QUE EXISTE ESTE ARCHIVO. El enunciado permite modelo por API **o** local, y hasta
 el 2026-08-23 el proyecto solo hacia lo primero: sin conexion avisaba con elegancia y
-se quedaba quieto. La duena apago el wifi cuatro veces y cuatro veces dijo que asi no
-le servia. Es su proyecto: se hace.
+se quedaba quieto. Se apago el wifi cuatro veces, y cuatro veces quedo claro que un
+asistente que no responde no sirve de nada, por elegante que sea el aviso.
 
 QUE CAMBIA Y QUE NO. La nube sigue siendo el camino principal, porque es mucho mejor.
 Lo local es un RESPALDO que entra solo cuando el camino principal falla por falta de
@@ -37,7 +37,7 @@ from config import NOMBRE_ASISTENTE
 MODELO_LLM_LOCAL = "Qwen/Qwen2.5-0.5B-Instruct"
 
 # "base" es el equilibrio: "tiny" se come palabras y "small" tarda el triple. Con el
-# acento de la duena, base transcribe bien los numeros, que es la parte dificil.
+# acento de las pruebas, base transcribe bien los numeros, que es la parte dificil.
 MODELO_STT_LOCAL = "base"
 
 # Un candado por modelo: la carga puede tardar medio minuto y dos turnos seguidos no
@@ -368,8 +368,8 @@ def precalentar_en_segundo_plano(avisar=None) -> threading.Thread:
 
     POR QUE ESTO EXISTE. Sin precalentar, el primer turno sin internet tardaba mas de
     un minuto: 18 s en cargar Whisper, 37 s en cargar el modelo de lenguaje y otros
-    veinte en generar. La duena apago el wifi, vio "Pensando..." durante todo ese rato
-    y dio por hecho que no funcionaba. Tenia razon en darlo por hecho: **un minuto sin
+    veinte en generar. Al apagar el wifi se veia "Pensando..." durante todo ese rato,
+    y era razonable dar por hecho que no funcionaba: **un minuto sin
     ninguna senal es indistinguible de estar colgado.**
 
     Cargarlos por adelantado mueve esa espera al arranque, donde nadie la nota porque

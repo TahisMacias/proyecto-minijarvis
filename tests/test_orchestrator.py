@@ -538,7 +538,7 @@ def test_el_orquestador_no_importa_nada_de_la_gui():
 # --- El aviso tiene que durar lo suficiente para verse ---------------------
 
 def test_el_estado_de_atencion_se_queda_a_la_vista_antes_de_volver_a_reposo():
-    """Defecto reportado por la duena: el aviso ocurria pero nadie lo veia.
+    """Defecto detectado al probar la aplicacion: el aviso ocurria pero nadie lo veia.
 
     Las dos transiciones pasaban en la misma linea, asi que ATENCION duraba
     microsegundos. La maquina de estados era correcta y aun asi el indicador nunca se

@@ -20,7 +20,7 @@ from pathlib import Path
 # --- Cuando no hay consola (arranque con doble clic) ------------------------
 #
 # El lanzador `.bat` usa `pythonw.exe`, que es el mismo interprete SIN ventana negra
-# detras. Se cambio a peticion de la duena: esa consola salia en el video de la
+# detras. Se cambio porque esa consola aparecia en el video de la
 # sustentacion y quedaba fea.
 #
 # El precio es que `pythonw` deja `sys.stdout` y `sys.stderr` en None, y este archivo

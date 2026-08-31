@@ -1,4 +1,4 @@
-"""Pruebas del push-to-talk por teclado (defecto reportado por la duena, 2026-08-14).
+"""Pruebas del push-to-talk por teclado (defecto detectado al probar, 2026-08-14).
 
 EL DEFECTO: mantener presionada la barra espaciadora no servia para hablar. La causa
 es la repeticion automatica de teclas del sistema. Mientras una tecla sigue hundida,

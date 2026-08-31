@@ -146,7 +146,7 @@ class Orquestador:
         LA VUELTA A REPOSO SE RETRASA A PROPOSITO. Antes las dos transiciones ocurrian
         en la misma linea, asi que el estado ATENCION existia durante microsegundos:
         la maquina de estados era correcta y aun asi **nadie veia nunca el aviso**. Lo
-        reporto la duena probando la aplicacion sin red el 2026-08-14: veia el mensaje
+        detecto probando la aplicacion sin red el 2026-08-14: se veia el mensaje
         de texto, pero el indicador nunca se ponia en ATENCION. Un aviso que no se
         alcanza a ver no es un aviso.
         """

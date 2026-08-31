@@ -42,7 +42,7 @@ from config import DOMINIOS_PERMITIDOS
 # calcular - un LLM predice texto, no calcula
 # ===========================================================================
 #
-# Existe por un fallo real: la duena pregunto por la raiz cuadrada de 3340 y el modelo
+# Existe por un fallo real: se pregunto por la raiz cuadrada de 3340 y el modelo
 # contesto que no tenia calculadora pero podia dar una respuesta aproximada. Un modelo
 # de lenguaje predice la siguiente palabra; que acierte una cuenta es suerte
 # estadistica. Python si calcula, y es exacto.
@@ -332,8 +332,8 @@ def buscar_web(consulta: str, buscador=None) -> str:
     # SE REINTENTA UNA VEZ, y no por adorno. Con la libreria anterior
     # (`duckduckgo_search`, descontinuada) la MISMA consulta devolvia unas veces cuatro
     # resultados y otras cero, sin lanzar ningun error. El modelo recibia una busqueda
-    # vacia y contestaba que no tenia acceso a internet, que es exactamente lo que la
-    # duena vio el 2026-08-23 preguntando por el Big Ben. Se migro a `ddgs`, que en
+    # vacia y contestaba que no tenia acceso a internet, que es exactamente lo que se
+    # observo el 2026-08-23 preguntando por el Big Ben. Se migro a `ddgs`, que en
     # seis intentos seguidos respondio las seis veces, pero un buscador publico y
     # gratuito siempre puede tener un mal momento y esto se demuestra en vivo.
     resultados = []
@@ -366,8 +366,8 @@ def buscar_web(consulta: str, buscador=None) -> str:
 # clima - el dato que cualquiera le pide a un asistente de voz
 # ===========================================================================
 #
-# Lo pidio la duena: "debe funcionar cuando le pregunto el clima, tal y como funciona
-# Alexa". Es la peticion mas natural que recibe un asistente y no estaba cubierta.
+# Criterio: debe funcionar cuando se le pregunta el clima, igual que en cualquier
+# asistente comercial. Es la peticion mas natural que recibe uno y no estaba cubierta.
 #
 # Se usa open-meteo porque NO EXIGE CLAVE DE API ni registro. Anadir otro proveedor con
 # credenciales habria significado otra clave que guardar, otra que puede caducar la
@@ -514,7 +514,7 @@ def _buscar_navegador():
 
     SE BUSCA, NO SE ESCRIBE A FUEGO. La primera version tenia la ruta de Edge escrita
     en una constante. Funcionaba en esta maquina y era un problema en cualquier otra:
-    la duena usa Brave, y una ruta fija de un navegador que la persona no usa es un
+    aqui se usa Brave, y una ruta fija de un navegador que la persona no usa es un
     detalle que se nota en una demostracion.
 
     El orden es deliberado: primero Brave, que es el que usa ella; despues Edge, que
@@ -558,7 +558,7 @@ def construir_comando(url_validada, ruta_navegador=None):
 
     VENTANA NORMAL, NO PANTALLA COMPLETA. Las dos primeras versiones abrian el navegador
     en modo kiosco. Funcionaba, y era un fastidio de usar: ocupaba la pantalla entera,
-    sin barra de titulo ni boton de cerrar, y la duena se quedaba atrapada sin saber
+    sin barra de titulo ni boton de cerrar, y se quedaba uno atrapado sin saber
     como salir. "Cierrala con Alt+F4" no es una respuesta: si hay que explicar como
     salir de algo, ese algo esta mal hecho.
 
@@ -626,7 +626,7 @@ def abrir_pagina(url, lanzar=None, ruta_navegador=None):
 # Control del sistema: volumen, brillo, carpetas y YouTube
 # ===========================================================================
 #
-# Anadidas el 2026-08-27 a peticion de la duena, que vio estas mismas funciones en el
+# Anadidas el 2026-08-27 tras ver estas mismas funciones en el
 # proyecto de un companero. La seccion 5.2 del enunciado las contempla entre los
 # valores agregados: "integracion con funciones reales" y "control de archivos locales".
 #

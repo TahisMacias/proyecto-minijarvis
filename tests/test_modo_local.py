@@ -7,7 +7,7 @@ pierda nada por el camino.
 
 La regla que mas importa de todas es la ultima del archivo: un fallo de credenciales NO
 debe activar el respaldo. Si la clave esta mal, cambiar al modelo pequeno esconderia el
-problema real y la duena se pasaria la sustentacion preguntandose por que responde tan
+problema real y uno se pasaria la sustentacion preguntandose por que responde tan
 mal.
 """
 

@@ -397,27 +397,28 @@ def _verificar_atenciones(salida):
 # El softmax, ejecutado
 # ---------------------------------------------------------------------------------
 #
-# Se anadio el 2026-08-30, al notar la duena que en el codigo no habia ningun softmax:
-# la palabra solo aparecia dentro de un texto que se imprime. Tenia razon. Lo que habia
-# era la comprobacion de que las filas suman 1, que es la CONSECUENCIA del softmax, no
-# el softmax. Va aqui, dentro del Nivel 2, porque es lo que explica esa suma.
+# Mas abajo se verifica que cada fila de atencion suma 1.0. Esa suma es la CONSECUENCIA
+# del softmax, no el softmax: la operacion ocurre dentro del modelo, y los pesos llegan
+# aqui ya normalizados. Esta seccion aplica uno sobre puntajes propios para exponer la
+# operacion completa, no solo su efecto.
+#
+# Va dentro del Nivel 2, y no como un nivel aparte, porque no introduce un concepto
+# nuevo de los que exige la seccion 2.2 del enunciado: explica por que las filas de
+# atencion suman uno.
 
 def _demostrar_softmax():
-    """Ejecuta un softmax de verdad, para poder ensenar la operacion y no solo su efecto.
+    """Aplica un softmax sobre puntajes propios y muestra la operacion completa.
 
-    POR QUE HACE FALTA ESTO. Mas abajo se comprueba que cada fila de atencion suma 1.0,
-    y esa suma es la huella del softmax. Pero es solo la huella: el softmax en si ocurre
-    DENTRO del modelo, y cuando los numeros llegan aqui ya salieron normalizados. A la
-    pregunta "ensename tu softmax" no se podia responder senalando una suma.
+    QUE APORTA SOBRE LA VERIFICACION DE MAS ABAJO. Comprobar que una fila suma 1.0
+    evidencia el resultado del softmax, pero no la operacion: el calculo ocurre dentro
+    del modelo y los pesos se reciben ya normalizados. Aqui entran numeros sin
+    normalizar y salen probabilidades, de modo que la transformacion queda a la vista.
 
-    Asi que aqui se aplica uno de verdad, sobre puntajes inventados, para que se vea la
-    operacion completa: entran numeros cualesquiera y salen probabilidades que suman 1.
-
-    Y de paso resuelve otra pregunta del enunciado. La temperatura del modelo NO es un
-    parametro aparte: es una division que se hace a los puntajes ANTES del softmax.
-    Dividir por un numero pequeno separa los puntajes y el reparto se vuelve extremo;
-    dividir por uno grande los acerca y el reparto se aplana. Las dos preguntas, la del
-    softmax y la de la temperatura, son la misma operacion vista desde dos sitios.
+    RELACION CON LA TEMPERATURA. La temperatura no es un parametro independiente: es un
+    divisor que se aplica a los puntajes antes del softmax. Un divisor pequeno separa
+    los puntajes y concentra el reparto en la opcion mas probable; uno grande los acerca
+    y lo aplana. La tabla que imprime esta funcion recorre cinco valores para hacer
+    visible ese efecto, que es el mismo que produce el deslizador de la interfaz.
     """
     _subtitulo("Que es exactamente un softmax (ejecutado aqui, no explicado)")
     puntajes = torch.tensor([2.0, 1.0, 0.1])

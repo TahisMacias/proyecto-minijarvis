@@ -55,8 +55,8 @@ TOGETHER_API_KEY = _leer_api_key()
 # --- Paleta (rediseno T-20 "neon minimo", 2026-08-23) ------------------------
 #
 # Tercera version del aspecto de la aplicacion, y esta vez elegida MIRANDO. Se le
-# dibujaron a la duena tres bocetos -claro y amable, HUD estilo Iron Man, y neon
-# minimo- y eligio el tercero. Las dos versiones anteriores se disenaron adivinando lo
+# dibujaron tres bocetos -claro y amable, HUD estilo Iron Man, y neon
+# minimo- y se eligio el tercero. Las dos versiones anteriores se disenaron adivinando lo
 # que queria a partir de descripciones, y las dos fallaron.
 #
 # La idea de esta: casi todo el espacio vacio, una sola pieza protagonista, y el resto
@@ -112,7 +112,7 @@ MODELO_LLM_PREDETERMINADO = "Qwen/Qwen3.8-2.4T-A95B"
 
 # ALTERNO CAMBIADO EL 2026-08-23. El anterior, Qwen2.5-7B-Instruct-Turbo, funcionaba
 # el 14 de agosto y para el 17 devolvia HTTP 503 en todos los intentos: Together lo
-# retiro en esos tres dias. Lo encontro la duena usando el selector.
+# retiro en esos tres dias. Se detecto usando el selector de la ventana.
 #
 # Se probaron los 169 modelos de chat del catalogo uno por uno. Solo 20 responden. De
 # esos, en espanol y con este system prompt:
@@ -143,7 +143,7 @@ IDIOMA_STT = "es"
 #
 # El PROYECTO se llama Mini-JARVIS: es el nombre de la tarea y asi se queda en el
 # repositorio, el informe y la sustentacion. La ASISTENTE se llama Elena, que es a
-# quien le habla la duena.
+# quien se le habla.
 #
 # La seccion 4 del enunciado lo permite explicitamente: "la personalidad del asistente
 # (nombre, tono, estilo de respuesta) queda a criterio de cada equipo: puede ser una
@@ -155,7 +155,7 @@ IDIOMA_STT = "es"
 # modelo local lo leen todos de esta constante.
 NOMBRE_ASISTENTE = "Elena"
 
-# Voz elegida por la duena el 2026-08-23 escuchando ocho muestras de la misma frase.
+# Voz elegida el 2026-08-23 escuchando ocho muestras de la misma frase.
 # Es argentina y se llama Elena, igual que la asistente: el nombre y la voz van juntos.
 # Antes fueron es-MX-DaliaNeural y es-ES-XimenaNeural.
 VOZ_TTS = "es-AR-ElenaNeural"
@@ -165,7 +165,7 @@ VOZ_TTS = "es-AR-ElenaNeural"
 # Estas dos constantes existieron desde el 2026-08-14 con valores "+35Hz" y "+8%" y un
 # comentario que decia que la voz estaba ajustada, pero **ningun archivo las leia**:
 # eran dos constantes muertas afirmando un ajuste inexistente. Se conectaron de verdad
-# en core/tts_engine.py, y una vez conectadas se ponen a cero, porque la duena eligio
+# en core/tts_engine.py, y una vez conectadas se ponen a cero, porque se eligieron
 # las muestras SIN retoque. Se dejan declaradas porque el motor ya las respeta.
 TONO_TTS = "+0Hz"
 RITMO_TTS = "+0%"
@@ -173,7 +173,7 @@ RITMO_TTS = "+0%"
 
 # --- Captura de audio (correccion del 2026-08-14) ---------------------------
 # Whisper ALUCINA con audio vacio: ante silencio devuelve muletillas como "Gracias" o
-# "Subtitulos realizados por...". Lo detecto la duena pulsando y soltando sin hablar.
+# "Subtitulos realizados por...". Se detecto pulsando y soltando sin hablar.
 # La defensa es no enviarle nada que no tenga voz dentro: se exige una duracion minima
 # y un volumen minimo. De paso ahorra dinero, porque cada envio se paga.
 DURACION_MINIMA_GRABACION = 0.35  # segundos
@@ -189,7 +189,7 @@ UMBRAL_DE_SILENCIO = 180
 #
 # Historia de este numero, que ya va por su tercera version:
 #   instantaneo -> el estado ocurria durante microsegundos y nadie lo veia jamas.
-#   2.5 s       -> medido y correcto, y la duena SIGUIO sin verlo (2026-08-23).
+#   2.5 s       -> medido y correcto, y SEGUIA sin verse (2026-08-23).
 #   5.0 s       -> el actual.
 #
 # La segunda vez se comprobo con el mainloop real que la ventana SI pintaba el
@@ -244,8 +244,8 @@ TOP_P_PREDETERMINADO = 0.9
 
 # Tope del slider de temperatura. NO es un numero elegido a ojo: sale de medir.
 #
-# La duena movio el slider al maximo (1.5) y la aplicacion se quedo pensando y acabo
-# diciendo que no habia internet. Su conexion estaba perfecta. Midiendo la misma frase
+# Se movio el slider al maximo (1.5) y la aplicacion se quedo pensando y acabo
+# diciendo que no habia internet. La conexion estaba perfecta. Midiendo la misma frase
 # contra la API real, con el modelo de razonamiento predeterminado:
 #
 #     temp 0.0   ->    2.4 s        temp 1.35  ->    1.7 s

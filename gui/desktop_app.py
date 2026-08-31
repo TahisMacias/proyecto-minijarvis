@@ -18,7 +18,7 @@ aplicacion: si la unica pista fuera el color, para ella la interfaz no comunicar
 nada. Por eso cada estado tiene ademas su propia figura: circulo lleno, tres puntos,
 onda y triangulo. La forma no es decoracion.
 
-REDISENO T-19 (2026-08-23), pedido por la duena
+REDISENO T-19 (2026-08-23)
 ===============================================
 
 Tres cambios de fondo respecto a la ventana anterior:
@@ -173,7 +173,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         """Maqueta la ventana: cabecera arriba, reactor a la izquierda, todo lo demas
         apilado a la derecha.
 
-        DISENO C, "NEON MINIMO", elegido por la duena el 2026-08-23 entre tres bocetos
+        DISENO C, "NEON MINIMO", elegido el 2026-08-23 entre tres bocetos
         dibujados. Las dos versiones anteriores se disenaron adivinando a partir de
         descripciones y las dos fallaron; esta se eligio mirando.
 
@@ -344,7 +344,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
                                      pady=(10, 0))
 
         # El acceso al system prompt NO vive aqui: esta abajo, en la fila unica de
-        # botones junto a los del laboratorio. La pantalla de la duena da 760 px utiles
+        # botones junto a los del laboratorio. La pantalla de destino da 760 px utiles
         # y esta fila extra era justo lo que no cabia.
         return marco
 
@@ -855,7 +855,7 @@ class AplicacionMiniJarvis(customtkinter.CTk):
         No es decoracion. El mensaje de error sale en esta columna, el indicador de
         estado esta en la de al lado, y quien acaba de hablar mira el texto. Se
         comprobo con el mainloop real que el triangulo SI se dibujaba sus segundos
-        completos, y la duena aun asi no lo vio dos veces seguidas: para cuando
+        completos, y aun asi no se distinguia dos veces seguidas: para cuando
         terminaba de leer el aviso, la figura ya habia vuelto a reposo. El color une
         las dos mitades del mismo aviso, el que se lee y el que se ve.
         """

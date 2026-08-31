@@ -196,7 +196,7 @@ def test_la_url_viaja_en_un_solo_argumento():
 
 
 def test_la_url_va_suelta_y_no_pegada_al_interruptor():
-    """Defecto real que la duena encontro el 2026-08-23: pidio Wikipedia y salio Edge
+    """Defecto real encontrado el 2026-08-23: se pidio Wikipedia y salio Edge
     con su pagina de importar datos.
 
     En Chromium `--kiosk` es un INTERRUPTOR, no una opcion con valor. Escribir
@@ -251,7 +251,7 @@ def test_se_busca_el_navegador_en_vez_de_fijarlo():
     """La ruta del navegador NO puede estar escrita a fuego.
 
     La primera version tenia la de Edge en una constante. Funcionaba en esta maquina y
-    era un problema en cualquier otra: la duena usa Brave. Ahora se busca entre los
+    era un problema en cualquier otra: aqui se usa Brave. Ahora se busca entre los
     Chromium habituales, con Brave primero.
     """
     from tools.system_skills import _buscar_navegador
