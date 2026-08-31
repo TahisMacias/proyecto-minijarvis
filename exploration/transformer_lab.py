@@ -393,6 +393,59 @@ def _verificar_atenciones(salida):
         )
 
 
+def _demostrar_softmax():
+    """Ejecuta un softmax de verdad, para poder ensenar la operacion y no solo su efecto.
+
+    POR QUE HACE FALTA ESTO. Mas abajo se comprueba que cada fila de atencion suma 1.0,
+    y esa suma es la huella del softmax. Pero es solo la huella: el softmax en si ocurre
+    DENTRO del modelo, y cuando los numeros llegan aqui ya salieron normalizados. A la
+    pregunta "ensename tu softmax" no se podia responder senalando una suma.
+
+    Asi que aqui se aplica uno de verdad, sobre puntajes inventados, para que se vea la
+    operacion completa: entran numeros cualesquiera y salen probabilidades que suman 1.
+
+    Y de paso resuelve otra pregunta del enunciado. La temperatura del modelo NO es un
+    parametro aparte: es una division que se hace a los puntajes ANTES del softmax.
+    Dividir por un numero pequeno separa los puntajes y el reparto se vuelve extremo;
+    dividir por uno grande los acerca y el reparto se aplana. Las dos preguntas, la del
+    softmax y la de la temperatura, son la misma operacion vista desde dos sitios.
+    """
+    _subtitulo("Que es exactamente un softmax (ejecutado aqui, no explicado)")
+    puntajes = torch.tensor([2.0, 1.0, 0.1])
+    print(f"Tres puntajes cualesquiera:      {[round(v, 2) for v in puntajes.tolist()]}")
+    print("Son numeros sueltos: no suman nada en particular y pueden ser negativos.")
+
+    probabilidades = torch.softmax(puntajes, dim=0)
+    print(f"Los mismos, tras el softmax:     "
+          f"{[round(v, 4) for v in probabilidades.tolist()]}")
+    print(f"Suma:                            {probabilidades.sum().item():.6f}")
+    print(
+        "Eso es todo lo que hace el softmax: convierte una lista de puntajes en una "
+        "distribucion de probabilidad. Todos los valores quedan entre 0 y 1, el orden "
+        "se conserva -el mas alto sigue siendo el mas alto- y el total es exactamente 1."
+    )
+
+    print()
+    print("Y la TEMPERATURA es este mismo calculo, dividiendo antes los puntajes:")
+    print(f"{'temperatura':>14}   reparto resultante")
+    for temperatura in (0.1, 0.5, 1.0, 2.0, 5.0):
+        reparto = torch.softmax(puntajes / temperatura, dim=0)
+        valores = "  ".join(f"{v:.3f}" for v in reparto.tolist())
+        print(f"{temperatura:>14.1f}   {valores}")
+    print(
+        "Con temperatura baja el reparto se vuelve extremo: casi todo se lo lleva la "
+        "opcion mas probable, y el modelo suena predecible. Con temperatura alta el "
+        "reparto se aplana, las opciones improbables ganan peso, y el modelo se vuelve "
+        "mas variado y tambien mas propenso a equivocarse. Es la misma operacion; lo "
+        "unico que cambia es entre cuanto se dividen los puntajes antes."
+    )
+    print(
+        "En la atencion ocurre exactamente esto, pero los puntajes no son inventados: "
+        "salen de comparar cada token con todos los demas, y el softmax convierte esas "
+        "comparaciones en el reparto de atencion que se ve en el mapa."
+    )
+
+
 def nivel_2_embeddings_y_atencion():
     """Extrae embeddings y matrices de self-attention reales de BETO.
 
@@ -486,6 +539,8 @@ def nivel_2_embeddings_y_atencion():
         f"  - Dimension 4 ({forma_capa[3]}): token CONSULTADO (key) - la columna: "
         "'a este otro token, cuanto lo miro'."
     )
+
+    _demostrar_softmax()
 
     _subtitulo("Verificacion: cada fila de atencion suma 1.0")
     fila = atenciones[0][0, 0, 1]  # capa 0, cabeza 0, token consultante 1 (la primera palabra real)
