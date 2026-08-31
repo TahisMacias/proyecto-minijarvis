@@ -393,6 +393,15 @@ def _verificar_atenciones(salida):
         )
 
 
+# ---------------------------------------------------------------------------------
+# El softmax, ejecutado
+# ---------------------------------------------------------------------------------
+#
+# Se anadio el 2026-08-30, al notar la duena que en el codigo no habia ningun softmax:
+# la palabra solo aparecia dentro de un texto que se imprime. Tenia razon. Lo que habia
+# era la comprobacion de que las filas suman 1, que es la CONSECUENCIA del softmax, no
+# el softmax. Va aqui, dentro del Nivel 2, porque es lo que explica esa suma.
+
 def _demostrar_softmax():
     """Ejecuta un softmax de verdad, para poder ensenar la operacion y no solo su efecto.
 
