@@ -411,7 +411,7 @@ suficiente contra su relleno y contra el fondo de la ventana.
 ## 9. Verificacion
 
 Hay 189 pruebas automaticas que corren en unos doce segundos, sin red, sin microfono y
-sin gastar saldo de API. El historial son 74 commits, uno por tarea.
+sin gastar saldo de API. El historial son 81 commits, uno por tarea.
 
 Las pruebas mas utiles del proyecto no comprueban comportamientos sino prohibiciones:
 que el orquestador no importe la interfaz, que `tools/` no contenga `eval`, que dos
